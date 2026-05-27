@@ -209,7 +209,38 @@ Client Signature: ____________________
 
 Performer Signature: __________________`;
   }
+function downloadInvoice() {
+  if (!selectedGig) return;
 
+  const balance = Math.max(Number(selectedGig.fee || 0) - Number(selectedGig.paid || 0), 0);
+
+  const invoiceText = `
+INVOICE
+
+Client: ${selectedGig.client || ''}
+Event: ${selectedGig.title || ''}
+Venue: ${selectedGig.venue || ''}
+Date: ${selectedGig.date || ''}
+Time: ${selectedGig.time || ''}
+
+Fee: ${currency(selectedGig.fee)}
+Deposit: ${currency(selectedGig.deposit)}
+Paid: ${currency(selectedGig.paid)}
+Balance Due: ${currency(balance)}
+
+Thank you for your business.
+`;
+
+  const blob = new Blob([invoiceText], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+
+  link.href = url;
+  link.download = `${selectedGig.title || 'invoice'}-invoice.txt`;
+  link.click();
+
+  URL.revokeObjectURL(url);
+}
   function copyContract() {
     if (!selectedGig) return;
 
@@ -305,7 +336,9 @@ Performer Signature: __________________`;
                   <CheckCircle2 size={16} /> Mark paid
                 </button>
 
-                <button type="button" onClick={copyContract}>
+                <button type="button" onClick={copyContract}><button type="button" onClick={downloadInvoice}>
+  Download invoice
+</button>
                   <FileText size={16} /> Copy contract
                 </button>
               </div>
