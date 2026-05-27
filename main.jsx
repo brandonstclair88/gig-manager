@@ -952,12 +952,4 @@ function Card({ icon, label, value }) {
 
     </div>
 
-  );
-
-}
-
-createRoot(
-
-  document.getElementById('root')
-
-).render(<App />);
+ 
