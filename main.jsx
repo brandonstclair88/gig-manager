@@ -342,11 +342,3 @@ function Card({ icon, label, value }) {
     <div className="card">
       {icon}
       <div>
-        <span>{label}</span>
-        <strong>{value}</strong>
-      </div>
-    </div>
-  );
-}
-
-createRoot(document.getElementById('root')).render(<App />);
