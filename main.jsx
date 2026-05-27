@@ -382,4 +382,5 @@ function Card({ icon, label, value }) {
   );
 }
 
-createRoot
+createRoot(document.getElementById('root')).render(<App />);
+
