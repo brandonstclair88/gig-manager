@@ -130,7 +130,7 @@ function App() {
 
   const stats = useMemo(() => {
     const total = gigs.reduce((sum, g) => sum + Number(g.paid || 0), 0);
-    const outstanding = gigs.reduce((sum, g) => sum + Math.max(Number(g.fee || 0) - Number(g.paid || 0), 0);
+    const outstanding = gigs.reduce((sum, g) => sum + Math.max(Number(g.fee || 0) - Number(g.paid || 0), 0), 0);
     const upcoming = gigs.filter(g => g.date && new Date(g.date) >= new Date(new Date().toDateString())).length;
     return { total, outstanding, upcoming };
   }, [gigs]);
