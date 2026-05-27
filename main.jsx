@@ -8,7 +8,7 @@ import {
   Music,
   Bell,
   Plus,
-  CheckCircle2,
+  CheckCircle2
 } from 'lucide-react';
 import './styles.css';
 
@@ -20,7 +20,7 @@ const supabase = createClient(
 function currency(n) {
   return Number(n || 0).toLocaleString(undefined, {
     style: 'currency',
-    currency: 'USD',
+    currency: 'USD'
   });
 }
 
@@ -42,7 +42,7 @@ function App() {
     paid: '',
     setlist: '',
     notes: '',
-    practice_date: '',
+    practice_date: ''
   });
 
   useEffect(() => {
@@ -54,31 +54,42 @@ function App() {
       setUser(session?.user || null);
     });
 
-    return () => data.subscription.unsubscribe();
+    return () => {
+      data.subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
-    if (user) loadGigs();
-    else setGigs([]);
+    if (user) {
+      loadGigs();
+    } else {
+      setGigs([]);
+      setSelectedGigId(null);
+    }
   }, [user]);
 
   async function signUp() {
     const { error } = await supabase.auth.signUp({
       email: authEmail,
-      password: authPassword,
+      password: authPassword
     });
 
-    if (error) alert(error.message);
-    else alert('Check your email to confirm your account.');
+    if (error) {
+      alert(error.message);
+    } else {
+      alert('Check your email to confirm your account.');
+    }
   }
 
   async function signIn() {
     const { error } = await supabase.auth.signInWithPassword({
       email: authEmail,
-      password: authPassword,
+      password: authPassword
     });
 
-    if (error) alert(error.message);
+    if (error) {
+      alert(error.message);
+    }
   }
 
   async function signOut() {
@@ -97,7 +108,10 @@ function App() {
     }
 
     setGigs(data || []);
-    if (data?.length) setSelectedGigId(data[0].id);
+
+    if (data && data.length > 0) {
+      setSelectedGigId(data[0].id);
+    }
   }
 
   const selectedGig = gigs.find(g => g.id === selectedGigId) || gigs[0];
@@ -110,9 +124,10 @@ function App() {
       0
     );
 
-    const upcoming = gigs.filter(
-      g => g.date && new Date(g.date) >= new Date(new Date().toDateString())
-    ).length;
+    const upcoming = gigs.filter(g => {
+      if (!g.date) return false;
+      return new Date(g.date) >= new Date(new Date().toDateString());
+    }).length;
 
     return { total, outstanding, upcoming };
   }, [gigs]);
@@ -120,25 +135,25 @@ function App() {
   async function addGig(e) {
     e.preventDefault();
 
-    const { error } = await supabase.from('gigs').insert([
-      {
-        user_id: user.id,
-        title: form.title,
-        client: form.client,
-        venue: form.venue,
-        date: form.date || null,
-        time: form.time || null,
-        fee: Number(form.fee || 0),
-        deposit: Number(form.deposit || 0),
-        paid: Number(form.paid || 0),
-        setlist: form.setlist,
-        notes: form.notes,
-        practice_date: form.practice_date || null,
-        invoice_status:
-          Number(form.paid || 0) >= Number(form.fee || 0) ? 'paid' : 'draft',
-        contract_status: 'not sent',
-      },
-    ]);
+    const newGig = {
+      user_id: user.id,
+      title: form.title,
+      client: form.client,
+      venue: form.venue,
+      date: form.date || null,
+      time: form.time || null,
+      fee: Number(form.fee || 0),
+      deposit: Number(form.deposit || 0),
+      paid: Number(form.paid || 0),
+      setlist: form.setlist,
+      notes: form.notes,
+      practice_date: form.practice_date || null,
+      invoice_status:
+        Number(form.paid || 0) >= Number(form.fee || 0) ? 'paid' : 'draft',
+      contract_status: 'not sent'
+    };
+
+    const { error } = await supabase.from('gigs').insert([newGig]);
 
     if (error) {
       alert(error.message);
@@ -156,7 +171,7 @@ function App() {
       paid: '',
       setlist: '',
       notes: '',
-      practice_date: '',
+      practice_date: ''
     });
 
     loadGigs();
@@ -165,11 +180,18 @@ function App() {
   async function markPaid(id, fee) {
     const { error } = await supabase
       .from('gigs')
-      .update({ paid: fee, invoice_status: 'paid' })
+      .update({
+        paid: fee,
+        invoice_status: 'paid'
+      })
       .eq('id', id);
 
-    if (error) alert(error.message);
-    else loadGigs();
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    loadGigs();
   }
 
   function generateContract(g) {
@@ -190,6 +212,7 @@ Performer Signature: __________________`;
 
   function copyContract() {
     if (!selectedGig) return;
+
     navigator.clipboard.writeText(generateContract(selectedGig));
     alert('Contract copied to clipboard.');
   }
@@ -201,7 +224,11 @@ Performer Signature: __________________`;
           <h1>Gig Manager Login</h1>
 
           <label>Email</label>
-          <input value={authEmail} onChange={e => setAuthEmail(e.target.value)} />
+          <input
+            type="email"
+            value={authEmail}
+            onChange={e => setAuthEmail(e.target.value)}
+          />
 
           <label>Password</label>
           <input
@@ -211,8 +238,8 @@ Performer Signature: __________________`;
           />
 
           <div className="actions">
-            <button onClick={signIn}>Log In</button>
-            <button onClick={signUp}>Sign Up</button>
+            <button type="button" onClick={signIn}>Log In</button>
+            <button type="button" onClick={signUp}>Sign Up</button>
           </div>
         </section>
       </main>
@@ -225,7 +252,7 @@ Performer Signature: __________________`;
         <div>
           <p className="eyebrow">SOLO MUSICIAN BUSINESS MANAGER</p>
           <h1>Gig Manager</h1>
-          <button onClick={signOut}>Sign Out</button>
+          <button type="button" onClick={signOut}>Sign Out</button>
           <p>Track bookings, invoices, income, contracts, and practice reminders in one place.</p>
         </div>
       </header>
@@ -239,10 +266,12 @@ Performer Signature: __________________`;
       <section className="grid">
         <div className="panel">
           <h2><Music size={20} /> Gigs</h2>
+
           <div className="gigList">
             {gigs.map(g => (
               <button
                 key={g.id}
+                type="button"
                 onClick={() => setSelectedGigId(g.id)}
                 className={g.id === selectedGig?.id ? 'gig active' : 'gig'}
               >
@@ -264,7 +293,7 @@ Performer Signature: __________________`;
                 <p><strong>Client</strong><br />{selectedGig.client}</p>
                 <p><strong>Fee</strong><br />{currency(selectedGig.fee)}</p>
                 <p><strong>Paid</strong><br />{currency(selectedGig.paid)}</p>
-                <p><strong>Balance</strong><br />{currency(Math.max(selectedGig.fee - selectedGig.paid, 0))}</p>
+                <p><strong>Balance</strong><br />{currency(Math.max(Number(selectedGig.fee || 0) - Number(selectedGig.paid || 0), 0))}</p>
               </div>
 
               <p><strong>Set list</strong><br />{selectedGig.setlist || 'No set list yet.'}</p>
@@ -272,10 +301,11 @@ Performer Signature: __________________`;
               <p><strong>Practice reminder</strong><br />{selectedGig.practice_date || 'None set.'}</p>
 
               <div className="actions">
-                <button onClick={() => markPaid(selectedGig.id, selectedGig.fee)}>
+                <button type="button" onClick={() => markPaid(selectedGig.id, selectedGig.fee)}>
                   <CheckCircle2 size={16} /> Mark paid
                 </button>
-                <button onClick={copyContract}>
+
+                <button type="button" onClick={copyContract}>
                   <FileText size={16} /> Copy contract
                 </button>
               </div>
