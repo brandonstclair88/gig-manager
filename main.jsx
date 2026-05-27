@@ -284,8 +284,4 @@ function App() {
   </main>;
 }
 
-function Card({ icon, label, value }) {
-  return <div className="card">{icon}<div><span>{label}</span><strong>{value}</strong></div></div>;
-}
-
-createRoot(document.getElementById('root')).render(<App />);
+function Card({ icon, label
