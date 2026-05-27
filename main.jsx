@@ -1,55 +1,69 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { CalendarDays, DollarSign, FileText, Music, Bell, Plus, CheckCircle2 } from 'lucide-react';
+import { createClient } from '@supabase/supabase-js';
 import './styles.css';
 
-const seedGigs = [
-  {
-    id: crypto.randomUUID(),
-    title: 'Wedding Ceremony',
-    client: 'Avery Johnson',
-    venue: 'Rosewood Gardens',
-    date: '2026-06-20',
-    time: '16:00',
-    fee: 900,
-    deposit: 300,
-    paid: 300,
-    invoiceStatus: 'sent',
-    contractStatus: 'sent',
-    setlist: 'Canon in D, Perfect, At Last',
-    notes: 'Arrive 90 minutes early. Outdoor ceremony.',
-    practiceDate: '2026-06-15',
-  },
-  {
-    id: crypto.randomUUID(),
-    title: 'Restaurant Dinner Set',
-    client: 'Marco Silva',
-    venue: 'The Copper Room',
-    date: '2026-06-05',
-    time: '19:00',
-    fee: 350,
-    deposit: 0,
-    paid: 350,
-    invoiceStatus: 'paid',
-    contractStatus: 'signed',
-    setlist: 'Jazz standards, pop covers',
-    notes: 'Two 45-minute sets.',
-    practiceDate: '2026-06-03',
-  },
-];
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
 
 function currency(n) {
   return Number(n || 0).toLocaleString(undefined, { style: 'currency', currency: 'USD' });
 }
 
 function App() {
-  const [gigs, setGigs] = useState(() => JSON.parse(localStorage.getItem('gigs') || 'null') || seedGigs);
-  const [selectedGigId, setSelectedGigId] = useState(gigs[0]?.id);
-  const [form, setForm] = useState({ title: '', client: '', venue: '', date: '', time: '', fee: '', deposit: '', paid: '', setlist: '', notes: '', practiceDate: '' });
+  const [gigs, setGigs] = useState([]);
+  const [selectedGigId, setSelectedGigId] = useState(null);
+  const [form, setForm] = useState({
+    title: '',
+    client: '',
+    venue: '',
+    date: '',
+    time: '',
+    fee: '',
+    deposit: '',
+    paid: '',
+    setlist: '',
+    notes: '',
+    practiceDate: ''
+  });
 
-  function save(next) {
-    setGigs(next);
-    localStorage.setItem('gigs', JSON.stringify(next));
+  useEffect(() => {
+    loadGigs();
+  }, []);
+
+  async function loadGigs() {
+    const { data, error } = await supabase
+      .from('gigs')
+      .select('*')
+      .order('gig_date', { ascending: true });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    const mapped = data.map(g => ({
+      id: g.id,
+      title: g.title,
+      client: '',
+      venue: g.venue,
+      date: g.gig_date,
+      time: g.start_time,
+      fee: Number(g.fee || 0),
+      deposit: Number(g.deposit || 0),
+      paid: Number(g.paid || 0),
+      invoiceStatus: g.status || 'draft',
+      contractStatus: 'not sent',
+      setlist: g.setlist || '',
+      notes: g.notes || '',
+      practiceDate: g.practice_date || ''
+    }));
+
+    setGigs(mapped);
+    setSelectedGigId(mapped[0]?.id || null);
   }
 
   const selectedGig = gigs.find(g => g.id === selectedGigId) || gigs[0];
@@ -57,29 +71,59 @@ function App() {
   const stats = useMemo(() => {
     const total = gigs.reduce((sum, g) => sum + Number(g.paid || 0), 0);
     const outstanding = gigs.reduce((sum, g) => sum + Math.max(Number(g.fee || 0) - Number(g.paid || 0), 0), 0);
-    const upcoming = gigs.filter(g => new Date(g.date) >= new Date(new Date().toDateString())).length;
+    const upcoming = gigs.filter(g => g.date && new Date(g.date) >= new Date(new Date().toDateString())).length;
     return { total, outstanding, upcoming };
   }, [gigs]);
 
-  function addGig(e) {
+  async function addGig(e) {
     e.preventDefault();
-    const gig = {
-      id: crypto.randomUUID(),
-      ...form,
-      fee: Number(form.fee || 0),
-      deposit: Number(form.deposit || 0),
-      paid: Number(form.paid || 0),
-      invoiceStatus: Number(form.paid || 0) >= Number(form.fee || 0) ? 'paid' : 'draft',
-      contractStatus: 'not sent',
-    };
-    const next = [...gigs, gig].sort((a, b) => a.date.localeCompare(b.date));
-    save(next);
-    setSelectedGigId(gig.id);
+
+    const { data, error } = await supabase
+      .from('gigs')
+      .insert({
+        title: form.title,
+        venue: form.venue,
+        gig_date: form.date || null,
+        start_time: form.time || null,
+        fee: Number(form.fee || 0),
+        deposit: Number(form.deposit || 0),
+        paid: Number(form.paid || 0),
+        status: Number(form.paid || 0) >= Number(form.fee || 0) ? 'paid' : 'draft',
+        setlist: form.setlist,
+        notes: `${form.notes}\n\nClient: ${form.client}`,
+        practice_date: form.practiceDate || null
+      })
+      .select()
+      .single();
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    await loadGigs();
+    setSelectedGigId(data.id);
     setForm({ title: '', client: '', venue: '', date: '', time: '', fee: '', deposit: '', paid: '', setlist: '', notes: '', practiceDate: '' });
   }
 
-  function markPaid(id) {
-    save(gigs.map(g => g.id === id ? { ...g, paid: g.fee, invoiceStatus: 'paid' } : g));
+  async function markPaid(id) {
+    const gig = gigs.find(g => g.id === id);
+    if (!gig) return;
+
+    const { error } = await supabase
+      .from('gigs')
+      .update({
+        paid: gig.fee,
+        status: 'paid'
+      })
+      .eq('id', id);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    await loadGigs();
   }
 
   function generateContract(g) {
