@@ -16,6 +16,10 @@ function currency(n) {
 function App() {
   const [gigs, setGigs] = useState([]);
   const [selectedGigId, setSelectedGigId] = useState(null);
+  const [user, setUser] = useState(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
   const [form, setForm] = useState({
     title: '',
     client: '',
@@ -31,8 +35,32 @@ function App() {
   });
 
   useEffect(() => {
-    loadGigs();
+    checkUser();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+
+      if (session?.user) {
+        loadGigs();
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
+
+  async function checkUser() {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    setUser(session?.user || null);
+
+    if (session?.user) {
+      loadGigs();
+    }
+  }
 
   async function loadGigs() {
     const { data, error } = await supabase
@@ -66,11 +94,43 @@ function App() {
     setSelectedGigId(mapped[0]?.id || null);
   }
 
+  async function signUp() {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    alert('Check your email to confirm signup.');
+  }
+
+  async function signIn() {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+  }
+
+  async function signOut() {
+    await supabase.auth.signOut();
+    setGigs([]);
+    setSelectedGigId(null);
+  }
+
   const selectedGig = gigs.find(g => g.id === selectedGigId) || gigs[0];
 
   const stats = useMemo(() => {
     const total = gigs.reduce((sum, g) => sum + Number(g.paid || 0), 0);
-    const outstanding = gigs.reduce((sum, g) => sum + Math.max(Number(g.fee || 0) - Number(g.paid || 0), 0), 0);
+    const outstanding = gigs.reduce((sum, g) => sum + Math.max(Number(g.fee || 0) - Number(g.paid || 0), 0);
     const upcoming = gigs.filter(g => g.date && new Date(g.date) >= new Date(new Date().toDateString())).length;
     return { total, outstanding, upcoming };
   }, [gigs]);
@@ -135,11 +195,41 @@ function App() {
     alert('Contract copied to clipboard.');
   }
 
+  if (!user) {
+    return (
+      <main className="auth">
+        <div className="panel form">
+          <h1>Gig Manager Login</h1>
+
+          <label>Email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+          />
+
+          <label>Password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+          />
+
+          <div className="actions">
+            <button onClick={signIn}>Login</button>
+            <button onClick={signUp}>Sign Up</button>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return <main>
     <header className="hero">
       <div>
         <p className="eyebrow">Solo Musician Business Manager</p>
         <h1>Gig Manager</h1>
+        <button onClick={signOut}>Sign Out</button>
         <p>Track bookings, invoices, income, contracts, and practice reminders in one place.</p>
       </div>
     </header>
