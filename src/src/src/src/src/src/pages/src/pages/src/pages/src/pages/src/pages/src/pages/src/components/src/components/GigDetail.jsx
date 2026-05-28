@@ -1,0 +1,221 @@
+import React, { useState } from 'react'
+import { Edit2, Trash2, CheckCircle2, FileText, Download, ExternalLink, Plus, X } from 'lucide-react'
+import { supabase } from '../supabase'
+import { currency, fmtDate, fmtTime, invoiceBadge, contractText, downloadPDFInvoice } from '../utils'
+
+export default function GigDetail({ gig, onEdit, onDelete, onRefresh }) {
+  const [tab, setTab] = useState('overview')
+  const [expense, setExpense] = useState({ description: '', amount: '' })
+  const [expenses, setExpenses] = useState(gig.expenses || [])
+
+  const balance = Math.max(Number(gig.fee || 0) - Number(gig.paid || 0), 0)
+
+  async function markPaid() {
+    const { error } = await supabase.from('gigs')
+      .update({ paid: gig.fee, invoice_status: 'paid' })
+      .eq('id', gig.id)
+    if (error) { alert(error.message); return }
+    onRefresh()
+  }
+
+  async function saveExpenses(updated) {
+    setExpenses(updated)
+    await supabase.from('gigs').update({ expenses: updated }).eq('id', gig.id)
+    onRefresh()
+  }
+
+  function addExpense() {
+    if (!expense.description || !expense.amount) return
+    const updated = [...expenses, { ...expense, amount: Number(expense.amount) }]
+    saveExpenses(updated)
+    setExpense({ description: '', amount: '' })
+  }
+
+  function removeExpense(i) {
+    saveExpenses(expenses.filter((_, idx) => idx !== i))
+  }
+
+  const totalExpenses = expenses.reduce((s, e) => s + Number(e.amount || 0), 0)
+  const profit = Number(gig.paid || 0) - totalExpenses
+
+  function openDocuSeal() {
+    window.open('https://docuseal.com', '_blank')
+  }
+
+  function copyContract() {
+    navigator.clipboard.writeText(contractText(gig))
+    alert('Contract copied to clipboard.')
+  }
+
+  return (
+    <div className="card" style={{ marginTop: 0 }}>
+      <div className="detail-header">
+        <div>
+          <h2>{gig.title}</h2>
+          <p className="muted" style={{ marginTop: 4 }}>
+            {fmtDate(gig.date)}{gig.time ? ` at ${fmtTime(gig.time)}` : ''} · {gig.venue || '—'}
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <span className={`badge ${invoiceBadge(gig.invoice_status)}`}>{gig.invoice_status || 'draft'}</span>
+          <button className="btn btn-ghost btn-sm" onClick={onEdit}><Edit2 size={14} /> Edit</button>
+          <button className="btn btn-danger btn-sm" onClick={onDelete}><Trash2 size={14} /> Delete</button>
+        </div>
+      </div>
+
+      <div className="tabs">
+        {['overview', 'financials', 'setlist', 'contract', 'expenses'].map(t => (
+          <button key={t} className={`tab${tab === t ? ' active' : ''}`} onClick={() => setTab(t)}>
+            {t.charAt(0).toUpperCase() + t.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'overview' && (
+        <>
+          <div className="mini-grid">
+            <div className="mini-cell">
+              <div className="mini-label">Client</div>
+              <div className="mini-val" style={{ fontSize: 14 }}>{gig.client || '—'}</div>
+            </div>
+            <div className="mini-cell">
+              <div className="mini-label">Fee</div>
+              <div className="mini-val">{currency(gig.fee)}</div>
+            </div>
+            <div className="mini-cell">
+              <div className="mini-label">Paid</div>
+              <div className="mini-val" style={{ color: 'var(--green)' }}>{currency(gig.paid)}</div>
+            </div>
+            <div className="mini-cell">
+              <div className="mini-label">Balance Due</div>
+              <div className="mini-val" style={{ color: balance > 0 ? 'var(--red)' : 'var(--green)' }}>{currency(balance)}</div>
+            </div>
+          </div>
+
+          {gig.practice_date && (
+            <p style={{ marginTop: 12 }}>
+              <strong>🎵 Practice reminder:</strong> {fmtDate(gig.practice_date)}
+            </p>
+          )}
+
+          <div className="actions-row" style={{ marginTop: 20 }}>
+            {balance > 0 && (
+              <button className="btn btn-gold btn-sm" onClick={markPaid}>
+                <CheckCircle2 size={14} /> Mark Fully Paid
+              </button>
+            )}
+            <button className="btn btn-ghost btn-sm" onClick={() => downloadPDFInvoice(gig)}>
+              <Download size={14} /> Download Invoice PDF
+            </button>
+          </div>
+        </>
+      )}
+
+      {tab === 'financials' && (
+        <>
+          <div className="mini-grid">
+            <div className="mini-cell">
+              <div className="mini-label">Fee</div>
+              <div className="mini-val">{currency(gig.fee)}</div>
+            </div>
+            <div className="mini-cell">
+              <div className="mini-label">Deposit</div>
+              <div className="mini-val">{currency(gig.deposit)}</div>
+            </div>
+            <div className="mini-cell">
+              <div className="mini-label">Paid</div>
+              <div className="mini-val">{currency(gig.paid)}</div>
+            </div>
+            <div className="mini-cell">
+              <div className="mini-label">Balance</div>
+              <div className="mini-val" style={{ color: 'var(--red)' }}>{currency(balance)}</div>
+            </div>
+            <div className="mini-cell">
+              <div className="mini-label">Expenses</div>
+              <div className="mini-val" style={{ color: 'var(--red)' }}>{currency(totalExpenses)}</div>
+            </div>
+            <div className="mini-cell">
+              <div className="mini-label">Net Profit</div>
+              <div className="mini-val" style={{ color: profit >= 0 ? 'var(--green)' : 'var(--red)' }}>{currency(profit)}</div>
+            </div>
+          </div>
+          <div style={{ marginTop: 16 }}>
+            <button className="btn btn-ghost btn-sm" onClick={() => downloadPDFInvoice(gig)}>
+              <Download size={14} /> Download Invoice PDF
+            </button>
+          </div>
+        </>
+      )}
+
+      {tab === 'setlist' && (
+        <div>
+          {gig.setlist
+            ? <p style={{ whiteSpace: 'pre-wrap', lineHeight: 1.7 }}>{gig.setlist}</p>
+            : <p className="muted">No set list added yet. Edit the gig to add one.</p>}
+          {gig.notes && (
+            <>
+              <hr className="divider" />
+              <p><strong>Notes</strong></p>
+              <p style={{ whiteSpace: 'pre-wrap', lineHeight: 1.7, marginTop: 8 }} className="muted">{gig.notes}</p>
+            </>
+          )}
+        </div>
+      )}
+
+      {tab === 'contract' && (
+        <div>
+          <div className="actions-row" style={{ marginBottom: 14 }}>
+            <button className="btn btn-ghost btn-sm" onClick={copyContract}>
+              <FileText size={14} /> Copy Contract Text
+            </button>
+            <button className="btn btn-primary btn-sm" onClick={openDocuSeal}>
+              <ExternalLink size={14} /> Open DocuSeal (e-signature)
+            </button>
+          </div>
+          <p className="muted" style={{ fontSize: 12, marginBottom: 10 }}>
+            DocuSeal is a free e-signature platform. Copy the contract text above, paste it into DocuSeal, add signature fields, and send to your client.
+          </p>
+          <div className="contract-preview">{contractText(gig)}</div>
+        </div>
+      )}
+
+      {tab === 'expenses' && (
+        <div>
+          <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
+            <input
+              placeholder="Description (travel, gear hire…)"
+              value={expense.description}
+              onChange={e => setExpense(x => ({ ...x, description: e.target.value }))}
+              style={{ flex: 2, minWidth: 140 }}
+            />
+            <input
+              type="number" placeholder="Amount"
+              value={expense.amount}
+              onChange={e => setExpense(x => ({ ...x, amount: e.target.value }))}
+              style={{ flex: 1, minWidth: 100 }}
+            />
+            <button className="btn btn-primary btn-sm" onClick={addExpense}><Plus size={14} /> Add</button>
+          </div>
+
+          {expenses.length === 0
+            ? <p className="muted">No expenses recorded for this gig.</p>
+            : expenses.map((ex, i) => (
+              <div key={i} className="expense-row">
+                <span style={{ flex: 1 }}>{ex.description}</span>
+                <span style={{ fontWeight: 600 }}>{currency(ex.amount)}</span>
+                <button className="btn btn-icon btn-danger btn-sm" onClick={() => removeExpense(i)}><X size={14} /></button>
+              </div>
+            ))
+          }
+
+          {expenses.length > 0 && (
+            <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid var(--paper3)', display: 'flex', justifyContent: 'space-between' }}>
+              <strong>Total Expenses</strong>
+              <strong style={{ color: 'var(--red)' }}>{currency(totalExpenses)}</strong>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
