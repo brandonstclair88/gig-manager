@@ -16,7 +16,7 @@ export default function SignPage() {
     if (!gigId) { setError('Invalid link.'); setLoading(false); return }
     supabase.from('gigs').select('*').eq('id', gigId).single()
       .then(({ data, error }) => {
-        if (error || !data) { setError('Contract not found.'); }
+        if (error || !data) { setError('Contract not found.') }
         else {
           setGig(data)
           if (data.signed_at) setSigned(true)
@@ -39,77 +39,98 @@ export default function SignPage() {
   }
 
   if (loading) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f0d0b' }}>
-      <p style={{ color: '#f0c060', fontFamily: 'Playfair Display, serif', fontSize: 22 }}>Loading contract…</p>
+    <div style={{ minHeight: '100vh', background: '#fdfaf7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: '#9a9189', fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontStyle: 'italic' }}>Loading contract…</p>
     </div>
   )
 
   if (error) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f0d0b' }}>
-      <p style={{ color: '#fca5a5', fontFamily: 'Playfair Display, serif', fontSize: 22 }}>{error}</p>
+    <div style={{ minHeight: '100vh', background: '#fdfaf7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: '#a33030', fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontStyle: 'italic' }}>{error}</p>
     </div>
   )
 
   if (signed) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f0d0b', padding: 20 }}>
-      <div style={{ background: '#faf8f4', borderRadius: 24, padding: 48, maxWidth: 480, width: '100%', textAlign: 'center' }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
-        <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 28, marginBottom: 12 }}>Contract Signed!</h1>
-        <p style={{ color: '#7a746e', marginBottom: 8 }}>Thank you, <strong>{gig.signed_by}</strong>.</p>
-        <p style={{ color: '#7a746e', fontSize: 14 }}>
-          Signed on {fmtDate(gig.signed_at?.slice(0, 10))} for <strong>{gig.title}</strong>.
-        </p>
-        <p style={{ color: '#7a746e', fontSize: 13, marginTop: 16 }}>You can close this page.</p>
+    <div style={{ minHeight: '100vh', background: '#fdfaf7', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <div style={{ textAlign: 'center', maxWidth: 420 }}>
+        <div style={{ fontSize: 48, marginBottom: 20 }}>✅</div>
+        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 400, fontStyle: 'italic', marginBottom: 12, color: '#1a1714' }}>Contract Signed!</h1>
+        <p style={{ color: '#9a9189', marginBottom: 8, fontSize: 15 }}>Thank you, <strong>{gig.signed_by}</strong>.</p>
+        <p style={{ color: '#9a9189', fontSize: 14 }}>Signed on {fmtDate(gig.signed_at?.slice(0, 10))} for <strong>{gig.title}</strong>.</p>
+        <p style={{ color: '#b0a89e', fontSize: 13, marginTop: 16, fontStyle: 'italic' }}>You can close this page.</p>
       </div>
     </div>
   )
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0f0d0b', padding: '40px 20px' }}>
-      <div style={{ maxWidth: 680, margin: '0 auto' }}>
+    <div style={{ minHeight: '100vh', background: '#fdfaf7', fontFamily: 'Jost, system-ui, sans-serif' }}>
 
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <p style={{ color: '#c9973a', fontSize: 12, textTransform: 'uppercase', letterSpacing: '.14em', marginBottom: 8 }}>Performance Agreement</p>
-          <h1 style={{ fontFamily: 'Playfair Display, serif', color: '#faf8f4', fontSize: 32, marginBottom: 8 }}>Paige Camryn Music</h1>
-          <p style={{ color: '#7a746e', fontSize: 14 }}>Luxury Event Harpist</p>
-        </div>
+      {/* Header */}
+      <div style={{ background: '#f2ebe3', borderBottom: '1px solid #ede5dc', padding: '48px 20px 36px', textAlign: 'center' }}>
+        <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.2em', marginBottom: 12, fontWeight: 500 }}>Performance Agreement</p>
+        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', color: '#1a1714', fontSize: 40, fontWeight: 400, fontStyle: 'italic', marginBottom: 8 }}>Paige Camryn Music</h1>
+        <p style={{ color: '#9a9189', fontSize: 14, letterSpacing: '.08em' }}>Luxury Event Harpist</p>
+        <div style={{ width: 40, height: 1, background: '#c9a097', margin: '20px auto 0' }} />
+      </div>
 
-        {/* Contract */}
-        <div style={{ background: '#faf8f4', borderRadius: 20, padding: 32, marginBottom: 24 }}>
-          <pre style={{ fontFamily: 'Courier New, monospace', fontSize: 13, whiteSpace: 'pre-wrap', lineHeight: 1.7, color: '#0f0d0b' }}>
+      <div style={{ maxWidth: 680, margin: '0 auto', padding: '48px 20px' }}>
+
+        {/* Contract text */}
+        <div style={{ background: 'white', borderRadius: 16, padding: 36, marginBottom: 24, border: '1px solid #ede5dc', boxShadow: '0 2px 20px rgba(26,23,20,.06)' }}>
+          <p style={{ color: '#c9a097', fontSize: 10, textTransform: 'uppercase', letterSpacing: '.16em', marginBottom: 16, fontWeight: 500 }}>Contract Details</p>
+          <pre style={{ fontFamily: 'Courier New, monospace', fontSize: 12, whiteSpace: 'pre-wrap', lineHeight: 1.8, color: '#3d3733' }}>
             {contractText(gig)}
           </pre>
         </div>
 
         {/* Signing box */}
-        <div style={{ background: '#faf8f4', borderRadius: 20, padding: 32 }}>
-          <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: 22, marginBottom: 8 }}>Sign this contract</h2>
-          <p style={{ color: '#7a746e', fontSize: 14, marginBottom: 20 }}>
+        <div style={{ background: 'white', borderRadius: 16, padding: 36, border: '1px solid #ede5dc', boxShadow: '0 2px 20px rgba(26,23,20,.06)' }}>
+          <p style={{ color: '#c9a097', fontSize: 10, textTransform: 'uppercase', letterSpacing: '.16em', marginBottom: 12, fontWeight: 500 }}>Sign Below</p>
+          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 28, fontWeight: 400, fontStyle: 'italic', marginBottom: 8, color: '#1a1714' }}>Sign this contract</h2>
+          <p style={{ color: '#9a9189', fontSize: 14, marginBottom: 24, lineHeight: 1.6 }}>
             By typing your full name below and clicking Sign, you agree to the terms of this performance agreement.
           </p>
 
-          <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#3a3530', marginBottom: 6 }}>
+          <label style={{ display: 'block', fontSize: 10, fontWeight: 500, color: '#9a9189', marginBottom: 6, letterSpacing: '.1em', textTransform: 'uppercase' }}>
             Full Name
           </label>
           <input
             value={name}
             onChange={e => setName(e.target.value)}
             placeholder="Type your full legal name"
-            style={{ width: '100%', padding: '12px 14px', border: '1.5px solid #e8e0d4', borderRadius: 10, fontSize: 16, fontFamily: 'inherit', marginBottom: 16, boxSizing: 'border-box' }}
+            style={{
+              width: '100%', padding: '12px 14px',
+              border: '1px solid #ede5dc', borderRadius: 8,
+              fontSize: 16, fontFamily: 'Jost, sans-serif',
+              marginBottom: 16, boxSizing: 'border-box',
+              background: '#fdfaf7', color: '#1a1714', outline: 'none'
+            }}
           />
 
-          <div style={{ background: '#f2ede4', borderRadius: 10, padding: '12px 16px', marginBottom: 20, fontSize: 13, color: '#7a746e' }}>
+          <div style={{ background: '#f5e6e2', borderRadius: 8, padding: '10px 14px', marginBottom: 20, fontSize: 12, color: '#b07870', border: '1px solid #e8c8c0' }}>
             📍 Your IP address and timestamp will be recorded as part of this agreement.
           </div>
 
           <button
             onClick={sign}
             disabled={signing || !name.trim()}
-            style={{ width: '100%', padding: '14px', background: '#0f0d0b', color: '#faf8f4', border: 'none', borderRadius: 12, fontSize: 16, fontWeight: 700, cursor: name.trim() ? 'pointer' : 'not-allowed', opacity: name.trim() ? 1 : 0.5 }}
+            style={{
+              width: '100%', padding: '14px',
+              background: name.trim() ? '#c9a097' : '#e8c8c0',
+              color: 'white', border: 'none', borderRadius: 10,
+              fontSize: 13, fontWeight: 500, letterSpacing: '.1em',
+              textTransform: 'uppercase', fontFamily: 'Jost, sans-serif',
+              cursor: name.trim() ? 'pointer' : 'not-allowed',
+              transition: 'background .15s'
+            }}
           >
-            {signing ? 'Signing…' : '✍️ Sign Contract'}
+            {signing ? 'Signing…' : '✍ Sign Contract'}
           </button>
+        </div>
+
+        {/* Footer */}
+        <div style={{ textAlign: 'center', marginTop: 40, paddingTop: 28, borderTop: '1px solid #ede5dc' }}>
+          <p style={{ fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', fontSize: 15, color: '#9a9189' }}>Paige Camryn Music · Luxury Event Harpist</p>
         </div>
 
       </div>
