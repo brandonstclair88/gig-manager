@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../supabase'
 
-const CATEGORIES = ['Classical', 'Wedding', 'Pop', 'Jazz', 'Celtic', 'Christmas', 'Film & TV', 'Other']
+const CATEGORIES = ['Classical', 'Wedding', 'Pop', 'Rock', 'Jazz', 'Celtic', 'Christmas', 'Hymns', 'Film & TV', 'Other']
 
 function Nav({ page, setPage }) {
   return (

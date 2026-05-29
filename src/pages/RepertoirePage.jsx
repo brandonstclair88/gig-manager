@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react'
 import { Plus, X, Edit2, Music } from 'lucide-react'
 import { supabase } from '../supabase'
 
-const CATEGORIES = ['Classical', 'Wedding', 'Pop', 'Jazz', 'Celtic', 'Christmas', 'Film & TV', 'Other']
+const CATEGORIES = ['Classical', 'Wedding', 'Pop', 'Rock', 'Jazz', 'Celtic', 'Christmas', 'Hymns', 'Film & TV', 'Other']
 
 const EMPTY = { title: '', composer: '', category: 'Classical', notes: '' }
 
