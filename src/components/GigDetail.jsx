@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Edit2, Trash2, CheckCircle2, FileText, Download, ExternalLink, Plus, X } from 'lucide-react'
+import { Edit2, Trash2, CheckCircle2, FileText, Download, Link, Plus, X } from 'lucide-react'
 import { supabase } from '../supabase'
 import { currency, fmtDate, fmtTime, invoiceBadge, contractText, downloadPDFInvoice } from '../utils'
 
@@ -38,8 +38,10 @@ export default function GigDetail({ gig, onEdit, onDelete, onRefresh }) {
   const totalExpenses = expenses.reduce((s, e) => s + Number(e.amount || 0), 0)
   const profit = Number(gig.paid || 0) - totalExpenses
 
-  function openDocuSeal() {
-    window.open('https://docuseal.com', '_blank')
+  function copySigningLink() {
+    const url = `${window.location.origin}?gig=${gig.id}`
+    navigator.clipboard.writeText(url)
+    alert('Signing link copied! Send this to your client:\n\n' + url)
   }
 
   function copyContract() {
@@ -58,6 +60,7 @@ export default function GigDetail({ gig, onEdit, onDelete, onRefresh }) {
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <span className={`badge ${invoiceBadge(gig.invoice_status)}`}>{gig.invoice_status || 'draft'}</span>
+          {gig.contract_status === 'signed' && <span className="badge badge-green">✍️ Signed</span>}
           <button className="btn btn-ghost btn-sm" onClick={onEdit}><Edit2 size={14} /> Edit</button>
           <button className="btn btn-danger btn-sm" onClick={onDelete}><Trash2 size={14} /> Delete</button>
         </div>
@@ -91,11 +94,20 @@ export default function GigDetail({ gig, onEdit, onDelete, onRefresh }) {
               <div className="mini-val" style={{ color: balance > 0 ? 'var(--red)' : 'var(--green)' }}>{currency(balance)}</div>
             </div>
           </div>
+
           {gig.practice_date && (
             <p style={{ marginTop: 12 }}>
               <strong>🎵 Practice reminder:</strong> {fmtDate(gig.practice_date)}
             </p>
           )}
+
+          {gig.signed_at && (
+            <div style={{ background: '#d4edda', borderRadius: 10, padding: '10px 14px', marginTop: 12 }}>
+              <p style={{ color: 'var(--green)', fontWeight: 600, fontSize: 14 }}>✍️ Signed by {gig.signed_by}</p>
+              <p style={{ color: 'var(--green)', fontSize: 12, marginTop: 2 }}>on {fmtDate(gig.signed_at?.slice(0, 10))}</p>
+            </div>
+          )}
+
           <div className="actions-row" style={{ marginTop: 20 }}>
             {balance > 0 && (
               <button className="btn btn-gold btn-sm" onClick={markPaid}>
@@ -166,12 +178,24 @@ export default function GigDetail({ gig, onEdit, onDelete, onRefresh }) {
             <button className="btn btn-ghost btn-sm" onClick={copyContract}>
               <FileText size={14} /> Copy Contract Text
             </button>
-            <button className="btn btn-primary btn-sm" onClick={openDocuSeal}>
-              <ExternalLink size={14} /> Open DocuSeal (e-signature)
+            <button className="btn btn-primary btn-sm" onClick={copySigningLink}>
+              <Link size={14} /> Copy Signing Link
             </button>
           </div>
+
+          {gig.signed_at ? (
+            <div style={{ background: '#d4edda', borderRadius: 10, padding: '12px 16px', marginBottom: 14 }}>
+              <p style={{ color: 'var(--green)', fontWeight: 600 }}>✍️ Signed by {gig.signed_by}</p>
+              <p style={{ color: 'var(--green)', fontSize: 13, marginTop: 2 }}>on {fmtDate(gig.signed_at?.slice(0, 10))}</p>
+            </div>
+          ) : (
+            <div style={{ background: '#fef3cd', borderRadius: 10, padding: '12px 16px', marginBottom: 14, fontSize: 13, color: '#856404' }}>
+              ⏳ Not yet signed. Copy the signing link and send it to your client.
+            </div>
+          )}
+
           <p className="muted" style={{ fontSize: 12, marginBottom: 10 }}>
-            DocuSeal is a free e-signature platform. Copy the contract text above, paste it into DocuSeal, add signature fields, and send to your client.
+            Your client clicks the link, reads the contract, types their name and signs. No account needed.
           </p>
           <div className="contract-preview">{contractText(gig)}</div>
         </div>

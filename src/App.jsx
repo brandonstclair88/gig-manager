@@ -7,6 +7,7 @@ import GigsPage from './pages/GigsPage'
 import CalendarPage from './pages/CalendarPage'
 import FinancePage from './pages/FinancePage'
 import ClientsPage from './pages/ClientsPage'
+import SignPage from './pages/SignPage'
 
 const NAV = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -22,6 +23,9 @@ export default function App() {
   const [page, setPage] = useState('dashboard')
   const [gigs, setGigs] = useState([])
   const [clients, setClients] = useState([])
+
+  // Show signing page if URL has ?gig=
+  if (window.location.search.includes('gig=')) return <SignPage />
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
