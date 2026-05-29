@@ -91,7 +91,7 @@ the duration of the event as outlined above. Services include:
   · One pre-event consultation to finalize song selections
 
 Client agrees to provide:
-  · A safe, covered performance area (min. 6ft x 6ft)
+  · A safe performance area (min. 6ft x 6ft)
   · Access to a standard electrical outlet within 25 feet
   · Adequate parking or load-in access for equipment
 
