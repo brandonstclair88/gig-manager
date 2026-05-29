@@ -91,7 +91,7 @@ export default function GigDetail({ gig, onEdit, onDelete, onRefresh }) {
             </div>
             <div className="mini-cell">
               <div className="mini-label">Balance Due</div>
-              <div className="mini-val" style={{ color: balance > 0 ? 'var(--red)' : 'var(--green)' }}>{currency(balance)}</div>
+              <div className="mini-val" style={{ color: 'var(--ink)' }}>{currency(balance)}</div>
             </div>
           </div>
 
@@ -138,7 +138,7 @@ export default function GigDetail({ gig, onEdit, onDelete, onRefresh }) {
             </div>
             <div className="mini-cell">
               <div className="mini-label">Balance</div>
-              <div className="mini-val" style={{ color: 'var(--red)' }}>{currency(balance)}</div>
+              <div className="mini-val" style={{ color: 'var(--ink)' }}>{currency(balance)}</div>
             </div>
             <div className="mini-cell">
               <div className="mini-label">Expenses</div>

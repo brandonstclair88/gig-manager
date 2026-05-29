@@ -89,9 +89,9 @@ export default function GigsPage({ gigs, userId, onRefresh }) {
                   onClick={() => setSelectedId(g.id === selectedId ? null : g.id)}
                   style={{
                     display: 'block', textAlign: 'left', width: '100%',
-                    background: g.id === selectedId ? 'var(--ink)' : 'white',
-                    color: g.id === selectedId ? 'var(--paper)' : 'var(--ink)',
-                    border: `1px solid ${g.id === selectedId ? 'var(--ink)' : 'var(--paper3)'}`,
+                    background: g.id === selectedId ? 'var(--blush)' : 'white',
+                    color: g.id === selectedId ? 'white' : 'var(--ink)',
+                    border: `1px solid ${g.id === selectedId ? 'var(--blush)' : 'var(--paper3)'}`,
                     borderRadius: 'var(--radius)', padding: '16px 18px',
                     cursor: 'pointer', transition: 'all .15s', boxShadow: 'var(--shadow)'
                   }}
