@@ -35,6 +35,19 @@ export default function SignPage() {
     }).eq('id', gigId)
     setSigning(false)
     if (error) { alert(error.message); return }
+
+    // Send email notification
+    try {
+      await fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'signed',
+          data: { ...gig, signed_by: name.trim() }
+        })
+      })
+    } catch (e) { console.error('Notification failed', e) }
+
     setSigned(true)
   }
 
