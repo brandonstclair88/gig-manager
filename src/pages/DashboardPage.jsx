@@ -1,8 +1,11 @@
-import React, { useMemo } from 'react'
-import { CalendarDays, Bell } from 'lucide-react'
+import React, { useMemo, useState } from 'react'
+import { CalendarDays, Bell, Mail } from 'lucide-react'
 import { currency, fmtDate, fmtTime, invoiceBadge } from '../utils'
 
 export default function DashboardPage({ gigs, onNavigate }) {
+  const [sendingDigest, setSendingDigest] = useState(false)
+  const [digestSent, setDigestSent] = useState(false)
+
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
@@ -14,15 +17,12 @@ export default function DashboardPage({ gigs, onNavigate }) {
       g.date && new Date(g.date + 'T00:00:00') < today && g.invoice_status !== 'paid'
     ))
     const totalExpenses = gigs.reduce((s, g) => s + (g.expenses || []).reduce((es, e) => es + Number(e.amount || 0), 0), 0)
-
-    // Deposit reminders - gigs where deposit hasn't been received and event is within 30 days
     const depositReminders = gigs.filter(g => {
       if (!g.date) return false
       const gigDate = new Date(g.date + 'T00:00:00')
       const daysUntil = (gigDate - today) / (1000 * 60 * 60 * 24)
       return daysUntil >= 0 && daysUntil <= 30 && Number(g.deposit || 0) === 0 && g.invoice_status !== 'paid'
     })
-
     return { paid, outstanding, upcoming, overdue, totalExpenses, netProfit: paid - totalExpenses, depositReminders }
   }, [gigs])
 
@@ -35,11 +35,52 @@ export default function DashboardPage({ gigs, onNavigate }) {
     return diff >= 0 && diff <= 7
   })
 
+  async function sendWeeklyDigest() {
+    setSendingDigest(true)
+    setDigestSent(false)
+
+    const upcomingGigs = gigs
+      .filter(g => g.date && new Date(g.date + 'T00:00:00') >= today)
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .map(g => ({
+        ...g,
+        days_until: Math.ceil((new Date(g.date + 'T00:00:00') - today) / (1000 * 60 * 60 * 24))
+      }))
+
+    const res = await fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'weekly_digest',
+        data: { gigs: upcomingGigs }
+      })
+    })
+
+    setSendingDigest(false)
+    if (res.ok) {
+      setDigestSent(true)
+      setTimeout(() => setDigestSent(false), 5000)
+    } else {
+      alert('Failed to send digest. Please try again.')
+    }
+  }
+
   return (
     <div>
       <div className="page-header">
         <h1>Dashboard</h1>
-        <p className="muted">{today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <p className="muted">{today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</p>
+          <button
+            className="btn btn-ghost btn-sm"
+            onClick={sendWeeklyDigest}
+            disabled={sendingDigest}
+            style={digestSent ? { background: '#e2ede6', color: 'var(--green)' } : {}}
+          >
+            <Mail size={14} />
+            {sendingDigest ? 'Sending…' : digestSent ? '✓ Digest Sent!' : 'Send Weekly Digest'}
+          </button>
+        </div>
       </div>
 
       {nextGig && (

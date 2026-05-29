@@ -98,6 +98,66 @@ export default async function handler(req, res) {
         </div>
       </div>
     `
+  } else if (type === 'weekly_digest') {
+    to = ['paigestclair19@gmail.com']
+    subject = `🎵 Weekly Practice Digest — ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`
+    
+    const gigs = data.gigs || []
+    
+    const gigsHtml = gigs.length === 0 
+      ? '<p style="color: #9a9189; font-style: italic;">No upcoming gigs this week.</p>'
+      : gigs.map(g => `
+        <div style="background: #fdfaf7; border: 1px solid #ede5dc; border-radius: 12px; padding: 20px; margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+            <div>
+              <h3 style="font-family: Georgia, serif; font-size: 20px; font-weight: 400; font-style: italic; color: #1a1714; margin: 0 0 4px 0;">${g.title}</h3>
+              <p style="color: #9a9189; font-size: 13px; margin: 0;">${g.client || ''} · ${g.date || ''} · ${g.venue || ''}</p>
+            </div>
+            <span style="background: #f5e6e2; color: #b07870; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 500; white-space: nowrap;">${g.days_until === 0 ? 'Today' : g.days_until === 1 ? 'Tomorrow' : `${g.days_until} days away`}</span>
+          </div>
+          ${g.setlist ? `
+            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #ede5dc;">
+              <p style="font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: #9a9189; margin-bottom: 8px; font-weight: 500;">Set List</p>
+              <p style="font-size: 13px; color: #3d3733; white-space: pre-wrap; line-height: 1.7; margin: 0;">${g.setlist}</p>
+            </div>
+          ` : ''}
+          ${g.requested_songs ? `
+            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #ede5dc;">
+              <p style="font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: #9a9189; margin-bottom: 8px; font-weight: 500;">Client Song Requests</p>
+              <p style="font-size: 13px; color: #c9a097; white-space: pre-wrap; line-height: 1.7; margin: 0;">${g.requested_songs}</p>
+            </div>
+          ` : ''}
+          ${g.notes ? `
+            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #ede5dc;">
+              <p style="font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: #9a9189; margin-bottom: 8px; font-weight: 500;">Notes</p>
+              <p style="font-size: 13px; color: #7a746e; line-height: 1.7; margin: 0;">${g.notes}</p>
+            </div>
+          ` : ''}
+        </div>
+      `).join('')
+
+    html = `
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; color: #1a1714;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 32px; font-weight: 400; font-style: italic; color: #c9a097; margin: 0 0 8px 0;">Weekly Practice Digest</h1>
+          <p style="color: #9a9189; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; margin: 0;">Paige Camryn Music</p>
+          <div style="width: 40px; height: 1px; background: #c9a097; margin: 16px auto 0;"></div>
+        </div>
+        
+        <p style="font-size: 15px; color: #3d3733; line-height: 1.7; margin-bottom: 28px;">
+          Here's your weekly overview of upcoming gigs and their song selections. Use this to guide your practice this week.
+        </p>
+
+        <p style="font-size: 11px; text-transform: uppercase; letter-spacing: .14em; color: #9a9189; margin-bottom: 16px; font-weight: 500;">${gigs.length} Upcoming Gig${gigs.length !== 1 ? 's' : ''}</p>
+        
+        ${gigsHtml}
+
+        <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid #ede5dc; text-align: center;">
+          <p style="font-style: italic; font-size: 15px; color: #9a9189; margin-bottom: 4px;">Paige Camryn Music</p>
+          <p style="font-size: 12px; color: #b0a89e;">hello@paigecamryn.com</p>
+        </div>
+      </div>
+    `
   } else {
     return res.status(400).json({ error: 'Unknown notification type' })
   }
