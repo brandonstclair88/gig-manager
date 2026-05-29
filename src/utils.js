@@ -89,6 +89,8 @@ the duration of the event as outlined above. Services include:
   · Professional sound equipment (amplifier & speakers)
   · A custom song list tailored to the Client's event
   · One pre-event consultation to finalize song selections
+  · For performances exceeding two (2) hours, Performer requires
+    one 10-minute break per additional hour
 
 Client agrees to provide:
   · A safe performance area (min. 6ft x 6ft)
