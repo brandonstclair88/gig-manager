@@ -76,7 +76,7 @@ export default function SignPage() {
   )
 
   return (
-    <div style={{ minHeight: '100vh', background: '#fdfaf7', fontFamily: 'Jost, system-ui, sans-serif' }}>
+    <div style={{ minHeight: '100vh', width: '100%', background: '#fdfaf7', fontFamily: 'Jost, system-ui, sans-serif' }}>
 
       {/* Header */}
       <div style={{ background: '#f2ebe3', borderBottom: '1px solid #ede5dc', padding: '48px 20px 36px', textAlign: 'center' }}>
