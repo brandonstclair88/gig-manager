@@ -5,7 +5,7 @@ const CATEGORIES = ['Classical', 'Wedding', 'Pop', 'Jazz', 'Celtic', 'Christmas'
 
 function Nav({ page, setPage }) {
   return (
-    <nav style={{ background: '#f2ebe3', borderBottom: '1px solid #ede5dc', padding: '0 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+    <nav style={{ background: '#f2ebe3', borderBottom: '1px solid #ede5dc', padding: "0 5%", display: "flex"', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
       <div style={{ padding: '20px 0' }}>
         <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 400, fontStyle: 'italic', color: '#1a1714' }}>Paige Camryn Music</h1>
         <p style={{ fontSize: 10, letterSpacing: '.16em', textTransform: 'uppercase', color: '#9a9189', marginTop: 2 }}>Luxury Event Harpist</p>
@@ -62,7 +62,7 @@ function EventsPage({ setPage }) {
   return (
     <div>
       <Hero title="Events" subtitle="Live harp music for every occasion" />
-      <div style={{ maxWidth: 760, margin: '0 auto', padding: '60px 20px' }}>
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: '60px 20px' }}>
 
         <p style={{ fontSize: 15, lineHeight: 1.9, color: '#3d3733', marginBottom: 12 }}>
           Paige Camryn has had the opportunity to perform for a wide variety of public and private events including memorial services, bridal showers, baby showers, private dinners, fundraisers, holiday events, birthday parties, art galleries, galas, churches, country clubs, hospice homes and hospitals.
@@ -148,7 +148,7 @@ function WeddingsPage({ setPage }) {
   return (
     <div>
       <Hero title="Weddings" subtitle="Creating an unforgettable atmosphere for your most special day" />
-      <div style={{ maxWidth: 860, margin: '0 auto', padding: '60px 20px' }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '60px 20px' }}>
         <div style={{ display: 'grid', gap: 24, marginBottom: 48 }}>
           {packages.map((pkg, i) => (
             <div key={pkg.name} style={{ background: 'white', border: '1px solid #ede5dc', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 20px rgba(26,23,20,.06)' }}>
@@ -239,7 +239,7 @@ function RepertoirePage({ setPage, setPreselectedSongs }) {
   return (
     <div>
       <Hero title="Repertoire" subtitle="Browse my song list and select your favourites for your event" />
-      <div style={{ maxWidth: 860, margin: '0 auto', padding: '48px 20px' }}>
+      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '48px 20px' }}>
 
         {/* Category tabs */}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 32, justifyContent: 'center' }}>
@@ -368,7 +368,7 @@ function ContactPage({ preselectedSongs, setPreselectedSongs }) {
   return (
     <div>
       <Hero title="Contact" subtitle="Let's create something beautiful together" />
-      <div style={{ maxWidth: 640, margin: '0 auto', padding: '60px 20px' }}>
+      <div style={{ maxWidth: 720, margin: '0 auto', padding: '60px 20px' }}>
 
         {preselectedSongs.length > 0 && (
           <div style={{ background: '#f5e6e2', borderRadius: 12, padding: '16px 20px', marginBottom: 28, border: '1px solid #e8c8c0' }}>
@@ -431,7 +431,7 @@ export default function PublicSite() {
   const [preselectedSongs, setPreselectedSongs] = useState([])
 
   return (
-    <div style={{ minHeight: '100vh', background: '#fdfaf7', fontFamily: 'Jost, system-ui, sans-serif' }}>
+    <div style={{ minHeight: "100vh", width: "100%", background: "#fdfaf7", fontFamily: 'Jost, system-ui, sans-serif' }}>
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
       <Nav page={page} setPage={setPage} />
       {page === 'events'     && <EventsPage setPage={setPage} />}
