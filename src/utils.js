@@ -26,39 +26,139 @@ export function invoiceBadge(status) {
 }
 
 export function contractText(g) {
-  return `PERFORMANCE AGREEMENT
+  const balance = Math.max(Number(g.fee || 0) - Number(g.deposit || 0), 0)
+  const depositDueDate = g.date ? (() => {
+    const d = new Date(g.date + 'T00:00:00')
+    d.setDate(d.getDate() - 14)
+    return fmtDate(d.toISOString().slice(0, 10))
+  })() : '[14 days before event]'
 
-This agreement is entered into between:
+  return `PERFORMANCE AGREEMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PAIGE CAMRYN MUSIC
+Thousand Oaks, CA
+hello@paigecamryn.com
+paigecamryn.com
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+This Performance Agreement ("Agreement") is entered into between:
+
+PERFORMER: Paige Camryn, performing as Paige Camryn Music
+           Thousand Oaks, CA | hello@paigecamryn.com
 
 CLIENT:    ${g.client || '[Client Name]'}
-PERFORMER: [Your Name]
+           ${g.client_email ? g.client_email : ''}
 
-EVENT:  ${g.title || '[Event Title]'}
-VENUE:  ${g.venue || '[Venue]'}
-DATE:   ${fmtDate(g.date)}
-TIME:   ${fmtTime(g.time) || '[Time]'}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EVENT DETAILS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-──────────────────────────────────────────
+Event:    ${g.title || '[Event Title]'}
+Venue:    ${g.venue || '[Venue]'}
+Date:     ${fmtDate(g.date)}
+Time:     ${fmtTime(g.time) || '[Time]'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 FINANCIAL TERMS
-──────────────────────────────────────────
-Performance Fee:   ${currency(g.fee)}
-Deposit Due:       ${currency(g.deposit)}
-Balance Due:       ${currency(Math.max(Number(g.fee || 0) - Number(g.deposit || 0), 0))}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-──────────────────────────────────────────
-TERMS
-──────────────────────────────────────────
-1. The Performer agrees to provide live musical performance services for the duration of the event.
-2. The deposit is non-refundable and is due upon signing.
-3. The balance is due on the day of the performance prior to the start time.
-4. Cancellations within 14 days of the event forfeit the full fee.
+Total Performance Fee:   ${currency(g.fee)}
+Deposit (Non-Refundable): ${currency(g.deposit)}
+Balance Due:             ${currency(balance)}
 
-──────────────────────────────────────────
+PAYMENT SCHEDULE:
+  · Deposit of ${currency(g.deposit)} is due upon signing this Agreement
+    and no later than ${depositDueDate}
+  · Remaining balance of ${currency(balance)} is due in cash or
+    electronic payment on the day of the performance,
+    prior to the start of Performer's set
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SERVICES & EQUIPMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Performer agrees to provide live harp performance services for
+the duration of the event as outlined above. Services include:
+
+  · Live amplified harp performance
+  · Professional sound equipment (amplifier & speakers)
+  · A custom song list tailored to the Client's event
+  · One pre-event consultation to finalize song selections
+
+Client agrees to provide:
+  · A safe, covered performance area (min. 6ft x 6ft)
+  · Access to a standard electrical outlet within 25 feet
+  · Adequate parking or load-in access for equipment
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CANCELLATION POLICY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Cancellation by Client:
+  · More than 30 days before event: Deposit is forfeited
+  · 15–30 days before event: 50% of total fee is due
+  · Fewer than 14 days before event: 100% of total fee is due
+
+Cancellation by Performer:
+  · In the unlikely event Performer must cancel, Client will
+    receive a full refund of all payments made. Performer will
+    make reasonable efforts to find a qualified substitute.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FORCE MAJEURE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Neither party shall be held liable for failure to perform due to
+circumstances beyond their reasonable control, including but not
+limited to natural disasters, severe weather, government-mandated
+restrictions, illness, or other acts of God. In such cases, both
+parties agree to make reasonable efforts to reschedule.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GENERAL TERMS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. This Agreement constitutes the entire agreement between the
+   parties and supersedes all prior negotiations or understandings.
+
+2. Any modifications to this Agreement must be made in writing
+   and agreed upon by both parties.
+
+3. Performer reserves the right to record or photograph the
+   performance for promotional purposes unless otherwise agreed.
+
+4. Client shall not hold Performer liable for any injury, loss,
+   or damage arising from the performance unless caused by
+   Performer's gross negligence.
+
+5. This Agreement shall be governed by the laws of the State
+   of California.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 SIGNATURES
-──────────────────────────────────────────
-Client Signature:     ________________________________  Date: __________
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Performer Signature:  ________________________________  Date: __________
+By signing below, both parties agree to the terms of this
+Performance Agreement.
+
+CLIENT
+
+Name:      ${g.client || '________________________________'}
+Signature: ________________________________
+Date:      __________
+
+
+PERFORMER
+
+Name:      Paige Camryn
+Signature: ________________________________
+Date:      __________
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Paige Camryn Music · hello@paigecamryn.com · paigecamryn.com
 `
 }
 
