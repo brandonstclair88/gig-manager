@@ -25,7 +25,7 @@ export default function AuthPage() {
   return (
     <div className="auth-wrap">
       <div className="auth-card">
-        <h1>Gig Manager</h1>
+        <h1>Paige Camryn Music</h1>
         <p>{mode === 'login' ? 'Sign in to your account' : 'Create a new account'}</p>
         <div className="field" style={{ marginBottom: 14 }}>
           <label>Email</label>

@@ -71,8 +71,8 @@ export default function App() {
     <>
       <nav className="sidebar">
         <div className="sidebar-logo">
-          Gig Manager
-          <span>Solo Musician</span>
+          Paige Camryn Music
+          <span>Luxury Event Harpist</span>
         </div>
 
         {NAV.map(({ id, label, icon: Icon }) => (
