@@ -30,6 +30,9 @@ export function contractText(g) {
   const depositDueDate = g.date ? (() => {
     const d = new Date(g.date + 'T00:00:00')
     d.setDate(d.getDate() - 14)
+    const today = new Date()
+    today.setHours(0,0,0,0)
+    if (d <= today) return 'immediately upon signing'
     return fmtDate(d.toISOString().slice(0, 10))
   })() : '[14 days before event]'
 
