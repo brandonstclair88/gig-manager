@@ -11,6 +11,7 @@ import SignPage from './pages/SignPage'
 import RepertoirePage from './pages/RepertoirePage'
 import InquiriesPage from './pages/InquiriesPage'
 import PublicRepertoirePage from './pages/PublicRepertoirePage'
+import PublicSite from './pages/PublicSite'
 
 const NAV = [
   { id: 'dashboard',  label: 'Dashboard',  icon: LayoutDashboard },
@@ -33,6 +34,7 @@ export default function App() {
 
   // Public pages
   if (window.location.search.includes('gig=')) return <SignPage />
+  if (window.location.search.includes('site=')) return <PublicSite />
   if (window.location.search.includes('repertoire=')) return <PublicRepertoirePage />
 
   useEffect(() => {
