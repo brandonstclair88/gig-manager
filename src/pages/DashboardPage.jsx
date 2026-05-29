@@ -86,4 +86,34 @@ export default function DashboardPage({ gigs, onNavigate }) {
               <div key={g.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: i < Math.min(stats.upcoming.length, 5) - 1 ? '1px solid var(--paper3)' : 'none' }}>
                 <div>
                   <p style={{ fontWeight: 600, fontSize: 14 }}>{g.title}</p>
-                  <p className="muted">{fmtDate(g.date)} · {g.
+                  <p className="muted">{fmtDate(g.date)} · {g.client}</p>
+                </div>
+                <p style={{ fontWeight: 700, fontSize: 14, flexShrink: 0 }}>{currency(g.fee)}</p>
+              </div>
+            ))}
+        </div>
+
+        <div className="card">
+          <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: 20, marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Bell size={18} /> Alerts
+          </h3>
+          {stats.overdue.length === 0 && practiceReminders.length === 0 && (
+            <p className="muted">All clear — no alerts right now.</p>
+          )}
+          {stats.overdue.map(g => (
+            <div key={g.id} style={{ background: '#fde8e8', borderRadius: 10, padding: '10px 14px', marginBottom: 10 }}>
+              <p style={{ fontWeight: 600, fontSize: 14, color: 'var(--red)' }}>⚠ Unpaid: {g.title}</p>
+              <p style={{ fontSize: 12, color: 'var(--red)', opacity: .8 }}>{fmtDate(g.date)} · {currency(Math.max(Number(g.fee || 0) - Number(g.paid || 0), 0))} outstanding</p>
+            </div>
+          ))}
+          {practiceReminders.map(g => (
+            <div key={g.id} style={{ background: '#fef3cd', borderRadius: 10, padding: '10px 14px', marginBottom: 10 }}>
+              <p style={{ fontWeight: 600, fontSize: 14, color: '#856404' }}>🎵 Practice reminder: {g.title}</p>
+              <p style={{ fontSize: 12, color: '#856404', opacity: .8 }}>Practice on {fmtDate(g.practice_date)} for {fmtDate(g.date)} gig</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}

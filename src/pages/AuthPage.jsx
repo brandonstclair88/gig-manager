@@ -27,25 +27,20 @@ export default function AuthPage() {
       <div className="auth-card">
         <h1>Gig Manager</h1>
         <p>{mode === 'login' ? 'Sign in to your account' : 'Create a new account'}</p>
-
         <div className="field" style={{ marginBottom: 14 }}>
           <label>Email</label>
           <input type="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" />
         </div>
-
         <div className="field" style={{ marginBottom: 20 }}>
           <label>Password</label>
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password"
+          <input type="password" value={password} onChange={e => setPassword(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handle()} />
         </div>
-
         {msg && <p style={{ color: msg.startsWith('Check') ? 'green' : 'red', fontSize: 13, marginBottom: 14 }}>{msg}</p>}
-
         <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginBottom: 12 }}
           onClick={handle} disabled={loading}>
           {loading ? 'Please wait…' : mode === 'login' ? 'Sign In' : 'Create Account'}
         </button>
-
         <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--ink3)' }}>
           {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
           <button style={{ background: 'none', border: 'none', color: 'var(--gold)', fontWeight: 600, cursor: 'pointer', fontSize: 13 }}

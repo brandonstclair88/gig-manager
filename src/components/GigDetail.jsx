@@ -91,13 +91,11 @@ export default function GigDetail({ gig, onEdit, onDelete, onRefresh }) {
               <div className="mini-val" style={{ color: balance > 0 ? 'var(--red)' : 'var(--green)' }}>{currency(balance)}</div>
             </div>
           </div>
-
           {gig.practice_date && (
             <p style={{ marginTop: 12 }}>
               <strong>🎵 Practice reminder:</strong> {fmtDate(gig.practice_date)}
             </p>
           )}
-
           <div className="actions-row" style={{ marginTop: 20 }}>
             {balance > 0 && (
               <button className="btn btn-gold btn-sm" onClick={markPaid}>
@@ -196,7 +194,6 @@ export default function GigDetail({ gig, onEdit, onDelete, onRefresh }) {
             />
             <button className="btn btn-primary btn-sm" onClick={addExpense}><Plus size={14} /> Add</button>
           </div>
-
           {expenses.length === 0
             ? <p className="muted">No expenses recorded for this gig.</p>
             : expenses.map((ex, i) => (
@@ -207,7 +204,6 @@ export default function GigDetail({ gig, onEdit, onDelete, onRefresh }) {
               </div>
             ))
           }
-
           {expenses.length > 0 && (
             <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid var(--paper3)', display: 'flex', justifyContent: 'space-between' }}>
               <strong>Total Expenses</strong>

@@ -71,7 +71,6 @@ export default function CalendarPage({ gigs, userId, onRefresh }) {
         <div className="cal-header">
           {DAYS.map(d => <div key={d} className="cal-day-name">{d}</div>)}
         </div>
-
         <div className="calendar-grid">
           {cells.map((cell, i) => {
             const dayGigs = cell.date ? gigsForDate(cell.date) : []

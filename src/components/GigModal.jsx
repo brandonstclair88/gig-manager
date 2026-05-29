@@ -77,12 +77,10 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
             <label>Event Title</label>
             <input value={form.title} onChange={e => set('title', e.target.value)} placeholder="Wedding reception, corporate party…" />
           </div>
-
           <div className="field span2">
             <label>Client</label>
             <input value={form.client} onChange={e => set('client', e.target.value)} placeholder="Client name" />
           </div>
-
           <div className="field">
             <label>Invoice Status</label>
             <select value={form.invoice_status} onChange={e => set('invoice_status', e.target.value)}>
@@ -92,47 +90,38 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
               <option value="overdue">Overdue</option>
             </select>
           </div>
-
           <div className="field span3">
             <label>Venue</label>
             <input value={form.venue} onChange={e => set('venue', e.target.value)} placeholder="Venue name and address" />
           </div>
-
           <div className="field">
             <label>Date</label>
             <input type="date" value={form.date} onChange={e => set('date', e.target.value)} />
           </div>
-
           <div className="field">
             <label>Time</label>
             <input type="time" value={form.time} onChange={e => set('time', e.target.value)} />
           </div>
-
           <div className="field">
             <label>Practice Reminder</label>
             <input type="date" value={form.practice_date} onChange={e => set('practice_date', e.target.value)} />
           </div>
-
           <div className="field">
             <label>Fee ($)</label>
             <input type="number" min="0" value={form.fee} onChange={e => set('fee', e.target.value)} />
           </div>
-
           <div className="field">
             <label>Deposit ($)</label>
             <input type="number" min="0" value={form.deposit} onChange={e => set('deposit', e.target.value)} />
           </div>
-
           <div className="field">
             <label>Paid to Date ($)</label>
             <input type="number" min="0" value={form.paid} onChange={e => set('paid', e.target.value)} />
           </div>
-
           <div className="field span3">
             <label>Set List</label>
             <textarea value={form.setlist} onChange={e => set('setlist', e.target.value)} placeholder="Song 1, Song 2…" />
           </div>
-
           <div className="field span3">
             <label>Notes</label>
             <textarea value={form.notes} onChange={e => set('notes', e.target.value)} placeholder="Special requests, parking info, contact details…" />

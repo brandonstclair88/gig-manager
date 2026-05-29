@@ -94,3 +94,42 @@ export default function GigsPage({ gigs, userId, onRefresh }) {
                     border: `1px solid ${g.id === selectedId ? 'var(--ink)' : 'var(--paper3)'}`,
                     borderRadius: 'var(--radius)', padding: '16px 18px',
                     cursor: 'pointer', transition: 'all .15s', boxShadow: 'var(--shadow)'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
+                    <strong style={{ fontSize: 15 }}>{g.title}</strong>
+                    <span className={`badge ${invoiceBadge(g.invoice_status)}`} style={{ flexShrink: 0 }}>{g.invoice_status || 'draft'}</span>
+                  </div>
+                  <p style={{ fontSize: 13, opacity: .75, marginTop: 4 }}>{g.client} · {fmtDate(g.date)}</p>
+                  <p style={{ fontSize: 13, opacity: .7, marginTop: 2 }}>{g.venue}</p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
+                    <span style={{ fontSize: 13, fontWeight: 600 }}>{currency(g.fee)}</span>
+                    {balance > 0 && <span style={{ fontSize: 12, color: g.id === selectedId ? '#fca5a5' : 'var(--red)' }}>Owes {currency(balance)}</span>}
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {selectedGig && (
+          <GigDetail
+            gig={selectedGig}
+            onEdit={() => openEdit(selectedGig)}
+            onDelete={() => deleteGig(selectedGig.id)}
+            onRefresh={onRefresh}
+          />
+        )}
+      </div>
+
+      {showModal && (
+        <GigModal
+          gig={editingGig}
+          userId={userId}
+          onClose={() => setShowModal(false)}
+          onSaved={onRefresh}
+        />
+      )}
+    </div>
+  )
+}
