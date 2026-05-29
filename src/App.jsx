@@ -10,7 +10,6 @@ import ClientsPage from './pages/ClientsPage'
 import SignPage from './pages/SignPage'
 import RepertoirePage from './pages/RepertoirePage'
 import InquiriesPage from './pages/InquiriesPage'
-import PublicRepertoirePage from './pages/PublicRepertoirePage'
 import PublicSite from './pages/PublicSite'
 
 const NAV = [
@@ -35,7 +34,6 @@ export default function App() {
   // Public pages
   if (window.location.search.includes('gig=')) return <SignPage />
   if (window.location.search.includes('site=')) return <PublicSite />
-  if (window.location.search.includes('repertoire=')) return <PublicRepertoirePage />
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
