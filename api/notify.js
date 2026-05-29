@@ -47,6 +47,7 @@ export default async function handler(req, res) {
       </div>
     `
   } else if (type === 'contract') {
+    if (!data.client_email) return res.status(400).json({ error: 'No client email' })
     to = [data.client_email]
     subject = `Your Performance Agreement — ${data.title}`
     const signingLink = `${data.origin}?gig=${data.id}`
