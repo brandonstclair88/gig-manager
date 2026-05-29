@@ -4,9 +4,10 @@ export default async function handler(req, res) {
   const { type, data } = req.body
   const apiKey = process.env.RESEND_API_KEY
 
-  let subject, html
+  let subject, html, to
 
   if (type === 'inquiry') {
+    to = ['paigestclair19@gmail.com']
     subject = `New Enquiry from ${data.name}`
     html = `
       <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; color: #1a1714;">
@@ -27,6 +28,7 @@ export default async function handler(req, res) {
       </div>
     `
   } else if (type === 'signed') {
+    to = ['paigestclair19@gmail.com']
     subject = `Contract Signed — ${data.title}`
     html = `
       <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; color: #1a1714;">
@@ -44,6 +46,39 @@ export default async function handler(req, res) {
         </div>
       </div>
     `
+  } else if (type === 'contract') {
+    to = [data.client_email]
+    subject = `Your Performance Agreement — ${data.title}`
+    const signingLink = `${data.origin}?gig=${data.id}`
+    html = `
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; color: #1a1714;">
+        <h1 style="font-size: 28px; font-weight: 400; font-style: italic; color: #c9a097; margin-bottom: 8px;">Performance Agreement</h1>
+        <p style="color: #9a9189; font-size: 13px; margin-bottom: 32px; letter-spacing: .08em; text-transform: uppercase;">Paige Camryn Music · Luxury Event Harpist</p>
+
+        <p style="font-size: 15px; line-height: 1.7; margin-bottom: 24px;">Dear ${data.client || 'there'},</p>
+        <p style="font-size: 15px; line-height: 1.7; margin-bottom: 24px;">Thank you for booking Paige Camryn Music for your upcoming event. Please review and sign your performance agreement using the button below.</p>
+
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 32px;">
+          <tr><td style="padding: 10px 0; border-bottom: 1px solid #ede5dc; color: #9a9189; font-size: 13px; width: 140px;">Event</td><td style="padding: 10px 0; border-bottom: 1px solid #ede5dc; font-size: 14px;">${data.title}</td></tr>
+          <tr><td style="padding: 10px 0; border-bottom: 1px solid #ede5dc; color: #9a9189; font-size: 13px;">Date</td><td style="padding: 10px 0; border-bottom: 1px solid #ede5dc; font-size: 14px;">${data.date || '—'}</td></tr>
+          <tr><td style="padding: 10px 0; border-bottom: 1px solid #ede5dc; color: #9a9189; font-size: 13px;">Venue</td><td style="padding: 10px 0; border-bottom: 1px solid #ede5dc; font-size: 14px;">${data.venue || '—'}</td></tr>
+          <tr><td style="padding: 10px 0; color: #9a9189; font-size: 13px;">Fee</td><td style="padding: 10px 0; font-size: 14px;">$${Number(data.fee || 0).toFixed(2)}</td></tr>
+        </table>
+
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="${signingLink}" style="display: inline-block; padding: 16px 40px; background: #c9a097; color: white; text-decoration: none; border-radius: 10px; font-size: 13px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; font-family: Arial, sans-serif;">Review & Sign Contract</a>
+        </div>
+
+        <p style="font-size: 13px; color: #9a9189; line-height: 1.7;">If the button doesn't work, copy and paste this link into your browser:<br/>
+          <a href="${signingLink}" style="color: #c9a097;">${signingLink}</a>
+        </p>
+
+        <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid #ede5dc; text-align: center;">
+          <p style="font-style: italic; font-size: 15px; color: #9a9189;">Paige Camryn Music</p>
+          <p style="font-size: 12px; color: #b0a89e;">hello@paigecamryn.com</p>
+        </div>
+      </div>
+    `
   } else {
     return res.status(400).json({ error: 'Unknown notification type' })
   }
@@ -57,7 +92,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         from: 'Paige Camryn Music <onboarding@resend.dev>',
-        to: ['paigestclair19@gmail.com'],
+        to,
         subject,
         html
       })

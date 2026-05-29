@@ -5,7 +5,7 @@ import { supabase } from '../supabase'
 const EMPTY = {
   title: '', client: '', venue: '', date: '', time: '',
   fee: '', deposit: '', paid: '', setlist: '', notes: '',
-  practice_date: '', invoice_status: 'draft'
+  practice_date: '', invoice_status: 'draft', client_email: ''
 }
 
 export default function GigModal({ gig, userId, onClose, onSaved }) {
@@ -17,6 +17,7 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
       setForm({
         title: gig.title || '',
         client: gig.client || '',
+        client_email: gig.client_email || '',
         venue: gig.venue || '',
         date: gig.date || '',
         time: gig.time || '',
@@ -38,6 +39,7 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
     const payload = {
       title: form.title,
       client: form.client,
+      client_email: form.client_email,
       venue: form.venue,
       date: form.date || null,
       time: form.time || null,
@@ -77,9 +79,13 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
             <label>Event Title</label>
             <input value={form.title} onChange={e => set('title', e.target.value)} placeholder="Wedding reception, corporate party…" />
           </div>
-          <div className="field span2">
+          <div className="field">
             <label>Client</label>
             <input value={form.client} onChange={e => set('client', e.target.value)} placeholder="Client name" />
+          </div>
+          <div className="field">
+            <label>Client Email</label>
+            <input type="email" value={form.client_email} onChange={e => set('client_email', e.target.value)} placeholder="client@email.com" />
           </div>
           <div className="field">
             <label>Invoice Status</label>

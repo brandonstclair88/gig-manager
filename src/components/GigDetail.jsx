@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Edit2, Trash2, CheckCircle2, FileText, Download, Link, Plus, X } from 'lucide-react'
+import { Edit2, Trash2, CheckCircle2, FileText, Download, Link, Plus, X, Send } from 'lucide-react'
 import { supabase } from '../supabase'
 import { currency, fmtDate, fmtTime, invoiceBadge, contractText, downloadPDFInvoice } from '../utils'
 
@@ -37,6 +37,26 @@ export default function GigDetail({ gig, onEdit, onDelete, onRefresh }) {
 
   const totalExpenses = expenses.reduce((s, e) => s + Number(e.amount || 0), 0)
   const profit = Number(gig.paid || 0) - totalExpenses
+
+  async function sendContractEmail() {
+    if (!gig.client_email) {
+      alert('No client email on this gig. Edit the gig to add one.')
+      return
+    }
+    const res = await fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'contract',
+        data: { ...gig, origin: window.location.origin }
+      })
+    })
+    if (res.ok) {
+      alert(`Contract sent to ${gig.client_email}!`)
+    } else {
+      alert('Failed to send email. Please check the client email address.')
+    }
+  }
 
   function copySigningLink() {
     const url = `${window.location.origin}?gig=${gig.id}`
@@ -181,6 +201,11 @@ export default function GigDetail({ gig, onEdit, onDelete, onRefresh }) {
             <button className="btn btn-primary btn-sm" onClick={copySigningLink}>
               <Link size={14} /> Copy Signing Link
             </button>
+            {gig.client_email && (
+              <button className="btn btn-gold btn-sm" onClick={sendContractEmail}>
+                <Send size={14} /> Email Contract to Client
+              </button>
+            )}
           </div>
 
           {gig.signed_at ? (
