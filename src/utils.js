@@ -69,72 +69,125 @@ export async function downloadPDFInvoice(gig) {
   const balance = Math.max(Number(gig.fee || 0) - Number(gig.paid || 0), 0)
   const invoiceNum = `INV-${String(gig.id || '').slice(0, 6).toUpperCase() || Date.now()}`
 
-  doc.setFillColor(15, 13, 11)
-  doc.rect(0, 0, 210, 40, 'F')
-  doc.setTextColor(240, 192, 96)
-  doc.setFontSize(22)
+  // Header bar - warm cream
+  doc.setFillColor(242, 235, 227)
+  doc.rect(0, 0, 210, 44, 'F')
+
+  // Brand name in rose
+  doc.setTextColor(176, 120, 112)
+  doc.setFontSize(18)
   doc.setFont('helvetica', 'bold')
-  doc.text('GIG MANAGER', 14, 18)
-  doc.setTextColor(200, 190, 180)
-  doc.setFontSize(10)
+  doc.text('PAIGE CAMRYN MUSIC', 14, 16)
+
+  // Subtitle
+  doc.setTextColor(154, 145, 137)
+  doc.setFontSize(8)
   doc.setFont('helvetica', 'normal')
-  doc.text('INVOICE', 14, 28)
-  doc.text(invoiceNum, 14, 35)
-  doc.setTextColor(200, 190, 180)
-  doc.setFontSize(9)
+  doc.text('LUXURY EVENT HARPIST', 14, 23)
+  doc.text('INVOICE', 14, 31)
+  doc.text(invoiceNum, 14, 37)
+
+  // Date right aligned
   doc.text(`Date: ${fmtDate(new Date().toISOString().slice(0, 10))}`, 196, 20, { align: 'right' })
-  doc.setTextColor(15, 13, 11)
+
+  // Thin rose divider line
+  doc.setDrawColor(201, 160, 151)
+  doc.setLineWidth(0.5)
+  doc.line(0, 44, 210, 44)
+
+  // Reset text color
+  doc.setTextColor(26, 23, 20)
+
+  // Bill to
+  doc.setFontSize(8)
+  doc.setFont('helvetica', 'bold')
+  doc.setTextColor(154, 145, 137)
+  doc.text('BILL TO', 14, 56)
+  doc.setFont('helvetica', 'normal')
+  doc.setTextColor(26, 23, 20)
   doc.setFontSize(10)
+  doc.text(gig.client || '—', 14, 63)
+
+  // Event details
   doc.setFont('helvetica', 'bold')
-  doc.text('BILL TO', 14, 54)
+  doc.setFontSize(8)
+  doc.setTextColor(154, 145, 137)
+  doc.text('EVENT DETAILS', 110, 56)
   doc.setFont('helvetica', 'normal')
-  doc.text(gig.client || '—', 14, 61)
-  doc.setFont('helvetica', 'bold')
-  doc.text('EVENT DETAILS', 110, 54)
-  doc.setFont('helvetica', 'normal')
+  doc.setTextColor(26, 23, 20)
   doc.setFontSize(9)
-  doc.text(`Event: ${gig.title || '—'}`, 110, 61)
-  doc.text(`Venue: ${gig.venue || '—'}`, 110, 67)
-  doc.text(`Date:  ${fmtDate(gig.date)}`, 110, 73)
-  doc.text(`Time:  ${fmtTime(gig.time) || '—'}`, 110, 79)
-  doc.setDrawColor(220, 210, 200)
-  doc.line(14, 88, 196, 88)
-  doc.setFillColor(242, 237, 228)
-  doc.rect(14, 92, 182, 10, 'F')
+  doc.text(`Event: ${gig.title || '—'}`, 110, 63)
+  doc.text(`Venue: ${gig.venue || '—'}`, 110, 69)
+  doc.text(`Date:  ${fmtDate(gig.date)}`, 110, 75)
+  doc.text(`Time:  ${fmtTime(gig.time) || '—'}`, 110, 81)
+
+  // Divider
+  doc.setDrawColor(237, 229, 220)
+  doc.setLineWidth(0.3)
+  doc.line(14, 90, 196, 90)
+
+  // Table header - blush background
+  doc.setFillColor(245, 230, 226)
+  doc.rect(14, 94, 182, 10, 'F')
   doc.setFont('helvetica', 'bold')
-  doc.setFontSize(9)
-  doc.text('DESCRIPTION', 18, 99)
-  doc.text('AMOUNT', 188, 99, { align: 'right' })
+  doc.setFontSize(8)
+  doc.setTextColor(154, 145, 137)
+  doc.text('DESCRIPTION', 18, 101)
+  doc.text('AMOUNT', 188, 101, { align: 'right' })
+
+  // Line items
   doc.setFont('helvetica', 'normal')
-  let y = 116
+  doc.setTextColor(26, 23, 20)
+  doc.setFontSize(10)
+  let y = 118
   doc.text('Performance Fee', 18, y)
   doc.text(currency(gig.fee), 188, y, { align: 'right' })
+
   y += 10
+  doc.setTextColor(154, 145, 137)
   doc.text('Deposit Received', 18, y)
   doc.text(`-${currency(gig.deposit)}`, 188, y, { align: 'right' })
+
   y += 10
   doc.text('Paid to Date', 18, y)
   doc.text(`-${currency(gig.paid)}`, 188, y, { align: 'right' })
+
+  // Divider before total
+  doc.setDrawColor(237, 229, 220)
   doc.line(14, y + 8, 196, y + 8)
+
+  // Balance due box - rose
   y += 18
-  doc.setFillColor(15, 13, 11)
+  doc.setFillColor(201, 160, 151)
   doc.rect(110, y - 7, 86, 14, 'F')
-  doc.setTextColor(240, 192, 96)
+  doc.setTextColor(255, 255, 255)
   doc.setFont('helvetica', 'bold')
-  doc.setFontSize(11)
+  doc.setFontSize(10)
   doc.text('BALANCE DUE', 116, y + 1)
   doc.text(currency(balance), 188, y + 1, { align: 'right' })
-  doc.setTextColor(15, 13, 11)
+
+  // Thank you note
+  doc.setTextColor(154, 145, 137)
   doc.setFont('helvetica', 'normal')
-  doc.setFontSize(9)
-  doc.text('Thank you for your business. Payment is due on the day of the performance.', 14, y + 24)
+  doc.setFontSize(8)
+  doc.text('Thank you for choosing Paige Camryn Music. Payment is due on the day of the performance.', 14, y + 24)
+
   if (gig.notes) {
     doc.setFontSize(8)
-    doc.setTextColor(120, 116, 110)
+    doc.setTextColor(154, 145, 137)
     doc.text(`Notes: ${gig.notes}`, 14, y + 32)
   }
+
+  // Footer line
+  doc.setDrawColor(237, 229, 220)
+  doc.line(14, 272, 196, 272)
+  doc.setTextColor(201, 160, 151)
+  doc.setFontSize(8)
+  doc.text('Paige Camryn Music · Luxury Event Harpist · paigecamryn.com', 105, 278, { align: 'center' })
+
   doc.save(`${gig.title || 'invoice'}-invoice.pdf`)
 }
+
 
 export function exportCSV(gigs) {
   const headers = ['Title', 'Client', 'Venue', 'Date', 'Time', 'Fee', 'Deposit', 'Paid', 'Balance', 'Invoice Status', 'Notes']
