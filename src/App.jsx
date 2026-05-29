@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { LayoutDashboard, Music, CalendarDays, DollarSign, Users, LogOut } from 'lucide-react'
+import { LayoutDashboard, Music, CalendarDays, DollarSign, Users, LogOut, MessageSquare, BookOpen } from 'lucide-react'
 import { supabase } from './supabase'
 import AuthPage from './pages/AuthPage'
 import DashboardPage from './pages/DashboardPage'
@@ -8,13 +8,18 @@ import CalendarPage from './pages/CalendarPage'
 import FinancePage from './pages/FinancePage'
 import ClientsPage from './pages/ClientsPage'
 import SignPage from './pages/SignPage'
+import RepertoirePage from './pages/RepertoirePage'
+import InquiriesPage from './pages/InquiriesPage'
+import PublicRepertoirePage from './pages/PublicRepertoirePage'
 
 const NAV = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'gigs',      label: 'Gigs',      icon: Music },
-  { id: 'calendar',  label: 'Calendar',  icon: CalendarDays },
-  { id: 'finance',   label: 'Finance',   icon: DollarSign },
-  { id: 'clients',   label: 'Clients',   icon: Users },
+  { id: 'dashboard',  label: 'Dashboard',  icon: LayoutDashboard },
+  { id: 'inquiries',  label: 'Inquiries',  icon: MessageSquare },
+  { id: 'gigs',       label: 'Gigs',       icon: Music },
+  { id: 'calendar',   label: 'Calendar',   icon: CalendarDays },
+  { id: 'finance',    label: 'Finance',    icon: DollarSign },
+  { id: 'clients',    label: 'Clients',    icon: Users },
+  { id: 'repertoire', label: 'Repertoire', icon: BookOpen },
 ]
 
 export default function App() {
@@ -23,9 +28,12 @@ export default function App() {
   const [page, setPage] = useState('dashboard')
   const [gigs, setGigs] = useState([])
   const [clients, setClients] = useState([])
+  const [repertoire, setRepertoire] = useState([])
+  const [inquiries, setInquiries] = useState([])
 
-  // Show signing page if URL has ?gig=
+  // Public pages
   if (window.location.search.includes('gig=')) return <SignPage />
+  if (window.location.search.includes('repertoire=')) return <PublicRepertoirePage />
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -40,23 +48,33 @@ export default function App() {
 
   const loadGigs = useCallback(async () => {
     if (!user) return
-    const { data, error } = await supabase
-      .from('gigs').select('*').order('date', { ascending: true })
+    const { data, error } = await supabase.from('gigs').select('*').order('date', { ascending: true })
     if (!error) setGigs(data || [])
   }, [user])
 
   const loadClients = useCallback(async () => {
     if (!user) return
-    const { data, error } = await supabase
-      .from('clients').select('*').order('name', { ascending: true })
+    const { data, error } = await supabase.from('clients').select('*').order('name', { ascending: true })
     if (!error) setClients(data || [])
   }, [user])
 
-  function refresh() { loadGigs(); loadClients() }
+  const loadRepertoire = useCallback(async () => {
+    if (!user) return
+    const { data, error } = await supabase.from('repertoire').select('*').order('category').order('title')
+    if (!error) setRepertoire(data || [])
+  }, [user])
+
+  const loadInquiries = useCallback(async () => {
+    if (!user) return
+    const { data, error } = await supabase.from('inquiries').select('*').order('created_at', { ascending: false })
+    if (!error) setInquiries(data || [])
+  }, [user])
+
+  function refresh() { loadGigs(); loadClients(); loadRepertoire(); loadInquiries() }
 
   useEffect(() => {
-    if (user) { loadGigs(); loadClients() }
-    else { setGigs([]); setClients([]) }
+    if (user) { loadGigs(); loadClients(); loadRepertoire(); loadInquiries() }
+    else { setGigs([]); setClients([]); setRepertoire([]); setInquiries([]) }
   }, [user])
 
   async function signOut() {
@@ -101,11 +119,13 @@ export default function App() {
       </nav>
 
       <main className="page">
-        {page === 'dashboard' && <DashboardPage gigs={gigs} onNavigate={setPage} />}
-        {page === 'gigs'      && <GigsPage gigs={gigs} userId={user.id} onRefresh={refresh} />}
-        {page === 'calendar'  && <CalendarPage gigs={gigs} userId={user.id} onRefresh={refresh} />}
-        {page === 'finance'   && <FinancePage gigs={gigs} />}
-        {page === 'clients'   && <ClientsPage clients={clients} gigs={gigs} userId={user.id} onRefresh={refresh} />}
+        {page === 'dashboard'  && <DashboardPage gigs={gigs} onNavigate={setPage} />}
+        {page === 'inquiries'  && <InquiriesPage inquiries={inquiries} userId={user.id} onRefresh={refresh} />}
+        {page === 'gigs'       && <GigsPage gigs={gigs} userId={user.id} onRefresh={refresh} />}
+        {page === 'calendar'   && <CalendarPage gigs={gigs} userId={user.id} onRefresh={refresh} />}
+        {page === 'finance'    && <FinancePage gigs={gigs} />}
+        {page === 'clients'    && <ClientsPage clients={clients} gigs={gigs} userId={user.id} onRefresh={refresh} />}
+        {page === 'repertoire' && <RepertoirePage repertoire={repertoire} userId={user.id} onRefresh={refresh} />}
       </main>
     </>
   )
