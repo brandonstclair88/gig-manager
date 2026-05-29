@@ -35,18 +35,18 @@ export default function DashboardPage({ gigs, onNavigate }) {
 
       {nextGig && (
         <div style={{
-          background: 'var(--ink)', color: 'var(--paper)',
+          background: 'var(--blush3)', color: 'var(--ink)',
           borderRadius: 'var(--radius)', padding: '24px 28px',
           marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16
         }}>
           <div>
-            <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '.12em', color: 'var(--gold2)', marginBottom: 6 }}>Next Gig</p>
+            <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '.12em', color: 'var(--rose)', marginBottom: 6 }}>Next Gig</p>
             <h2 style={{ fontFamily: 'Playfair Display, serif', fontSize: 28, marginBottom: 6 }}>{nextGig.title}</h2>
             <p style={{ opacity: .75, fontSize: 14 }}>{fmtDate(nextGig.date)}{nextGig.time ? ` at ${fmtTime(nextGig.time)}` : ''} · {nextGig.venue}</p>
           </div>
           <div style={{ textAlign: 'right' }}>
             <p style={{ fontSize: 11, opacity: .6, textTransform: 'uppercase', letterSpacing: '.1em', marginBottom: 4 }}>Fee</p>
-            <p style={{ fontFamily: 'Playfair Display, serif', fontSize: 32, color: 'var(--gold2)' }}>{currency(nextGig.fee)}</p>
+            <p style={{ fontFamily: 'Playfair Display, serif', fontSize: 32, color: 'var(--rose)' }}>{currency(nextGig.fee)}</p>
             <span className={`badge ${invoiceBadge(nextGig.invoice_status)}`}>{nextGig.invoice_status}</span>
           </div>
         </div>

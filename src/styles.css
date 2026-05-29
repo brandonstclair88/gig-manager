@@ -272,3 +272,7 @@ tr:hover td { background: var(--paper); }
   .page-header h1 { font-size: 30px; }
   .cal-cell { min-height: 50px; }
 }
+
+/* ── Overrides ── */
+.btn-primary { background: var(--blush) !important; color: white !important; }
+.btn-gold { background: var(--rose) !important; color: white !important; }
