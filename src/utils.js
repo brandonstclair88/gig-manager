@@ -45,7 +45,7 @@ paigecamryn.com
 
 This Performance Agreement ("Agreement") is entered into between:
 
-PERFORMER: Paige Camryn, performing as Paige Camryn Music
+PERFORMER: Paige St. Clair, performing as Paige Camryn Music
            Thousand Oaks, CA | hello@paigecamryn.com
 
 CLIENT:    ${g.client || '[Client Name]'}
@@ -152,7 +152,7 @@ Date:      __________
 
 PERFORMER
 
-Name:      Paige Camryn
+Name:      Paige St. Clair
 Signature: ________________________________
 Date:      __________
 
