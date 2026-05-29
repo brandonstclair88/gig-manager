@@ -97,16 +97,18 @@ export default function App() {
           <span>Luxury Event Harpist</span>
         </div>
 
-        {NAV.map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            className={`nav-btn${page === id ? ' active' : ''}`}
-            onClick={() => setPage(id)}
-          >
-            <Icon size={17} />
-            {label}
-          </button>
-        ))}
+        <div className="sidebar-nav-group">
+          {NAV.map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              className={`nav-btn${page === id ? ' active' : ''}`}
+              onClick={() => setPage(id)}
+            >
+              <Icon size={17} />
+              {label}
+            </button>
+          ))}
+        </div>
 
         <div className="sidebar-spacer" />
 

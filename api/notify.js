@@ -80,6 +80,24 @@ export default async function handler(req, res) {
         </div>
       </div>
     `
+  } else if (type === 'quote') {
+    to = [data.email]
+    subject = `Your Quote from Paige Camryn Music`
+    html = `
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; color: #1a1714;">
+        <h1 style="font-size: 28px; font-weight: 400; font-style: italic; color: #c9a097; margin-bottom: 8px;">Your Quote</h1>
+        <p style="color: #9a9189; font-size: 13px; margin-bottom: 32px; letter-spacing: .08em; text-transform: uppercase;">Paige Camryn Music · Luxury Event Harpist</p>
+        <div style="white-space: pre-wrap; font-size: 15px; line-height: 1.8; color: #3d3733; margin-bottom: 32px;">${data.message}</div>
+        <div style="margin-top: 32px; padding: 24px; background: #f5e6e2; border-radius: 10px; border: 1px solid #e8c8c0; text-align: center;">
+          <p style="font-family: Georgia, serif; font-size: 13px; color: #9a9189; margin-bottom: 8px; text-transform: uppercase; letter-spacing: .1em;">Quoted Amount</p>
+          <p style="font-family: Georgia, serif; font-size: 36px; color: #c9a097; font-weight: 400; margin: 0;">$${Number(data.quoted_amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
+        </div>
+        <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #ede5dc; text-align: center;">
+          <p style="font-style: italic; font-size: 15px; color: #9a9189;">Paige Camryn Music</p>
+          <p style="font-size: 12px; color: #b0a89e;">hello@paigecamryn.com</p>
+        </div>
+      </div>
+    `
   } else {
     return res.status(400).json({ error: 'Unknown notification type' })
   }
