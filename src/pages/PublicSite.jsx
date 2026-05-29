@@ -5,7 +5,7 @@ const CATEGORIES = ['Classical', 'Wedding', 'Pop', 'Jazz', 'Celtic', 'Christmas'
 
 function Nav({ page, setPage }) {
   return (
-    <nav style={{ background: '#f2ebe3', borderBottom: '1px solid #ede5dc', padding: "0 5%", display: "flex"', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+    <nav style={{ background: '#f2ebe3', borderBottom: '1px solid #ede5dc', padding: "0 5%", display: "flex", alignItems: "center"', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
       <div style={{ padding: '20px 0' }}>
         <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 400, fontStyle: 'italic', color: '#1a1714' }}>Paige Camryn Music</h1>
         <p style={{ fontSize: 10, letterSpacing: '.16em', textTransform: 'uppercase', color: '#9a9189', marginTop: 2 }}>Luxury Event Harpist</p>
