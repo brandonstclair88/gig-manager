@@ -554,3 +554,37 @@ body[data-theme="dark"] .sign-out-btn:hover {
   background: rgba(255,255,255,.07) !important;
   color: #f0ece6 !important;
 }
+
+/* ── Dark Mode Badge & Status Fixes ── */
+body[data-theme="dark"] .badge-grey {
+  background: #3a342c !important;
+  color: #d4cdc4 !important;
+}
+
+body[data-theme="dark"] .badge-green {
+  background: #1a2e20 !important;
+  color: #7ab88a !important;
+}
+
+body[data-theme="dark"] .badge-gold {
+  background: #3d3010 !important;
+  color: #d4a830 !important;
+}
+
+body[data-theme="dark"] .badge-red {
+  background: #3d1a1a !important;
+  color: #e07070 !important;
+}
+
+/* Signed by box */
+body[data-theme="dark"] div[style*="background: '#d4edda'"],
+body[data-theme="dark"] div[style*="background: #d4edda"],
+body[data-theme="dark"] div[style*="background: '#e2ede6'"] {
+  background: #1a2e20 !important;
+  border-color: #2d4a35 !important;
+}
+
+body[data-theme="dark"] div[style*="background: '#d4edda'"] p,
+body[data-theme="dark"] div[style*="background: #e2ede6"] p {
+  color: #7ab88a !important;
+}
