@@ -200,7 +200,7 @@ function HomePage({ setPage }) {
               }}
             >
               Follow on Instagram
-            </a>
+            </button>
           </div>
 
           {/* Instagram embed via Behold widget - free tier */}
