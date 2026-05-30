@@ -27,7 +27,7 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
         setlist: gig.setlist || '',
         notes: gig.notes || '',
         invoice_status: gig.invoice_status || 'draft',
-        venue_address: gig.venue_address || ''
+        venue_address: gig.venue_address ? String(gig.venue_address) : ''
       })
     }
   }, [gig])
@@ -103,7 +103,7 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
           </div>
           <div className="field span3">
             <label>Venue Address</label>
-            <input value={form.venue_address} onChange={e => set('venue_address', e.target.value)} placeholder="123 Main St, City, CA 90210" />
+            <input value={form.venue_address ?? ''} onChange={e => set('venue_address', e.target.value)} placeholder="123 Main St, City, CA 90210" />
           </div>
           <div className="field">
             <label>Date</label>
