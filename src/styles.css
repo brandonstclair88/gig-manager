@@ -799,39 +799,3 @@ body[data-theme="dark"] div[style*="background: '#e2ede6'"] p {
   .nav-btn { padding: 8px 10px !important; font-size: 11px !important; gap: 6px !important; }
   .nav-btn svg { width: 14px !important; height: 14px !important; }
 }
-
-/* ── Nav scroll hint on mobile ── */
-@media (max-width: 768px) {
-  .sidebar-nav-group {
-    position: relative;
-  }
-
-  .sidebar-nav-group::after {
-    content: '›';
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--blush);
-    font-size: 20px;
-    pointer-events: none;
-    background: linear-gradient(to right, transparent, var(--ink) 60%);
-    padding: 4px 8px 4px 20px;
-  }
-
-  /* Public site nav scroll hint */
-  nav > div:last-child {
-    position: relative;
-  }
-
-  nav > div:last-child::after {
-    content: ' ›';
-    position: sticky;
-    right: 0;
-    color: #c9a097;
-    font-size: 16px;
-    flex-shrink: 0;
-    padding: 10px 4px;
-    background: linear-gradient(to right, transparent, #f2ebe3 60%);
-  }
-}
