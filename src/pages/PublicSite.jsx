@@ -11,7 +11,7 @@ function Nav({ page, setPage }) {
         <p style={{ fontSize: 10, letterSpacing: '.16em', textTransform: 'uppercase', color: '#9a9189', marginTop: 2 }}>Luxury Event Harpist</p>
       </div>
       <div style={{ display: 'flex', gap: 4 }}>
-        {['home', 'events', 'weddings', 'repertoire', 'contact'].map(p => (
+        {['home', 'music', 'events', 'weddings', 'repertoire', 'contact'].map(p => (
           <button key={p} onClick={() => setPage(p)} style={{
             padding: '8px 18px', border: 'none', background: 'transparent',
             fontFamily: 'Jost, sans-serif', fontSize: 12, fontWeight: 500,
@@ -163,6 +163,7 @@ function HomePage({ setPage }) {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20 }}>
           {[
             { title: 'Weddings', desc: 'From intimate ceremonies to grand celebrations, Paige creates the perfect musical atmosphere for your wedding day.', page: 'weddings' },
+            { title: 'Music', desc: 'Listen to Paige perform live. Browse her YouTube channel and get a taste of what she can bring to your event.', page: 'music' },
             { title: 'Events', desc: 'Corporate galas, private parties, fundraisers — live harp music elevates any occasion to something truly special.', page: 'events' },
             { title: 'Repertoire', desc: 'Browse hundreds of songs across classical, pop, jazz, Celtic and more. Select your favourites for your event.', page: 'repertoire' },
           ].map(s => (
@@ -302,6 +303,60 @@ function TestimonialsSection() {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+
+function MusicPage() {
+  const videos = [
+    { id: 'UCX_zOd0pkl_Iu2gl8G5ecdw', title: 'Thirty Minutes of Relaxation', desc: 'A peaceful collection of harp music perfect for relaxation and meditation.' },
+  ]
+
+  return (
+    <div>
+      <Hero title="Music" subtitle="Listen to Paige perform live and in the studio" />
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: '60px 20px' }}>
+
+        <div style={{ textAlign: 'center', marginBottom: 40 }}>
+          <p style={{ fontSize: 15, lineHeight: 1.8, color: '#3d3733', maxWidth: 560, margin: '0 auto 24px' }}>
+            Experience the beauty of live harp music. Browse Paige's performances and get a taste of what she can bring to your event.
+          </p>
+          <a href="https://www.youtube.com/@paigetheharpist" target="_blank" rel="noreferrer" style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            padding: '12px 24px', background: '#ff0000', color: 'white',
+            borderRadius: 10, fontSize: 12, fontWeight: 500, letterSpacing: '.08em',
+            textTransform: 'uppercase', textDecoration: 'none', fontFamily: 'Jost, sans-serif'
+          }}>▶ View Full YouTube Channel</a>
+        </div>
+
+        <div style={{ display: 'grid', gap: 32 }}>
+          <div style={{ background: 'white', border: '1px solid #ede5dc', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 20px rgba(26,23,20,.06)' }}>
+            <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}>
+              <iframe
+                src="https://www.youtube.com/embed?listType=user_uploads&list=UCX_zOd0pkl_Iu2gl8G5ecdw"
+                title="Paige Camryn Music"
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+            <div style={{ padding: '20px 24px' }}>
+              <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 400, fontStyle: 'italic', color: '#1a1714', marginBottom: 6 }}>Latest Performances</h3>
+              <p style={{ fontSize: 14, color: '#9a9189' }}>Watch Paige's latest videos from her YouTube channel</p>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ textAlign: 'center', marginTop: 48, padding: '40px', background: '#f5e6e2', borderRadius: 20, border: '1px solid #e8c8c0' }}>
+          <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 28, fontWeight: 400, fontStyle: 'italic', color: '#1a1714', marginBottom: 12 }}>Love what you hear?</h3>
+          <p style={{ color: '#9a9189', fontSize: 14, marginBottom: 24 }}>Book Paige for your next event and experience live harp music in person.</p>
+          <a href="?site=true" onClick={e => { e.preventDefault(); window.dispatchEvent(new CustomEvent('navigate', { detail: 'contact' })) }}
+            style={{ display: 'inline-block', padding: '14px 36px', background: '#c9a097', color: 'white', borderRadius: 10, fontSize: 12, fontWeight: 500, letterSpacing: '.12em', textTransform: 'uppercase', textDecoration: 'none', fontFamily: 'Jost, sans-serif', cursor: 'pointer' }}>
+            Book Paige
+          </a>
         </div>
       </div>
     </div>
@@ -686,6 +741,7 @@ export default function PublicSite() {
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
       <Nav page={page} setPage={setPage} />
       {page === 'home'       && <HomePage setPage={setPage} />}
+      {page === 'music'      && <MusicPage />}
       {page === 'events'     && <EventsPage setPage={setPage} />}
       {page === 'weddings'   && <WeddingsPage setPage={setPage} />}
       {page === 'repertoire' && <RepertoirePage setPage={setPage} setPreselectedSongs={setPreselectedSongs} />}
