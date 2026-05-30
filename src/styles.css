@@ -684,3 +684,92 @@ body[data-theme="dark"] div[style*="background: '#e2ede6'"] p {
     grid-template-columns: 1fr 1fr !important;
   }
 }
+
+/* ── Mobile App Layout Improvements ── */
+@media (max-width: 768px) {
+  /* Page padding */
+  .page { padding: 16px 14px !important; }
+
+  /* Page header stacks */
+  .page-header { 
+    flex-direction: column !important; 
+    align-items: flex-start !important;
+    gap: 10px !important;
+    margin-bottom: 16px !important;
+  }
+  .page-header h1 { font-size: 28px !important; }
+
+  /* Stats 2 col on mobile */
+  .stats { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+  .stat-card { padding: 14px !important; }
+  .stat-card .value { font-size: 22px !important; }
+
+  /* Cards full width */
+  .card { padding: 16px !important; }
+
+  /* Detail panel stacks below list */
+  div[style*="gridTemplateColumns: selectedGig"] { 
+    grid-template-columns: 1fr !important; 
+  }
+
+  /* Tabs scroll */
+  .tabs { 
+    width: 100% !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    flex-wrap: nowrap !important;
+  }
+  .tab { 
+    padding: 7px 12px !important; 
+    font-size: 10px !important;
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+  }
+
+  /* Mini grid 2 col */
+  .mini-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+  /* Filter bar stacks */
+  .filter-bar { flex-direction: column !important; }
+  .filter-bar input, .filter-bar select { width: 100% !important; }
+
+  /* Actions row wraps */
+  .actions-row { flex-wrap: wrap !important; }
+  .actions-row .btn { flex: 1 !important; justify-content: center !important; }
+
+  /* Modal full screen */
+  .modal-backdrop { padding: 0 !important; align-items: flex-end !important; }
+  .modal { 
+    border-radius: 20px 20px 0 0 !important; 
+    max-height: 92vh !important;
+    padding: 24px 16px !important;
+  }
+
+  /* Form grid single col */
+  .form-grid { grid-template-columns: 1fr !important; }
+
+  /* Dashboard cards stack */
+  div[style*="gridTemplateColumns: '1fr 1fr'"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Gig list buttons full width */
+  div[style*="display: 'grid', gap: 10"] button {
+    width: 100% !important;
+  }
+
+  /* Calendar smaller */
+  .cal-cell { min-height: 44px !important; padding: 4px !important; }
+  .cal-num { font-size: 11px !important; }
+  .cal-gig { font-size: 9px !important; padding: 1px 4px !important; }
+
+  /* Table responsive */
+  .table-wrap { font-size: 12px !important; }
+  th, td { padding: 8px 10px !important; }
+
+  /* Sign out button visible on mobile */
+  .sign-out-btn { display: flex !important; }
+
+  /* Search bar full width */
+  .filter-bar > div { width: 100% !important; flex: none !important; }
+}
