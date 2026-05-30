@@ -79,7 +79,7 @@ function HomePage({ setPage }) {
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, #f5e6e2 0%, #f2ebe3 60%, #ede5dc 100%)', opacity: .6 }} />
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 700 }}>
           <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.22em', marginBottom: 24, fontWeight: 500, fontFamily: 'Jost, sans-serif' }}>Luxury Event Harpist</p>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(48px, 8vw, 96px)', fontWeight: 300, fontStyle: 'italic', color: '#1a1714', lineHeight: 1.1, marginBottom: 32 }}>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(36px, 8vw, 96px)', fontWeight: 300, fontStyle: 'italic', color: '#1a1714', lineHeight: 1.1, marginBottom: 32 }}>
             Paige Camryn
           </h1>
           <div style={{ width: 60, height: 1, background: '#c9a097', margin: '0 auto 32px' }} />
@@ -102,7 +102,7 @@ function HomePage({ setPage }) {
       </div>
 
       {/* Bio section */}
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: '80px 20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: '48px 20px', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 40, alignItems: 'center' }}>
         <div>
           <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.2em', marginBottom: 16, fontWeight: 500, fontFamily: 'Jost, sans-serif' }}>About Paige</p>
           <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 400, fontStyle: 'italic', color: '#1a1714', marginBottom: 20, lineHeight: 1.2 }}>
@@ -160,7 +160,7 @@ function HomePage({ setPage }) {
           <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.2em', marginBottom: 12, fontWeight: 500, fontFamily: 'Jost, sans-serif' }}>Services</p>
           <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 400, fontStyle: 'italic', color: '#1a1714' }}>How can Paige serve you?</h2>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))', gap: 20 }}>
           {[
             { title: 'Weddings', desc: 'From intimate ceremonies to grand celebrations, Paige creates the perfect musical atmosphere for your wedding day.', page: 'weddings' },
             { title: 'Music', desc: 'Listen to Paige perform live. Browse her YouTube channel and get a taste of what she can bring to your event.', page: 'music' },
@@ -290,7 +290,7 @@ function TestimonialsSection() {
           <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.2em', marginBottom: 12, fontWeight: 500, fontFamily: 'Jost, sans-serif' }}>Kind Words</p>
           <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 400, fontStyle: 'italic', color: '#1a1714' }}>What clients say</h2>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: 20 }}>
           {testimonials.map(t => (
             <div key={t.id} style={{ background: 'white', borderRadius: 16, padding: '28px 24px', border: '1px solid #ede5dc', boxShadow: '0 2px 16px rgba(26,23,20,.05)' }}>
               <div style={{ display: 'flex', gap: 2, marginBottom: 14 }}>
@@ -332,7 +332,7 @@ function MusicPage() {
           }}>▶ View Full YouTube Channel</a>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(360px, 100%), 1fr))', gap: 24 }}>
           {[
             { id: 'E0ihH0jDN3U', title: 'Thirty Minutes of Relaxation', desc: 'A peaceful collection perfect for unwinding and relaxation.' },
             { id: "dmT36UVW0Jw", title: "More Favorites", desc: "A selection of Paige's favorite harp pieces." },
@@ -387,7 +387,7 @@ function EventsPage({ setPage }) {
           <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.2em', marginBottom: 20, fontWeight: 500 }}>Event Rates</p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 48 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', gap: 16, marginBottom: 48 }}>
           {[
             { duration: 'One Hour', price: '$375' },
             { duration: 'Two Hours', price: '$590' },
