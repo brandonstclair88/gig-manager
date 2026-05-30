@@ -27,7 +27,6 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
         setlist: gig.setlist || '',
         notes: gig.notes || '',
         invoice_status: gig.invoice_status || 'draft',
-        client_email: gig.client_email || '',
         venue_address: gig.venue_address || ''
       })
     }

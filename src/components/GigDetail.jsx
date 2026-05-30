@@ -171,7 +171,7 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
               
                 href={`maps://maps.apple.com/?q=${encodeURIComponent(gig.venue_address)}`}
                 style={{ fontSize: 12, color: 'var(--blush)', textDecoration: 'none', fontWeight: 500, fontFamily: 'Jost, sans-serif', letterSpacing: '.06em' }}
-              >Open in Apple Maps →</a>
+              >Open in Apple Maps</a>
             </div>
           )}
 
