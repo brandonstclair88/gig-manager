@@ -418,12 +418,13 @@ function EventsPage({ setPage }) {
   )
 }
 
-function WeddingsPage({ setPage }) {
+function WeddingsPage({ setPage, setSelectedPackage }) {
   const packages = [
     {
       name: 'Signature Ceremony',
       price: 'Starting at $500',
       duration: 'One Hour',
+      songLimit: 2,
       description: 'The signature ceremony includes pre-ceremony and ceremony music (processional, bridal walk, recessional) for one hour of live amplified harp music.',
       details: [
         'Includes one meeting with Paige six weeks prior to finalize song selections & confirm wedding day details',
@@ -434,6 +435,7 @@ function WeddingsPage({ setPage }) {
       name: 'C & C Serenade',
       price: 'Starting at $850',
       duration: 'Two Hours',
+      songLimit: 5,
       description: 'The C & C Serenade package includes pre-ceremony, ceremony and cocktail hour for a total of two hours of live amplified harp music.',
       details: [
         'Includes one meeting upon booking to discuss your vision for the perfect wedding day',
@@ -446,11 +448,12 @@ function WeddingsPage({ setPage }) {
       name: 'Evening Étude',
       price: 'Starting at $1,100',
       duration: 'Three Hours',
+      songLimit: 8,
       description: 'The Evening Étude package includes pre-ceremony, ceremony, cocktail hour, and reception for a total of three hours of live amplified harp music.',
       details: [
         'Playlists tailored by the couple and Paige over the course of your engagement',
         'Paige available upon booking by phone or email for song recommendations',
-        'Will learn up to 10 requested songs outside of her repertoire',
+        'Will learn up to 8 requested songs outside of her repertoire',
         'One meeting six weeks prior to finalize song selections & wedding day details',
         'Includes a recorded playlist of your wedding day songs delivered within two weeks',
       ]
@@ -481,12 +484,12 @@ function WeddingsPage({ setPage }) {
                     </li>
                   ))}
                 </ul>
-                <button onClick={() => setPage('contact')} style={{
+                <button onClick={() => { setSelectedPackage(pkg); setPage('contact') }} style={{
                   marginTop: 20, padding: '10px 24px', background: '#c9a097', color: 'white',
                   border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 500,
                   letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer',
                   fontFamily: 'Jost, sans-serif'
-                }}>Secure Your Date</button>
+                }}>Book This Package</button>
               </div>
             </div>
           ))}
@@ -640,8 +643,8 @@ function RepertoirePage({ setPage, setPreselectedSongs }) {
   )
 }
 
-function ContactPage({ preselectedSongs, setPreselectedSongs }) {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', event_type: '', event_date: '', venue: '', notes: '' })
+function ContactPage({ preselectedSongs, setPreselectedSongs, selectedPackage, setSelectedPackage }) {
+  const [form, setForm] = useState({ name: '', email: '', phone: '', event_type: '', event_date: '', venue: '', notes: '', song_requests: '' })
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
@@ -658,7 +661,12 @@ function ContactPage({ preselectedSongs, setPreselectedSongs }) {
       name: form.name, email: form.email, phone: form.phone,
       event_type: form.event_type, event_date: form.event_date || null,
       venue: form.venue,
-      notes: (form.notes ? form.notes + '\n\n' : '') + (songList ? 'Requested songs:\n' + songList : ''),
+      notes: [
+        form.notes,
+        selectedPackage ? `Package: ${selectedPackage.name} (${selectedPackage.price})` : '',
+        form.song_requests ? `Custom song requests:\n${form.song_requests}` : '',
+        songList ? `Repertoire selections:\n${songList}` : ''
+      ].filter(Boolean).join('\n\n'),
       stage: 'enquired'
     }])
     setSubmitting(false)
@@ -681,6 +689,15 @@ function ContactPage({ preselectedSongs, setPreselectedSongs }) {
     <div>
       <Hero title="Contact" subtitle="Let's create something beautiful together" />
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '60px 20px' }}>
+
+        {selectedPackage && (
+          <div style={{ background: '#f5e6e2', borderRadius: 12, padding: '16px 20px', marginBottom: 24, border: '1px solid #e8c8c0' }}>
+            <p style={{ fontWeight: 600, fontSize: 14, color: '#b07870', marginBottom: 4 }}>💍 Selected Package: {selectedPackage.name}</p>
+            <p style={{ fontSize: 13, color: '#9a9189' }}>{selectedPackage.price} · {selectedPackage.duration}</p>
+            <p style={{ fontSize: 13, color: '#9a9189', marginTop: 4 }}>You can request up to <strong>{selectedPackage.songLimit} custom songs</strong> outside of the standard repertoire.</p>
+            <button onClick={() => setSelectedPackage(null)} style={{ marginTop: 8, background: 'none', border: 'none', color: '#c9a097', fontSize: 12, cursor: 'pointer', padding: 0, fontFamily: 'Jost, sans-serif' }}>✕ Remove package</button>
+          </div>
+        )}
 
         {preselectedSongs.length > 0 && (
           <div style={{ background: '#f5e6e2', borderRadius: 12, padding: '16px 20px', marginBottom: 28, border: '1px solid #e8c8c0' }}>
@@ -709,6 +726,19 @@ function ContactPage({ preselectedSongs, setPreselectedSongs }) {
                 />
               </div>
             ))}
+            {selectedPackage && (
+              <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column' }}>
+                <label style={{ fontSize: 10, fontWeight: 500, color: '#9a9189', marginBottom: 6, letterSpacing: '.1em', textTransform: 'uppercase', fontFamily: 'Jost, sans-serif' }}>
+                  Song Requests (up to {selectedPackage.songLimit})
+                </label>
+                <textarea value={form.song_requests} 
+                  placeholder={`List up to ${selectedPackage.songLimit} songs you'd like Paige to learn for your event…`}
+                  onChange={e => setField('song_requests', e.target.value)}
+                  style={{ padding: '10px 13px', border: '1px solid #ede5dc', borderRadius: 8, fontSize: 14, fontFamily: 'Jost, sans-serif', background: '#fdfaf7', color: '#1a1714', minHeight: 100, resize: 'vertical', outline: 'none' }}
+                />
+                <p style={{ fontSize: 11, color: '#9a9189', marginTop: 4 }}>One song per line. You can finalise these with Paige closer to your event.</p>
+              </div>
+            )}
             <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column' }}>
               <label style={{ fontSize: 10, fontWeight: 500, color: '#9a9189', marginBottom: 6, letterSpacing: '.1em', textTransform: 'uppercase', fontFamily: 'Jost, sans-serif' }}>Additional Notes</label>
               <textarea value={form.notes} placeholder="Any special requests or questions…"
@@ -742,6 +772,7 @@ function ContactPage({ preselectedSongs, setPreselectedSongs }) {
 export default function PublicSite() {
   const [page, setPage] = useState('home')
   const [preselectedSongs, setPreselectedSongs] = useState([])
+  const [selectedPackage, setSelectedPackage] = useState(null)
 
   return (
     <div style={{ minHeight: "100vh", width: "100%", background: "#fdfaf7", fontFamily: 'Jost, system-ui, sans-serif' }}>
@@ -750,9 +781,9 @@ export default function PublicSite() {
       {page === 'home'       && <HomePage setPage={setPage} />}
       {page === 'music'      && <MusicPage />}
       {page === 'events'     && <EventsPage setPage={setPage} />}
-      {page === 'weddings'   && <WeddingsPage setPage={setPage} />}
+      {page === 'weddings'   && <WeddingsPage setPage={setPage} setSelectedPackage={setSelectedPackage} />}
       {page === 'repertoire' && <RepertoirePage setPage={setPage} setPreselectedSongs={setPreselectedSongs} />}
-      {page === 'contact'    && <ContactPage preselectedSongs={preselectedSongs} setPreselectedSongs={setPreselectedSongs} />}
+      {page === 'contact'    && <ContactPage preselectedSongs={preselectedSongs} setPreselectedSongs={setPreselectedSongs} selectedPackage={selectedPackage} setSelectedPackage={setSelectedPackage} />}
       <Footer />
     </div>
   )
