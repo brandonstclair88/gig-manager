@@ -42,9 +42,11 @@ export default function GigsPage({ gigs, userId, onRefresh }) {
   }
 
   async function toggleArchive(id, archived) {
-    await supabase.from('gigs').update({ archived: !archived }).eq('id', id)
+    const { error } = await supabase.from('gigs').update({ archived: !archived }).eq('id', id)
+    if (error) { alert(error.message); return }
     setSelectedId(null)
     onRefresh()
+    alert(archived ? 'Gig unarchived!' : 'Gig archived! Toggle "Show Archived" to view it.')
   }
 
   function openAdd() { setEditingGig(null); setShowModal(true) }
