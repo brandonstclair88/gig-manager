@@ -165,6 +165,16 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
             </div>
           </div>
 
+          {gig.venue_address && (
+            <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+              <p><strong>📍 Venue:</strong> {gig.venue_address}</p>
+              
+                href={`maps://maps.apple.com/?q=${encodeURIComponent(gig.venue_address)}`}
+                style={{ fontSize: 12, color: 'var(--blush)', textDecoration: 'none', fontWeight: 500, fontFamily: 'Jost, sans-serif', letterSpacing: '.06em' }}
+              >Open in Apple Maps →</a>
+            </div>
+          )}
+
           {gig.practice_date && (
             <p style={{ marginTop: 12 }}>
               <strong>🎵 Practice reminder:</strong> {fmtDate(gig.practice_date)}
@@ -263,10 +273,18 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
               <div className="mini-val" style={{ color: profit >= 0 ? 'var(--green)' : 'var(--red)' }}>{currency(profit)}</div>
             </div>
           </div>
-          <div style={{ marginTop: 16 }}>
+          <div style={{ marginTop: 16, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <button className="btn btn-ghost btn-sm" onClick={() => downloadPDFInvoice(gig)}>
               <Download size={14} /> Download Invoice PDF
             </button>
+            {gig.venue_address && (
+              
+                href={`maps://maps.apple.com/?q=${encodeURIComponent(gig.venue_address)}&saddr=Thousand+Oaks,CA`}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 13px', background: 'var(--paper2)', color: 'var(--ink2)', borderRadius: 8, fontSize: 11, fontWeight: 500, textDecoration: 'none', border: '1px solid var(--paper3)', letterSpacing: '.06em' }}
+              >
+                📍 Get Directions
+              </a>
+            )}
           </div>
         </>
       )}

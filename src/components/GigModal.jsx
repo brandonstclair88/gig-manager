@@ -5,7 +5,7 @@ import { supabase } from '../supabase'
 const EMPTY = {
   title: '', client: '', venue: '', date: '', time: '',
   fee: '', deposit: '', paid: '', setlist: '', notes: '',
-  invoice_status: 'draft', client_email: ''
+  invoice_status: 'draft', client_email: '', venue_address: ''
 }
 
 export default function GigModal({ gig, userId, onClose, onSaved }) {
@@ -26,7 +26,9 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
         paid: gig.paid ?? '',
         setlist: gig.setlist || '',
         notes: gig.notes || '',
-        invoice_status: gig.invoice_status || 'draft'
+        invoice_status: gig.invoice_status || 'draft',
+        client_email: gig.client_email || '',
+        venue_address: gig.venue_address || ''
       })
     }
   }, [gig])
@@ -40,6 +42,7 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
       client: form.client,
       client_email: form.client_email,
       venue: form.venue,
+      venue_address: form.venue_address,
       date: form.date || null,
       time: form.time || null,
       fee: Number(form.fee || 0),
@@ -95,9 +98,13 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
               <option value="overdue">Overdue</option>
             </select>
           </div>
+          <div className="field span2">
+            <label>Venue Name</label>
+            <input value={form.venue} onChange={e => set('venue', e.target.value)} placeholder="Venue name" />
+          </div>
           <div className="field span3">
-            <label>Venue</label>
-            <input value={form.venue} onChange={e => set('venue', e.target.value)} placeholder="Venue name and address" />
+            <label>Venue Address</label>
+            <input value={form.venue_address} onChange={e => set('venue_address', e.target.value)} placeholder="123 Main St, City, CA 90210" />
           </div>
           <div className="field">
             <label>Date</label>
