@@ -34,9 +34,12 @@ export default async function handler(req, res) {
     const [hours, minutes] = startTime.split(':')
     const startDateTime = `${startDate}T${startTime}:00`
     
-    // End time 2 hours after start
-    const endHour = String(Math.min(23, parseInt(hours) + 2)).padStart(2, '0')
-    const endDateTime = `${startDate}T${endHour}:${minutes}:00`
+    // End time based on duration
+    const duration = Number(gig.duration_hours || 2)
+    const totalMinutes = parseInt(hours) * 60 + parseInt(minutes) + duration * 60
+    const endHour = String(Math.min(23, Math.floor(totalMinutes / 60))).padStart(2, '0')
+    const endMin = String(Math.round(totalMinutes % 60)).padStart(2, '0')
+    const endDateTime = `${startDate}T${endHour}:${endMin}:00`
 
     return {
       summary: `🎵 ${gig.title}${gig.client ? ` — ${gig.client}` : ''}`,

@@ -46,6 +46,7 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
       client_email: form.client_email,
       venue: form.venue,
       venue_address: form.venue_address,
+      duration_hours: Number(form.duration_hours || 2),
       date: form.date || null,
       time: form.time || null,
       fee: Number(form.fee || 0),
@@ -182,6 +183,11 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.08em' }}>Time</label>
             <input type="time" value={form.time} onChange={e => set('time', e.target.value)} />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.08em' }}>Duration (hours)</label>
+            <input type="number" min="0.5" max="8" step="0.5" value={form.duration_hours} onChange={e => set('duration_hours', e.target.value)} />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>

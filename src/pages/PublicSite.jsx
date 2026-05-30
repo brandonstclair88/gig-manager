@@ -644,7 +644,7 @@ function RepertoirePage({ setPage, setPreselectedSongs }) {
 }
 
 function ContactPage({ preselectedSongs, setPreselectedSongs, selectedPackage, setSelectedPackage }) {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', event_type: '', event_date: '', venue: '', notes: '', song_requests: '' })
+  const [form, setForm] = useState({ name: '', email: '', phone: '', event_type: '', event_date: '', venue: '', notes: '', song_requests: '', bride_name: '', groom_name: '' })
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
@@ -661,6 +661,8 @@ function ContactPage({ preselectedSongs, setPreselectedSongs, selectedPackage, s
       name: form.name, email: form.email, phone: form.phone,
       event_type: form.event_type, event_date: form.event_date || null,
       venue: form.venue,
+      bride_name: form.bride_name || null,
+      groom_name: form.groom_name || null,
       notes: [
         form.notes,
         selectedPackage ? `Package: ${selectedPackage.name} (${selectedPackage.price})` : '',
@@ -717,6 +719,8 @@ function ContactPage({ preselectedSongs, setPreselectedSongs, selectedPackage, s
               { label: 'Event Type', key: 'event_type', placeholder: 'Wedding, corporate, private party…', type: 'text' },
               { label: 'Event Date', key: 'event_date', placeholder: '', type: 'date' },
               { label: 'Venue', key: 'venue', placeholder: 'Venue name or location', type: 'text' },
+              { label: "Bride's Name", key: 'bride_name', placeholder: "Bride's full name", type: 'text' },
+              { label: "Groom's Name", key: 'groom_name', placeholder: "Groom's full name", type: 'text' },
             ].map(f => (
               <div key={f.key} style={{ display: 'flex', flexDirection: 'column' }}>
                 <label style={{ fontSize: 10, fontWeight: 500, color: '#9a9189', marginBottom: 6, letterSpacing: '.1em', textTransform: 'uppercase', fontFamily: 'Jost, sans-serif' }}>{f.label}</label>
