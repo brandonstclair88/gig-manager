@@ -316,3 +316,45 @@ body[data-theme="dark"] .table-wrap { border-color: #2e2a24; }
 body[data-theme="dark"] .mini-cell { background: #2e2a24; }
 body[data-theme="dark"] .btn-ghost { background: #2e2a24; color: #d4cdc4; border-color: #3a342c; }
 body[data-theme="dark"] .auth-card { background: #242018; }
+
+/* ── Dark Mode Text Fixes ── */
+body[data-theme="dark"] p,
+body[data-theme="dark"] span,
+body[data-theme="dark"] td,
+body[data-theme="dark"] th,
+body[data-theme="dark"] label,
+body[data-theme="dark"] .muted { color: #d4cdc4; }
+
+body[data-theme="dark"] strong,
+body[data-theme="dark"] h1,
+body[data-theme="dark"] h2,
+body[data-theme="dark"] h3 { color: #f0ece6; }
+
+body[data-theme="dark"] .stat-card .label { color: #8a8078; }
+body[data-theme="dark"] .stat-card .value { color: #f0ece6; }
+body[data-theme="dark"] .stat-card .sub { color: #8a8078; }
+
+body[data-theme="dark"] .mini-cell .mini-label { color: #8a8078; }
+body[data-theme="dark"] .mini-cell .mini-val { color: #f0ece6; }
+
+body[data-theme="dark"] .page-header h1 { color: #f0ece6; }
+body[data-theme="dark"] .page-header p { color: #8a8078; }
+
+body[data-theme="dark"] .cal-num { color: #d4cdc4; }
+body[data-theme="dark"] .cal-cell { background: #242018; border-color: #2e2a24; }
+body[data-theme="dark"] .cal-cell.other-month { background: #1a1714; }
+
+body[data-theme="dark"] .contract-preview { background: #2e2a24; color: #d4cdc4; border-color: #3a342c; }
+
+body[data-theme="dark"] .badge-grey { background: #2e2a24; color: #8a8078; }
+body[data-theme="dark"] .filter-bar input,
+body[data-theme="dark"] .filter-bar select { background: #242018; color: #f0ece6; border-color: #2e2a24; }
+
+body[data-theme="dark"] .expense-row { border-color: #2e2a24; }
+body[data-theme="dark"] .divider { border-color: #2e2a24; }
+body[data-theme="dark"] .modal-footer { border-color: #2e2a24; }
+body[data-theme="dark"] .modal h2 { color: #f0ece6; }
+body[data-theme="dark"] .modal-close { background: #2e2a24; color: #d4cdc4; }
+
+body[data-theme="dark"] .sidebar-logo { color: #e8c8c0; }
+body[data-theme="dark"] .page-header { border-color: #2e2a24; }
