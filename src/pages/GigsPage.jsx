@@ -31,7 +31,7 @@ export default function GigsPage({ gigs, userId, onRefresh }) {
         if (sortBy === 'client') return (a.client || '').localeCompare(b.client || '')
         return 0
       })
-  }, [gigs, search, statusFilter, sortBy])
+  }, [gigs, search, statusFilter, sortBy, showArchived])
 
   async function deleteGig(id) {
     if (!confirm('Delete this gig? This cannot be undone.')) return
