@@ -835,3 +835,12 @@ body[data-theme="dark"] div[style*="background: '#e2ede6'"] p {
     background: linear-gradient(to right, transparent, #f2ebe3 60%);
   }
 }
+
+/* ── Public site nav responsive ── */
+.nav-desktop { display: flex !important; }
+.nav-mobile { display: none !important; }
+
+@media (max-width: 768px) {
+  .nav-desktop { display: none !important; }
+  .nav-mobile { display: block !important; }
+}
