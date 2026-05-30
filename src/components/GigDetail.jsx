@@ -71,10 +71,15 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
         body: JSON.stringify({ action, gig })
       })
       const data = await res.json()
-      if (data.eventId && !gig.calendar_event_id) {
-        await supabase.from('gigs').update({ calendar_event_id: data.eventId }).eq('id', gig.id)
+      if (data.error) {
+        alert('Calendar error: ' + JSON.stringify(data))
+        setSyncingCalendar(false)
+        return
       }
-      alert('✅ Synced to Google Calendar!')
+      if (data.eventId) {
+        await supabase.from('gigs').update({ calendar_event_id: data.eventId }).eq('id', gig.id)
+        alert('✅ Synced to Google Calendar! Check June ' + (gig.date || 'unknown date'))
+      }
       onRefresh()
     } catch (e) {
       alert('Failed to sync: ' + e.message)
