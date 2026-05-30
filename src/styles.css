@@ -435,3 +435,61 @@ body[data-theme="dark"] .divider { border-color: #3a342c !important; }
 body[data-theme="dark"] .expense-row { border-color: #3a342c !important; }
 body[data-theme="dark"] .table-wrap { border-color: #2e2a24 !important; }
 body[data-theme="dark"] thead { background: #2e2a24 !important; }
+
+/* ── Dark Mode Card & List Item Fixes ── */
+body[data-theme="dark"] button[style*="background: white"],
+body[data-theme="dark"] button[style*="background: 'white'"] {
+  background: #242018 !important;
+  color: #f0ece6 !important;
+  border-color: #3a342c !important;
+}
+
+body[data-theme="dark"] div[style*="background: white"],
+body[data-theme="dark"] div[style*="background: 'white'"] {
+  background: #242018 !important;
+  color: #f0ece6 !important;
+}
+
+body[data-theme="dark"] div[style*="background: '#fdfaf7'"],
+body[data-theme="dark"] div[style*="background: #fdfaf7"] {
+  background: #242018 !important;
+}
+
+body[data-theme="dark"] div[style*="background: '#f2ebe3'"],
+body[data-theme="dark"] div[style*="background: #f2ebe3"] {
+  background: #2e2a24 !important;
+}
+
+body[data-theme="dark"] div[style*="background: '#f5e6e2'"],
+body[data-theme="dark"] div[style*="background: #f5e6e2"] {
+  background: #3d2820 !important;
+}
+
+body[data-theme="dark"] div[style*="background: '#fef3cd'"],
+body[data-theme="dark"] div[style*="background: #fef3cd"] {
+  background: #3d3010 !important;
+}
+
+body[data-theme="dark"] div[style*="background: '#e2ede6'"],
+body[data-theme="dark"] div[style*="background: #e2ede6"] {
+  background: #1a2e20 !important;
+}
+
+body[data-theme="dark"] p[style*="color: '#1a1714'"],
+body[data-theme="dark"] p[style*="color: #1a1714"],
+body[data-theme="dark"] strong[style*="color: '#1a1714'"] { color: #f0ece6 !important; }
+
+body[data-theme="dark"] p[style*="color: '#3d3733'"],
+body[data-theme="dark"] p[style*="color: #3d3733"] { color: #d4cdc4 !important; }
+
+body[data-theme="dark"] p[style*="color: '#9a9189'"],
+body[data-theme="dark"] p[style*="color: #9a9189"],
+body[data-theme="dark"] span[style*="color: '#9a9189'"] { color: #8a8078 !important; }
+
+body[data-theme="dark"] div[style*="borderBottom: '1px solid #ede5dc'"],
+body[data-theme="dark"] div[style*="borderBottom: '1px solid var(--paper3)'"] {
+  border-color: #3a342c !important;
+}
+
+body[data-theme="dark"] .page { background: #1a1714 !important; }
+body[data-theme="dark"] #root { background: #1a1714 !important; }
