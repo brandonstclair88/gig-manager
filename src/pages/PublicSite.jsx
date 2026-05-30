@@ -11,7 +11,7 @@ function Nav({ page, setPage }) {
         <p style={{ fontSize: 10, letterSpacing: '.16em', textTransform: 'uppercase', color: '#9a9189', marginTop: 2 }}>Luxury Event Harpist</p>
       </div>
       <div style={{ display: 'flex', gap: 4 }}>
-        {['events', 'weddings', 'repertoire', 'contact'].map(p => (
+        {['home', 'events', 'weddings', 'repertoire', 'contact'].map(p => (
           <button key={p} onClick={() => setPage(p)} style={{
             padding: '8px 18px', border: 'none', background: 'transparent',
             fontFamily: 'Jost, sans-serif', fontSize: 12, fontWeight: 500,
@@ -54,6 +54,143 @@ function Hero({ title, subtitle }) {
       <h2 style={{ fontFamily: 'Cormorant Garamond, serif', color: '#1a1714', fontSize: 48, fontWeight: 400, fontStyle: 'italic', marginBottom: 12 }}>{title}</h2>
       <p style={{ color: '#9a9189', fontSize: 15, maxWidth: 480, margin: '0 auto' }}>{subtitle}</p>
       <div style={{ width: 40, height: 1, background: '#c9a097', margin: '24px auto 0' }} />
+    </div>
+  )
+}
+
+
+function HomePage({ setPage }) {
+  return (
+    <div style={{ width: '100%' }}>
+
+      {/* Hero */}
+      <div style={{
+        background: '#f2ebe3',
+        minHeight: '90vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textAlign: 'center',
+        padding: '80px 20px',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, #f5e6e2 0%, #f2ebe3 60%, #ede5dc 100%)', opacity: .6 }} />
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: 700 }}>
+          <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.22em', marginBottom: 24, fontWeight: 500, fontFamily: 'Jost, sans-serif' }}>Luxury Event Harpist</p>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(48px, 8vw, 96px)', fontWeight: 300, fontStyle: 'italic', color: '#1a1714', lineHeight: 1.1, marginBottom: 32 }}>
+            Paige Camryn
+          </h1>
+          <div style={{ width: 60, height: 1, background: '#c9a097', margin: '0 auto 32px' }} />
+          <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(18px, 3vw, 26px)', fontStyle: 'italic', color: '#7a746e', lineHeight: 1.6, marginBottom: 40, fontWeight: 300 }}>
+            Infusing Southern California with musical magic<br/>for over a decade
+          </p>
+          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button onClick={() => setPage('weddings')} style={{
+              padding: '14px 36px', background: '#c9a097', color: 'white', border: 'none',
+              borderRadius: 10, fontSize: 12, fontWeight: 500, letterSpacing: '.12em',
+              textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Jost, sans-serif'
+            }}>Book Paige</button>
+            <button onClick={() => setPage('repertoire')} style={{
+              padding: '14px 36px', background: 'transparent', color: '#1a1714',
+              border: '1px solid #c9a097', borderRadius: 10, fontSize: 12, fontWeight: 500,
+              letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Jost, sans-serif'
+            }}>Browse Repertoire</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Bio section */}
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: '80px 20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 60, alignItems: 'center' }}>
+        <div>
+          <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.2em', marginBottom: 16, fontWeight: 500, fontFamily: 'Jost, sans-serif' }}>About Paige</p>
+          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 400, fontStyle: 'italic', color: '#1a1714', marginBottom: 20, lineHeight: 1.2 }}>
+            A Southern California native with a distinctive harp origin story
+          </h2>
+          <p style={{ fontSize: 15, lineHeight: 1.9, color: '#3d3733', marginBottom: 16 }}>
+            Paige began her musical journey at the age of five, inspired by the music production process for one of her favorite childhood movies, <em>Barbie of Swan Lake</em>. One instrument in particular seemed to command her attention — and while her interest in Barbie quickly faded, her love of the harp was just beginning.
+          </p>
+          <p style={{ fontSize: 15, lineHeight: 1.9, color: '#3d3733', marginBottom: 24 }}>
+            Paige has performed at venues including the Civic Arts Plaza, Four Seasons Westlake Village, Ronald Reagan Presidential Library, Sherwood Country Club, Jonathan Club, and Calamigos Ranch. She is also passionate about providing instrumental relaxation for those in hospice and private homes.
+          </p>
+          <p style={{ fontSize: 15, lineHeight: 1.9, color: '#3d3733', marginBottom: 32 }}>
+            As a 2021 graduate from Bushnell University with a Bachelor of Arts in Interpersonal Communication and a minor in Music, Paige is well-equipped to provide an unforgettable experience.
+          </p>
+          <button onClick={() => setPage('contact')} style={{
+            padding: '12px 30px', background: '#1a1714', color: 'white', border: 'none',
+            borderRadius: 10, fontSize: 12, fontWeight: 500, letterSpacing: '.12em',
+            textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Jost, sans-serif'
+          }}>Book Her</button>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Decorative card */}
+          <div style={{ background: '#f5e6e2', borderRadius: 20, padding: '40px 32px', border: '1px solid #e8c8c0', textAlign: 'center' }}>
+            <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 48, color: '#c9a097', fontWeight: 300, marginBottom: 4 }}>10+</p>
+            <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '.14em', color: '#9a9189', fontFamily: 'Jost, sans-serif' }}>Years performing</p>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div style={{ background: '#f2ebe3', borderRadius: 16, padding: '24px 20px', border: '1px solid #ede5dc', textAlign: 'center' }}>
+              <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, color: '#c9a097', fontWeight: 300, marginBottom: 4 }}>50+</p>
+              <p style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '.12em', color: '#9a9189', fontFamily: 'Jost, sans-serif' }}>Venues</p>
+            </div>
+            <div style={{ background: '#f2ebe3', borderRadius: 16, padding: '24px 20px', border: '1px solid #ede5dc', textAlign: 'center' }}>
+              <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, color: '#c9a097', fontWeight: 300, marginBottom: 4 }}>∞</p>
+              <p style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '.12em', color: '#9a9189', fontFamily: 'Jost, sans-serif' }}>Memories</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quote section */}
+      <div style={{ background: '#1a1714', padding: '80px 20px', textAlign: 'center' }}>
+        <div style={{ maxWidth: 700, margin: '0 auto' }}>
+          <p style={{ color: '#c9a097', fontSize: 32, marginBottom: 24, opacity: .6 }}>"</p>
+          <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(20px, 3vw, 28px)', fontStyle: 'italic', color: '#fdfaf7', lineHeight: 1.7, fontWeight: 300, marginBottom: 24 }}>
+            Music stirs the human soul in an inexplicable manner: to tears, laughter, song and dance; healing is not an uncommon side effect of opening one's heart and mind to the possibilities that lie between the lines.
+          </p>
+          <p style={{ color: '#c9a097', fontSize: 12, textTransform: 'uppercase', letterSpacing: '.18em', fontFamily: 'Jost, sans-serif', fontWeight: 500 }}>— Paige Camryn</p>
+        </div>
+      </div>
+
+      {/* Services section */}
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: '80px 20px' }}>
+        <div style={{ textAlign: 'center', marginBottom: 48 }}>
+          <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.2em', marginBottom: 12, fontWeight: 500, fontFamily: 'Jost, sans-serif' }}>Services</p>
+          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 400, fontStyle: 'italic', color: '#1a1714' }}>How can Paige serve you?</h2>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20 }}>
+          {[
+            { title: 'Weddings', desc: 'From intimate ceremonies to grand celebrations, Paige creates the perfect musical atmosphere for your wedding day.', page: 'weddings' },
+            { title: 'Events', desc: 'Corporate galas, private parties, fundraisers — live harp music elevates any occasion to something truly special.', page: 'events' },
+            { title: 'Repertoire', desc: 'Browse hundreds of songs across classical, pop, jazz, Celtic and more. Select your favourites for your event.', page: 'repertoire' },
+          ].map(s => (
+            <div key={s.title} style={{ background: 'white', border: '1px solid #ede5dc', borderRadius: 20, padding: '32px 28px', boxShadow: '0 2px 20px rgba(26,23,20,.05)' }}>
+              <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 26, fontWeight: 400, fontStyle: 'italic', color: '#1a1714', marginBottom: 12 }}>{s.title}</h3>
+              <p style={{ fontSize: 14, lineHeight: 1.8, color: '#7a746e', marginBottom: 20 }}>{s.desc}</p>
+              <button onClick={() => setPage(s.page)} style={{
+                padding: '10px 22px', background: 'transparent', color: '#c9a097',
+                border: '1px solid #c9a097', borderRadius: 8, fontSize: 11, fontWeight: 500,
+                letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Jost, sans-serif'
+              }}>Learn More</button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div style={{ background: '#f5e6e2', padding: '60px 20px', textAlign: 'center', borderTop: '1px solid #e8c8c0' }}>
+        <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.2em', marginBottom: 12, fontWeight: 500, fontFamily: 'Jost, sans-serif' }}>Ready to book?</p>
+        <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 400, fontStyle: 'italic', color: '#1a1714', marginBottom: 16 }}>Let's create something beautiful</h2>
+        <p style={{ color: '#9a9189', fontSize: 15, marginBottom: 32 }}>Available throughout Southern California</p>
+        <button onClick={() => setPage('contact')} style={{
+          padding: '16px 48px', background: '#c9a097', color: 'white', border: 'none',
+          borderRadius: 10, fontSize: 12, fontWeight: 500, letterSpacing: '.14em',
+          textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Jost, sans-serif'
+        }}>Get in Touch</button>
+      </div>
+
     </div>
   )
 }
@@ -427,13 +564,14 @@ function ContactPage({ preselectedSongs, setPreselectedSongs }) {
 }
 
 export default function PublicSite() {
-  const [page, setPage] = useState('events')
+  const [page, setPage] = useState('home')
   const [preselectedSongs, setPreselectedSongs] = useState([])
 
   return (
     <div style={{ minHeight: "100vh", width: "100%", background: "#fdfaf7", fontFamily: 'Jost, system-ui, sans-serif' }}>
       <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
       <Nav page={page} setPage={setPage} />
+      {page === 'home'       && <HomePage setPage={setPage} />}
       {page === 'events'     && <EventsPage setPage={setPage} />}
       {page === 'weddings'   && <WeddingsPage setPage={setPage} />}
       {page === 'repertoire' && <RepertoirePage setPage={setPage} setPreselectedSongs={setPreselectedSongs} />}
