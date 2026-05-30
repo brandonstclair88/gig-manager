@@ -516,3 +516,41 @@ body[data-theme="dark"] .sign-out-btn { color: #d4cdc4 !important; }
 
 /* Email at bottom of sidebar */
 body[data-theme="dark"] div[style*="color: 'var(--ink3)'"] { color: #8a8078 !important; }
+
+/* ── Dark Mode Sidebar Fix ── */
+body[data-theme="dark"] .sidebar {
+  background: #1a1714 !important;
+  color: #f0ece6 !important;
+}
+
+body[data-theme="dark"] .sidebar-logo {
+  color: #e8c8c0 !important;
+}
+
+body[data-theme="dark"] .sidebar-logo span {
+  color: #6a6460 !important;
+}
+
+body[data-theme="dark"] .nav-btn {
+  color: #8a8078 !important;
+}
+
+body[data-theme="dark"] .nav-btn:hover {
+  background: rgba(255,255,255,.07) !important;
+  color: #f0ece6 !important;
+}
+
+body[data-theme="dark"] .nav-btn.active {
+  background: var(--blush) !important;
+  color: white !important;
+}
+
+body[data-theme="dark"] .sign-out-btn {
+  color: #8a8078 !important;
+  border-color: rgba(255,255,255,.1) !important;
+}
+
+body[data-theme="dark"] .sign-out-btn:hover {
+  background: rgba(255,255,255,.07) !important;
+  color: #f0ece6 !important;
+}
