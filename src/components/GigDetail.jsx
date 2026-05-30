@@ -169,6 +169,7 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
             <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
               <p><strong>📍 Venue:</strong> {gig.venue_address}</p>
               
+              <a
                 href={`maps://maps.apple.com/?q=${encodeURIComponent(gig.venue_address)}`}
                 style={{ fontSize: 12, color: 'var(--blush)', textDecoration: 'none', fontWeight: 500, fontFamily: 'Jost, sans-serif', letterSpacing: '.06em' }}
               >Open in Apple Maps</a>
@@ -279,6 +280,7 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
             </button>
             {gig.venue_address && (
               
+              <a
                 href={`maps://maps.apple.com/?q=${encodeURIComponent(gig.venue_address)}&saddr=Thousand+Oaks,CA`}
                 style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 13px', background: 'var(--paper2)', color: 'var(--ink2)', borderRadius: 8, fontSize: 11, fontWeight: 500, textDecoration: 'none', border: '1px solid var(--paper3)', letterSpacing: '.06em' }}
               >
