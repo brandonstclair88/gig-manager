@@ -180,6 +180,41 @@ function HomePage({ setPage }) {
         </div>
       </div>
 
+
+      {/* Instagram Section */}
+      <div style={{ background: 'white', padding: '80px 20px', borderTop: '1px solid #ede5dc' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.2em', marginBottom: 12, fontWeight: 500, fontFamily: 'Jost, sans-serif' }}>Follow Along</p>
+            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 400, fontStyle: 'italic', color: '#1a1714', marginBottom: 16 }}>@paigetheharpist</h2>
+            
+              href="https://www.instagram.com/paigetheharpist/"
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+                padding: '12px 28px', background: 'linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)',
+                color: 'white', borderRadius: 10, fontSize: 12, fontWeight: 500,
+                letterSpacing: '.1em', textTransform: 'uppercase', textDecoration: 'none',
+                fontFamily: 'Jost, sans-serif', marginBottom: 40
+              }}
+            >
+              Follow on Instagram
+            </a>
+          </div>
+
+          {/* Instagram embed via Behold widget - free tier */}
+          <div style={{ borderRadius: 16, overflow: 'hidden' }}>
+            <iframe
+              src="https://www.instagram.com/paigetheharpist/embed"
+              style={{ width: '100%', height: 500, border: 'none', borderRadius: 16 }}
+              scrolling="no"
+              allowTransparency="true"
+            />
+          </div>
+        </div>
+      </div>
+
       <TestimonialsSection />
 
       {/* CTA */}
