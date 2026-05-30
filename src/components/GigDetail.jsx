@@ -169,10 +169,10 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
             <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
               <p><strong>📍 Venue:</strong> {gig.venue_address}</p>
               
-              <a
-                href={`maps://maps.apple.com/?q=${encodeURIComponent(gig.venue_address)}`}
-                style={{ fontSize: 12, color: 'var(--blush)', textDecoration: 'none', fontWeight: 500, fontFamily: 'Jost, sans-serif', letterSpacing: '.06em' }}
-              >Open in Apple Maps</a>
+              <button
+                className="btn btn-ghost btn-sm"
+                onClick={() => window.open(`maps://maps.apple.com/?q=${encodeURIComponent(gig.venue_address)}`, '_blank')}
+              >📍 Open in Apple Maps</button>
             </div>
           )}
 
