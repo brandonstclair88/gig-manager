@@ -5,7 +5,7 @@ const CATEGORIES = ['Classical', 'Wedding', 'Pop', 'Rock', 'Jazz', 'Celtic', 'Ch
 
 function Nav({ page, setPage }) {
   const [menuOpen, setMenuOpen] = React.useState(false)
-  const [isMobile, setIsMobile] = React.useState(false)
+  const [isMobile, setIsMobile] = React.useState(window.innerWidth <= 768)
   const pages = ['home', 'music', 'events', 'weddings', 'repertoire', 'contact']
   const labels = { home: 'Home', music: 'Music', events: 'Events', weddings: 'Weddings', repertoire: 'Repertoire', contact: 'Contact' }
 
