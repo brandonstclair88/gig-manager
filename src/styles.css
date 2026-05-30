@@ -799,3 +799,22 @@ body[data-theme="dark"] div[style*="background: '#e2ede6'"] p {
   .nav-btn { padding: 8px 10px !important; font-size: 11px !important; gap: 6px !important; }
   .nav-btn svg { width: 14px !important; height: 14px !important; }
 }
+
+/* ── Public site nav mobile scroll hint ── */
+@media (max-width: 768px) {
+  .public-nav-tabs {
+    position: relative;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .public-nav-tabs::after {
+    content: '';
+    position: fixed;
+    right: 0;
+    width: 40px;
+    height: 44px;
+    background: linear-gradient(to right, transparent, #f2ebe3);
+    pointer-events: none;
+  }
+}
