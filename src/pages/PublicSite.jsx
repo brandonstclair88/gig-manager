@@ -332,22 +332,29 @@ function MusicPage() {
           }}>▶ View Full YouTube Channel</a>
         </div>
 
-        <div style={{ display: 'grid', gap: 32 }}>
-          <div style={{ background: 'white', border: '1px solid #ede5dc', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 20px rgba(26,23,20,.06)' }}>
-            <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}>
-              <iframe
-                src="https://www.youtube.com/embed?listType=user_uploads&list=UCX_zOd0pkl_Iu2gl8G5ecdw"
-                title="Paige Camryn Music"
-                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24 }}>
+          {[
+            { id: 'E0ihH0jDN3U', title: 'Thirty Minutes of Relaxation', desc: 'A peaceful collection perfect for unwinding and relaxation.' },
+            { id: 'dmT36UVW0Jw', title: 'More Favorites', desc: 'A selection of Paige's favorite harp pieces.' },
+            { id: 'HYF5x3fE1v8', title: 'Live Performance', desc: 'Experience the beauty of live harp music.' },
+            { id: 'k_Ib0HaKOZg', title: 'Featured Performance', desc: 'A stunning performance by Paige Camryn.' },
+          ].map(v => (
+            <div key={v.id} style={{ background: 'white', border: '1px solid #ede5dc', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 20px rgba(26,23,20,.06)' }}>
+              <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}>
+                <iframe
+                  src={`https://www.youtube.com/embed/${v.id}`}
+                  title={v.title}
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+              <div style={{ padding: '16px 20px' }}>
+                <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, fontWeight: 400, fontStyle: 'italic', color: '#1a1714', marginBottom: 4 }}>{v.title}</h3>
+                <p style={{ fontSize: 13, color: '#9a9189' }}>{v.desc}</p>
+              </div>
             </div>
-            <div style={{ padding: '20px 24px' }}>
-              <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 400, fontStyle: 'italic', color: '#1a1714', marginBottom: 6 }}>Latest Performances</h3>
-              <p style={{ fontSize: 14, color: '#9a9189' }}>Watch Paige's latest videos from her YouTube channel</p>
-            </div>
-          </div>
+          ))}
         </div>
 
         <div style={{ textAlign: 'center', marginTop: 48, padding: '40px', background: '#f5e6e2', borderRadius: 20, border: '1px solid #e8c8c0' }}>
