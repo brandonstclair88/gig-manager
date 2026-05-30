@@ -493,3 +493,26 @@ body[data-theme="dark"] div[style*="borderBottom: '1px solid var(--paper3)'"] {
 
 body[data-theme="dark"] .page { background: #1a1714 !important; }
 body[data-theme="dark"] #root { background: #1a1714 !important; }
+
+/* ── Dark Mode Specific Component Fixes ── */
+
+/* Sidebar logo */
+body[data-theme="dark"] .sidebar-logo { color: #f0ece6 !important; }
+body[data-theme="dark"] .sidebar-logo span { color: #8a8078 !important; }
+
+/* Next gig banner - change from blush to dark */
+body[data-theme="dark"] div[style*="background: '#f5e6e2'"][style*="border: '1px solid #e8c8c0'"] {
+  background: #2e2a24 !important;
+  border-color: #3a342c !important;
+}
+
+body[data-theme="dark"] div[style*="background: '#f5e6e2'"] p,
+body[data-theme="dark"] div[style*="background: '#f5e6e2'"] h2 {
+  color: #f0ece6 !important;
+}
+
+/* Sign out button */
+body[data-theme="dark"] .sign-out-btn { color: #d4cdc4 !important; }
+
+/* Email at bottom of sidebar */
+body[data-theme="dark"] div[style*="color: 'var(--ink3)'"] { color: #8a8078 !important; }
