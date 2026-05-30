@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Edit2, Trash2, CheckCircle2, FileText, Download, Link, Plus, X, Send, PenLine } from 'lucide-react'
+import { Edit2, Trash2, CheckCircle2, FileText, Download, Link, Plus, X, Send, PenLine, CreditCard } from 'lucide-react'
 import { supabase } from '../supabase'
 import { currency, fmtDate, fmtTime, invoiceBadge, contractText, downloadPDFInvoice } from '../utils'
 
@@ -59,6 +59,38 @@ export default function GigDetail({ gig, onEdit, onDelete, onRefresh }) {
   }
 
   const [signingAsPerformer, setSigningAsPerformer] = useState(false)
+  const [showPayment, setShowPayment] = useState(false)
+  const [paymentAmount, setPaymentAmount] = useState('')
+  const [paymentDesc, setPaymentDesc] = useState('')
+  const [passFee, setPassFee] = useState(true)
+  const [sendingPayment, setSendingPayment] = useState(false)
+
+  async function sendPaymentLink() {
+    if (!paymentAmount) { alert('Please enter an amount.'); return }
+    setSendingPayment(true)
+    const res = await fetch('/api/payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: paymentAmount,
+        gigId: gig.id,
+        gigTitle: gig.title,
+        client: gig.client,
+        client_email: gig.client_email,
+        description: paymentDesc || `Payment for ${gig.title}`,
+        passFeeToCient: passFee
+      })
+    })
+    const data = await res.json()
+    setSendingPayment(false)
+    if (data.url) {
+      navigator.clipboard.writeText(data.url)
+      alert('Payment link copied to clipboard! Send it to your client.')
+      setShowPayment(false)
+    } else {
+      alert('Failed to create payment link: ' + (data.error || 'Unknown error'))
+    }
+  }
   const [performerName, setPerformerName] = useState('Paige St. Clair')
 
   async function signAsPerformer() {
@@ -152,7 +184,51 @@ export default function GigDetail({ gig, onEdit, onDelete, onRefresh }) {
             <button className="btn btn-ghost btn-sm" onClick={() => downloadPDFInvoice(gig)}>
               <Download size={14} /> Download Invoice PDF
             </button>
+            {balance > 0 && (
+              <button className="btn btn-primary btn-sm" onClick={() => { setPaymentAmount(balance); setShowPayment(true) }}>
+                <CreditCard size={14} /> Request Payment
+              </button>
+            )}
           </div>
+
+          {showPayment && (
+            <div style={{ background: '#f5e6e2', borderRadius: 12, padding: 20, marginTop: 16, border: '1px solid #e8c8c0' }}>
+              <p style={{ fontWeight: 600, fontSize: 14, color: 'var(--rose)', marginBottom: 14 }}>💳 Create Payment Link</p>
+              <div style={{ display: 'grid', gap: 10, marginBottom: 14 }}>
+                <div className="field">
+                  <label>Amount ($)</label>
+                  <input type="number" value={paymentAmount} onChange={e => setPaymentAmount(e.target.value)} />
+                </div>
+                <div className="field">
+                  <label>Description (optional)</label>
+                  <input value={paymentDesc} onChange={e => setPaymentDesc(e.target.value)} placeholder={`Deposit for ${gig.title}`} />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <input
+                    type="checkbox"
+                    id="passFee"
+                    checked={passfee}
+                    onChange={e => setPassFee(e.target.checked)}
+                    style={{ width: 'auto', margin: 0 }}
+                  />
+                  <label htmlFor="passFee" style={{ textTransform: 'none', fontSize: 13, color: 'var(--ink2)', margin: 0 }}>
+                    Pass Stripe fee (2.9% + $0.30) to client
+                  </label>
+                </div>
+                {passFee && paymentAmount && (
+                  <p style={{ fontSize: 12, color: 'var(--ink3)' }}>
+                    Client will be charged: ${(Math.round((Number(paymentAmount) * 100 + 30) / (1 - 0.029)) / 100).toFixed(2)}
+                  </p>
+                )}
+              </div>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button className="btn btn-ghost btn-sm" onClick={() => setShowPayment(false)}>Cancel</button>
+                <button className="btn btn-primary btn-sm" onClick={sendPaymentLink} disabled={sendingPayment}>
+                  <CreditCard size={14} /> {sendingPayment ? 'Creating…' : 'Copy Payment Link'}
+                </button>
+              </div>
+            </div>
+          )}
         </>
       )}
 
