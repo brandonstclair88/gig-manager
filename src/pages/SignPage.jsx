@@ -64,6 +64,18 @@ export default function SignPage() {
   )
 
   if (signed) return (
+    <div style={{ minHeight: '100vh', width: '100%', background: '#fdfaf7', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <div style={{ textAlign: 'center', maxWidth: 420 }}>
+        <div style={{ fontSize: 48, marginBottom: 20 }}>✅</div>
+        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 400, fontStyle: 'italic', marginBottom: 12, color: '#1a1714' }}>Contract Signed!</h1>
+        <p style={{ color: '#9a9189', marginBottom: 8, fontSize: 15 }}>Thank you, <strong>{gig.signed_by}</strong>.</p>
+        <p style={{ color: '#9a9189', fontSize: 14 }}>Signed on {fmtDate(gig.signed_at?.slice(0, 10))} for <strong>{gig.title}</strong>.</p>
+        <p style={{ color: '#b0a89e', fontSize: 13, marginTop: 16, fontStyle: 'italic' }}>Paige will countersign and you will both have a fully executed agreement. You can close this page.</p>
+      </div>
+    </div>
+  )
+
+  if (false) return (
     <div style={{ minHeight: '100vh', background: '#fdfaf7', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
       <div style={{ textAlign: 'center', maxWidth: 420 }}>
         <div style={{ fontSize: 48, marginBottom: 20 }}>✅</div>

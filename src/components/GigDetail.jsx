@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Edit2, Trash2, CheckCircle2, FileText, Download, Link, Plus, X, Send } from 'lucide-react'
+import { Edit2, Trash2, CheckCircle2, FileText, Download, Link, Plus, X, Send, PenLine } from 'lucide-react'
 import { supabase } from '../supabase'
 import { currency, fmtDate, fmtTime, invoiceBadge, contractText, downloadPDFInvoice } from '../utils'
 
@@ -56,6 +56,21 @@ export default function GigDetail({ gig, onEdit, onDelete, onRefresh }) {
     } else {
       alert('Failed to send email. Please check the client email address.')
     }
+  }
+
+  const [signingAsPerformer, setSigningAsPerformer] = useState(false)
+  const [performerName, setPerformerName] = useState('Paige St. Clair')
+
+  async function signAsPerformer() {
+    if (!performerName.trim()) return
+    setSigningAsPerformer(true)
+    const { error } = await supabase.from('gigs').update({
+      performer_signature: performerName.trim(),
+      performer_signed_at: new Date().toISOString(),
+    }).eq('id', gig.id)
+    setSigningAsPerformer(false)
+    if (error) { alert(error.message); return }
+    onRefresh()
   }
 
   function copySigningLink() {
@@ -208,14 +223,42 @@ export default function GigDetail({ gig, onEdit, onDelete, onRefresh }) {
             )}
           </div>
 
+          {/* Client signature status */}
           {gig.signed_at ? (
-            <div style={{ background: '#d4edda', borderRadius: 10, padding: '12px 16px', marginBottom: 14 }}>
-              <p style={{ color: 'var(--green)', fontWeight: 600 }}>✍️ Signed by {gig.signed_by}</p>
+            <div style={{ background: '#e2ede6', borderRadius: 10, padding: '12px 16px', marginBottom: 12, border: '1px solid #c3dbc9' }}>
+              <p style={{ color: 'var(--green)', fontWeight: 600 }}>✍️ Client signed: {gig.signed_by}</p>
               <p style={{ color: 'var(--green)', fontSize: 13, marginTop: 2 }}>on {fmtDate(gig.signed_at?.slice(0, 10))}</p>
             </div>
           ) : (
-            <div style={{ background: '#fef3cd', borderRadius: 10, padding: '12px 16px', marginBottom: 14, fontSize: 13, color: '#856404' }}>
-              ⏳ Not yet signed. Copy the signing link and send it to your client.
+            <div style={{ background: '#fef3cd', borderRadius: 10, padding: '12px 16px', marginBottom: 12, fontSize: 13, color: '#856404', border: '1px solid #fde68a' }}>
+              ⏳ Awaiting client signature. Copy the signing link and send it to your client.
+            </div>
+          )}
+
+          {/* Performer signature */}
+          {gig.performer_signed_at ? (
+            <div style={{ background: '#e2ede6', borderRadius: 10, padding: '12px 16px', marginBottom: 14, border: '1px solid #c3dbc9' }}>
+              <p style={{ color: 'var(--green)', fontWeight: 600 }}>✍️ Performer signed: {gig.performer_signature}</p>
+              <p style={{ color: 'var(--green)', fontSize: 13, marginTop: 2 }}>on {fmtDate(gig.performer_signed_at?.slice(0, 10))}</p>
+            </div>
+          ) : (
+            <div style={{ background: '#f5e6e2', borderRadius: 10, padding: '16px', marginBottom: 14, border: '1px solid #e8c8c0' }}>
+              <p style={{ fontWeight: 600, fontSize: 14, color: 'var(--rose)', marginBottom: 10 }}>✍️ Sign as Performer</p>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <input
+                  value={performerName}
+                  onChange={e => setPerformerName(e.target.value)}
+                  placeholder="Your full legal name"
+                  style={{ flex: 1, padding: '8px 12px', border: '1px solid #e8c8c0', borderRadius: 8, fontSize: 14, background: 'white' }}
+                />
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={signAsPerformer}
+                  disabled={signingAsPerformer || !performerName.trim()}
+                >
+                  <PenLine size={14} /> {signingAsPerformer ? 'Signing…' : 'Sign'}
+                </button>
+              </div>
             </div>
           )}
 

@@ -151,15 +151,15 @@ Performance Agreement.
 CLIENT
 
 Name:      ${g.client || '________________________________'}
-Signature: ________________________________
-Date:      __________
+Signature: ${g.signed_by ? g.signed_by : '________________________________'}
+Date:      ${g.signed_at ? fmtDate(g.signed_at.slice(0, 10)) : '__________'}
 
 
 PERFORMER
 
 Name:      Paige St. Clair
-Signature: ________________________________
-Date:      __________
+Signature: ${g.performer_signature ? g.performer_signature : '________________________________'}
+Date:      ${g.performer_signed_at ? fmtDate(g.performer_signed_at.slice(0, 10)) : '__________'}
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
