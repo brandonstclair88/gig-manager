@@ -93,9 +93,9 @@ export default function ClientsPage({ clients, gigs, userId, onRefresh }) {
                 onClick={() => setSelectedId(c.id === selectedId ? null : c.id)}
                 style={{
                   display: 'block', textAlign: 'left', width: '100%',
-                  background: c.id === selectedId ? 'var(--ink)' : 'white',
-                  color: c.id === selectedId ? 'var(--paper)' : 'var(--ink)',
-                  border: `1px solid ${c.id === selectedId ? 'var(--ink)' : 'var(--paper3)'}`,
+                  background: c.id === selectedId ? 'var(--blush)' : 'var(--paper)',
+                  color: c.id === selectedId ? 'white' : 'var(--ink)',
+                  border: `1px solid ${c.id === selectedId ? 'var(--blush)' : 'var(--paper3)'}`,
                   borderRadius: 'var(--radius)', padding: '14px 16px',
                   cursor: 'pointer', transition: 'all .15s', boxShadow: 'var(--shadow)'
                 }}

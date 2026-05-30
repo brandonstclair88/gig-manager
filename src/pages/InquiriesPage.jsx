@@ -285,7 +285,7 @@ export default function InquiriesPage({ inquiries, userId, onRefresh }) {
                     onClick={() => setSelectedId(inq.id === selectedId ? null : inq.id)}
                     style={{
                       display: 'block', textAlign: 'left', width: '100%',
-                      background: inq.id === selectedId ? 'var(--blush)' : 'white',
+                      background: inq.id === selectedId ? 'var(--blush)' : 'var(--paper)',
                       color: inq.id === selectedId ? 'white' : 'var(--ink)',
                       border: `1px solid ${inq.id === selectedId ? 'var(--blush)' : 'var(--paper3)'}`,
                       borderRadius: 'var(--radius)', padding: '14px 16px',

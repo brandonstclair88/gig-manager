@@ -82,7 +82,7 @@ export default function TestimonialsPage() {
 
       <div style={{ display: 'grid', gap: 14 }}>
         {filtered.map(t => (
-          <div key={t.id} className="card" style={{ borderLeft: `4px solid ${t.approved ? 'var(--green)' : 'var(--blush)'}` }}>
+          <div key={t.id} className="card" style={{ borderLeft: `4px solid ${t.approved ? 'var(--green)' : 'var(--blush)'}`, background: 'var(--paper)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>

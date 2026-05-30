@@ -114,7 +114,7 @@ export default function RepertoirePage({ repertoire, userId, onRefresh }) {
         </div>
       </div>
 
-      <div style={{ background: '#d4edda', borderRadius: 12, padding: '12px 16px', marginBottom: 20, fontSize: 13, color: 'var(--green)' }}>
+      <div style={{ background: 'var(--paper2)', borderRadius: 12, padding: '12px 16px', marginBottom: 20, fontSize: 13, color: 'var(--green)', border: '1px solid var(--paper3)' }}>
         🎵 Share your public repertoire link with clients so they can browse your songs and submit song requests when enquiring.
       </div>
 
