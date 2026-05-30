@@ -35,6 +35,16 @@ export default function GigsPage({ gigs, userId, onRefresh }) {
 
   async function deleteGig(id) {
     if (!confirm('Delete this gig? This cannot be undone.')) return
+    const gig = gigs.find(g => g.id === id)
+    if (gig?.calendar_event_id) {
+      try {
+        await fetch('/api/calendar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'delete', gig })
+        })
+      } catch (e) { console.error('Calendar delete failed:', e) }
+    }
     const { error } = await supabase.from('gigs').delete().eq('id', id)
     if (error) { alert(error.message); return }
     setSelectedId(null)

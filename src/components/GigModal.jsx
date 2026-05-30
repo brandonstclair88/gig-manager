@@ -68,6 +68,34 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
 
     setLoading(false)
     if (error) { alert(error.message); return }
+
+    // Sync with Google Calendar
+    try {
+      if (gig?.id && gig?.calendar_event_id) {
+        // Update existing event
+        await fetch('/api/calendar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'update', gig: { ...payload, id: gig.id, calendar_event_id: gig.calendar_event_id } })
+        })
+      } else {
+        // Create new event
+        const calRes = await fetch('/api/calendar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'create', gig: payload })
+        })
+        const calData = await calRes.json()
+        if (calData.eventId) {
+          // Save the calendar event ID back to the gig
+          const gigId = gig?.id || (await supabase.from('gigs').select('id').order('created_at', { ascending: false }).limit(1).single()).data?.id
+          await supabase.from('gigs').update({ calendar_event_id: calData.eventId }).eq('id', gigId)
+        }
+      }
+    } catch (e) {
+      console.error('Calendar sync failed:', e)
+    }
+
     onSaved()
     onClose()
   }

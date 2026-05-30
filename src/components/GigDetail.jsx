@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Edit2, Trash2, CheckCircle2, FileText, Download, Link, Plus, X, Send, PenLine, CreditCard, Archive } from 'lucide-react'
+import { Edit2, Trash2, CheckCircle2, FileText, Download, Link, Plus, X, Send, PenLine, CreditCard, Archive, Calendar } from 'lucide-react'
 import { supabase } from '../supabase'
 import { currency, fmtDate, fmtTime, invoiceBadge, contractText, downloadPDFInvoice } from '../utils'
 
@@ -59,6 +59,28 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
   }
 
   const [signingAsPerformer, setSigningAsPerformer] = useState(false)
+  const [syncingCalendar, setSyncingCalendar] = useState(false)
+
+  async function syncToCalendar() {
+    setSyncingCalendar(true)
+    try {
+      const action = gig.calendar_event_id ? 'update' : 'create'
+      const res = await fetch('/api/calendar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, gig })
+      })
+      const data = await res.json()
+      if (data.eventId && !gig.calendar_event_id) {
+        await supabase.from('gigs').update({ calendar_event_id: data.eventId }).eq('id', gig.id)
+      }
+      alert('✅ Synced to Google Calendar!')
+      onRefresh()
+    } catch (e) {
+      alert('Failed to sync: ' + e.message)
+    }
+    setSyncingCalendar(false)
+  }
   const [showPayment, setShowPayment] = useState(false)
   const [paymentAmount, setPaymentAmount] = useState('')
   const [paymentDesc, setPaymentDesc] = useState('')
@@ -197,6 +219,9 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
             )}
             <button className="btn btn-ghost btn-sm" onClick={() => downloadPDFInvoice(gig)}>
               <Download size={14} /> Download Invoice PDF
+            </button>
+            <button className="btn btn-ghost btn-sm" onClick={syncToCalendar} disabled={syncingCalendar}>
+              <Calendar size={14} /> {syncingCalendar ? 'Syncing…' : gig.calendar_event_id ? 'Update Calendar' : 'Add to Calendar'}
             </button>
             {balance > 0 && (
               <button className="btn btn-primary btn-sm" onClick={() => { setPaymentAmount(balance); setShowPayment(true) }}>
