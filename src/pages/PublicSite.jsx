@@ -179,6 +179,8 @@ function HomePage({ setPage }) {
         </div>
       </div>
 
+      <TestimonialsSection />
+
       {/* CTA */}
       <div style={{ background: '#f5e6e2', padding: '60px 20px', textAlign: 'center', borderTop: '1px solid #e8c8c0' }}>
         <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.2em', marginBottom: 12, fontWeight: 500, fontFamily: 'Jost, sans-serif' }}>Ready to book?</p>
@@ -191,6 +193,117 @@ function HomePage({ setPage }) {
         }}>Get in Touch</button>
       </div>
 
+    </div>
+  )
+}
+
+
+function TestimonialForm() {
+  const [form, setForm] = React.useState({ name: '', event_type: '', message: '' })
+  const [submitted, setSubmitted] = React.useState(false)
+  const [submitting, setSubmitting] = React.useState(false)
+
+  function set(k, v) { setForm(f => ({ ...f, [k]: v })) }
+
+  async function submit() {
+    if (!form.name.trim() || !form.message.trim()) { alert('Please enter your name and review.'); return }
+    setSubmitting(true)
+    const { createClient } = await import('@supabase/supabase-js')
+    const sb = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ANON_KEY)
+    const { error } = await sb.from('testimonials').insert([{
+      name: form.name,
+      event_type: form.event_type,
+      message: form.message
+    }])
+    setSubmitting(false)
+    if (error) { alert(error.message); return }
+    setSubmitted(true)
+  }
+
+  if (submitted) return (
+    <div style={{ background: '#e2ede6', borderRadius: 16, padding: '32px', textAlign: 'center', border: '1px solid #c3dbc9' }}>
+      <p style={{ fontSize: 32, marginBottom: 12 }}>🌟</p>
+      <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 24, fontWeight: 400, fontStyle: 'italic', color: '#1a1714', marginBottom: 8 }}>Thank you!</h3>
+      <p style={{ color: '#5a7a65', fontSize: 14 }}>Your review has been submitted and will appear on the site once approved.</p>
+    </div>
+  )
+
+  return (
+    <div style={{ background: 'white', borderRadius: 20, padding: 36, border: '1px solid #ede5dc', boxShadow: '0 2px 20px rgba(26,23,20,.06)', marginTop: 48 }}>
+      <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.2em', marginBottom: 10, fontWeight: 500, fontFamily: 'Jost, sans-serif' }}>Share Your Experience</p>
+      <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 28, fontWeight: 400, fontStyle: 'italic', marginBottom: 8, color: '#1a1714' }}>Leave a Review</h2>
+      <p style={{ color: '#9a9189', fontSize: 14, marginBottom: 24 }}>Had a wonderful experience with Paige? We'd love to hear about it!</p>
+
+      <div style={{ display: 'grid', gap: 14 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label style={{ fontSize: 10, fontWeight: 500, color: '#9a9189', marginBottom: 6, letterSpacing: '.1em', textTransform: 'uppercase', fontFamily: 'Jost, sans-serif' }}>Your Name *</label>
+            <input value={form.name} onChange={e => set('name', e.target.value)} placeholder="Your name"
+              style={{ padding: '10px 13px', border: '1px solid #ede5dc', borderRadius: 8, fontSize: 14, fontFamily: 'Jost, sans-serif', background: '#fdfaf7', color: '#1a1714', outline: 'none' }} />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label style={{ fontSize: 10, fontWeight: 500, color: '#9a9189', marginBottom: 6, letterSpacing: '.1em', textTransform: 'uppercase', fontFamily: 'Jost, sans-serif' }}>Event Type</label>
+            <input value={form.event_type} onChange={e => set('event_type', e.target.value)} placeholder="Wedding, corporate…"
+              style={{ padding: '10px 13px', border: '1px solid #ede5dc', borderRadius: 8, fontSize: 14, fontFamily: 'Jost, sans-serif', background: '#fdfaf7', color: '#1a1714', outline: 'none' }} />
+          </div>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <label style={{ fontSize: 10, fontWeight: 500, color: '#9a9189', marginBottom: 6, letterSpacing: '.1em', textTransform: 'uppercase', fontFamily: 'Jost, sans-serif' }}>Your Review *</label>
+          <textarea value={form.message} onChange={e => set('message', e.target.value)}
+            placeholder="Share your experience…"
+            style={{ padding: '10px 13px', border: '1px solid #ede5dc', borderRadius: 8, fontSize: 14, fontFamily: 'Jost, sans-serif', background: '#fdfaf7', color: '#1a1714', minHeight: 120, resize: 'vertical', outline: 'none' }} />
+        </div>
+      </div>
+
+      <button onClick={submit} disabled={submitting} style={{
+        width: '100%', marginTop: 20, padding: '14px',
+        background: '#c9a097', color: 'white', border: 'none',
+        borderRadius: 10, fontSize: 12, fontWeight: 500,
+        letterSpacing: '.1em', textTransform: 'uppercase',
+        cursor: submitting ? 'not-allowed' : 'pointer',
+        fontFamily: 'Jost, sans-serif', opacity: submitting ? .7 : 1
+      }}>
+        {submitting ? 'Submitting…' : '⭐ Submit Review'}
+      </button>
+    </div>
+  )
+}
+
+function TestimonialsSection() {
+  const [testimonials, setTestimonials] = React.useState([])
+
+  React.useEffect(() => {
+    import('@supabase/supabase-js').then(({ createClient }) => {
+      const sb = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ANON_KEY)
+      sb.from('testimonials').select('*').eq('approved', true).order('created_at', { ascending: false })
+        .then(({ data }) => setTestimonials(data || []))
+    })
+  }, [])
+
+  if (testimonials.length === 0) return null
+
+  return (
+    <div style={{ background: '#f2ebe3', padding: '80px 20px', borderTop: '1px solid #ede5dc' }}>
+      <div style={{ maxWidth: 900, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 48 }}>
+          <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.2em', marginBottom: 12, fontWeight: 500, fontFamily: 'Jost, sans-serif' }}>Kind Words</p>
+          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 400, fontStyle: 'italic', color: '#1a1714' }}>What clients say</h2>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
+          {testimonials.map(t => (
+            <div key={t.id} style={{ background: 'white', borderRadius: 16, padding: '28px 24px', border: '1px solid #ede5dc', boxShadow: '0 2px 16px rgba(26,23,20,.05)' }}>
+              <div style={{ display: 'flex', gap: 2, marginBottom: 14 }}>
+                {[...Array(5)].map((_, i) => <span key={i} style={{ color: '#c9a097', fontSize: 14 }}>★</span>)}
+              </div>
+              <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, fontStyle: 'italic', lineHeight: 1.7, color: '#3d3733', marginBottom: 16 }}>"{t.message}"</p>
+              <div>
+                <p style={{ fontWeight: 600, fontSize: 13, color: '#1a1714' }}>{t.name}</p>
+                {t.event_type && <p style={{ fontSize: 12, color: '#9a9189', marginTop: 2 }}>{t.event_type}</p>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
@@ -558,6 +671,7 @@ function ContactPage({ preselectedSongs, setPreselectedSongs }) {
         <div style={{ textAlign: 'center', marginTop: 32 }}>
           <p style={{ fontSize: 13, color: '#9a9189' }}>Or email directly: <a href="mailto:hello@paigecamryn.com" style={{ color: '#c9a097', textDecoration: 'none' }}>hello@paigecamryn.com</a></p>
         </div>
+      <TestimonialForm />
       </div>
     </div>
   )

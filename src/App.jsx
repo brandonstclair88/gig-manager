@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { LayoutDashboard, Music, CalendarDays, DollarSign, Users, LogOut, MessageSquare, BookOpen } from 'lucide-react'
+import { LayoutDashboard, Music, CalendarDays, DollarSign, Users, LogOut, MessageSquare, BookOpen, Star } from 'lucide-react'
 import { supabase } from './supabase'
 import AuthPage from './pages/AuthPage'
 import DashboardPage from './pages/DashboardPage'
@@ -7,6 +7,7 @@ import GigsPage from './pages/GigsPage'
 import CalendarPage from './pages/CalendarPage'
 import FinancePage from './pages/FinancePage'
 import ClientsPage from './pages/ClientsPage'
+import TestimonialsPage from './pages/TestimonialsPage'
 import SignPage from './pages/SignPage'
 import RepertoirePage from './pages/RepertoirePage'
 import InquiriesPage from './pages/InquiriesPage'
@@ -20,6 +21,7 @@ const NAV = [
   { id: 'finance',    label: 'Finance',    icon: DollarSign },
   { id: 'clients',    label: 'Clients',    icon: Users },
   { id: 'repertoire', label: 'Repertoire', icon: BookOpen },
+  { id: 'testimonials', label: 'Testimonials', icon: Star },
 ]
 
 export default function App() {
@@ -128,6 +130,7 @@ export default function App() {
         {page === 'finance'    && <FinancePage gigs={gigs} />}
         {page === 'clients'    && <ClientsPage clients={clients} gigs={gigs} userId={user.id} onRefresh={refresh} />}
         {page === 'repertoire' && <RepertoirePage repertoire={repertoire} userId={user.id} onRefresh={refresh} />}
+        {page === 'testimonials' && <TestimonialsPage />}
       </main>
     </>
   )

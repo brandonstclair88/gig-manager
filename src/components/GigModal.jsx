@@ -5,7 +5,7 @@ import { supabase } from '../supabase'
 const EMPTY = {
   title: '', client: '', venue: '', date: '', time: '',
   fee: '', deposit: '', paid: '', setlist: '', notes: '',
-  practice_date: '', invoice_status: 'draft', client_email: ''
+  invoice_status: 'draft', client_email: ''
 }
 
 export default function GigModal({ gig, userId, onClose, onSaved }) {
@@ -26,7 +26,6 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
         paid: gig.paid ?? '',
         setlist: gig.setlist || '',
         notes: gig.notes || '',
-        practice_date: gig.practice_date || '',
         invoice_status: gig.invoice_status || 'draft'
       })
     }
@@ -48,7 +47,7 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
       paid: Number(form.paid || 0),
       setlist: form.setlist,
       notes: form.notes,
-      practice_date: form.practice_date || null,
+      practice_date: null,
       invoice_status: Number(form.paid || 0) >= Number(form.fee || 0) && Number(form.fee || 0) > 0
         ? 'paid'
         : form.invoice_status || 'draft',
@@ -108,10 +107,7 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
             <label>Time</label>
             <input type="time" value={form.time} onChange={e => set('time', e.target.value)} />
           </div>
-          <div className="field">
-            <label>Practice Reminder</label>
-            <input type="date" value={form.practice_date} onChange={e => set('practice_date', e.target.value)} />
-          </div>
+
           <div className="field">
             <label>Fee ($)</label>
             <input type="number" min="0" value={form.fee} onChange={e => set('fee', e.target.value)} />
