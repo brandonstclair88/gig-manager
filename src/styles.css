@@ -818,13 +818,3 @@ body[data-theme="dark"] div[style*="background: '#e2ede6'"] p {
     pointer-events: none;
   }
 }
-
-/* ── Public site nav ── */
-.public-nav-desktop { display: flex !important; }
-.public-nav-hamburger { display: none !important; }
-.public-nav-dropdown { display: block; }
-
-@media (max-width: 768px) {
-  .public-nav-desktop { display: none !important; }
-  .public-nav-hamburger { display: block !important; }
-}
