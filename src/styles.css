@@ -588,3 +588,50 @@ body[data-theme="dark"] div[style*="background: '#d4edda'"] p,
 body[data-theme="dark"] div[style*="background: #e2ede6"] p {
   color: #7ab88a !important;
 }
+
+/* ── Dark Mode Additional Fixes ── */
+
+/* Client list selected card - light background */
+body[data-theme="dark"] button[style*="background: '#f2ebe3'"],
+body[data-theme="dark"] button[style*="background: #f2ebe3"],
+body[data-theme="dark"] button[style*="background: 'var(--paper2)'"] {
+  background: #2e2a24 !important;
+  color: #f0ece6 !important;
+  border-color: #3a342c !important;
+}
+
+/* Repertoire green info banner */
+body[data-theme="dark"] div[style*="background: '#d4edda'"] {
+  background: #1a2e20 !important;
+  border-color: #2d4a35 !important;
+  color: #7ab88a !important;
+}
+
+body[data-theme="dark"] div[style*="background: '#d4edda'"] p {
+  color: #7ab88a !important;
+}
+
+/* Testimonials approved badge white background */
+body[data-theme="dark"] span[style*="background: white"],
+body[data-theme="dark"] span[style*="background: '#ffffff'"] {
+  background: #2e2a24 !important;
+  color: #f0ece6 !important;
+  border-color: #3a342c !important;
+}
+
+/* Client card unselected light background */
+body[data-theme="dark"] button[style*="background: 'white'"] {
+  background: #242018 !important;
+  color: #f0ece6 !important;
+  border-color: #2e2a24 !important;
+}
+
+/* Info banners */
+body[data-theme="dark"] div[style*="background: '#e2ede6'"] {
+  background: #1a2e20 !important;
+  border-color: #2d4a35 !important;
+}
+
+body[data-theme="dark"] div[style*="background: '#e2ede6'"] p {
+  color: #7ab88a !important;
+}
