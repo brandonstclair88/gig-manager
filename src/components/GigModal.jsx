@@ -3,9 +3,9 @@ import { X } from 'lucide-react'
 import { supabase } from '../supabase'
 
 const EMPTY = {
-  title: '', client: '', venue: '', date: '', time: '',
-  fee: '', deposit: '', paid: '', setlist: '', notes: '',
-  invoice_status: 'draft', client_email: '', venue_address: ''
+  title: '', client: '', client_email: '', venue: '', venue_address: '',
+  date: '', time: '', fee: '', deposit: '', paid: '',
+  setlist: '', notes: '', invoice_status: 'draft'
 }
 
 export default function GigModal({ gig, userId, onClose, onSaved }) {
@@ -19,6 +19,7 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
         client: gig.client || '',
         client_email: gig.client_email || '',
         venue: gig.venue || '',
+        venue_address: gig.venue_address || '',
         date: gig.date || '',
         time: gig.time || '',
         fee: gig.fee ?? '',
@@ -26,13 +27,16 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
         paid: gig.paid ?? '',
         setlist: gig.setlist || '',
         notes: gig.notes || '',
-        invoice_status: gig.invoice_status || 'draft',
-        venue_address: gig.venue_address ? String(gig.venue_address) : ''
+        invoice_status: gig.invoice_status || 'draft'
       })
+    } else {
+      setForm(EMPTY)
     }
   }, [gig])
 
-  function set(key, val) { setForm(f => ({ ...f, [key]: val })) }
+  function set(key, val) {
+    setForm(prev => ({ ...prev, [key]: val }))
+  }
 
   async function save() {
     setLoading(true)
@@ -51,8 +55,7 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
       notes: form.notes,
       practice_date: null,
       invoice_status: Number(form.paid || 0) >= Number(form.fee || 0) && Number(form.fee || 0) > 0
-        ? 'paid'
-        : form.invoice_status || 'draft',
+        ? 'paid' : form.invoice_status || 'draft',
       contract_status: gig?.contract_status || 'not sent'
     }
 
@@ -69,27 +72,47 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
     onClose()
   }
 
-  return (
-    <div className="modal-backdrop" onClick={e => e.target === e.currentTarget && onClose()}>
-      <div className="modal">
-        <button className="modal-close" onClick={onClose}><X size={18} /></button>
-        <h2>{gig?.id ? 'Edit Gig' : 'Add a Gig'}</h2>
+  function stopProp(e) { e.stopPropagation() }
 
-        <div className="form-grid" onClick={e => e.stopPropagation()}>
-          <div className="field span3">
-            <label>Event Title</label>
+  return (
+    <div
+      style={{ position: 'fixed', inset: 0, background: 'rgba(26,23,20,.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 20 }}
+      onClick={onClose}
+    >
+      <div
+        style={{ background: 'white', borderRadius: 24, padding: 36, width: '100%', maxWidth: 640, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 8px 40px rgba(26,23,20,.16)', position: 'relative' }}
+        onClick={stopProp}
+      >
+        <button
+          onClick={onClose}
+          style={{ position: 'absolute', top: 18, right: 18, background: 'var(--paper2)', border: 'none', borderRadius: 8, padding: 6, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+        >
+          <X size={18} />
+        </button>
+
+        <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 26, fontWeight: 400, fontStyle: 'italic', marginBottom: 22 }}>
+          {gig?.id ? 'Edit Gig' : 'Add a Gig'}
+        </h2>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+
+          <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column' }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.08em' }}>Event Title</label>
             <input value={form.title} onChange={e => set('title', e.target.value)} placeholder="Wedding reception, corporate party…" />
           </div>
-          <div className="field">
-            <label>Client</label>
+
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.08em' }}>Client</label>
             <input value={form.client} onChange={e => set('client', e.target.value)} placeholder="Client name" />
           </div>
-          <div className="field">
-            <label>Client Email</label>
+
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.08em' }}>Client Email</label>
             <input type="email" value={form.client_email} onChange={e => set('client_email', e.target.value)} placeholder="client@email.com" />
           </div>
-          <div className="field">
-            <label>Invoice Status</label>
+
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.08em' }}>Invoice Status</label>
             <select value={form.invoice_status} onChange={e => set('invoice_status', e.target.value)}>
               <option value="draft">Draft</option>
               <option value="sent">Sent</option>
@@ -97,46 +120,55 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
               <option value="overdue">Overdue</option>
             </select>
           </div>
-          <div className="field span2">
-            <label>Venue Name</label>
+
+          <div style={{ gridColumn: 'span 2', display: 'flex', flexDirection: 'column' }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.08em' }}>Venue Name</label>
             <input value={form.venue} onChange={e => set('venue', e.target.value)} placeholder="Venue name" />
           </div>
-          <div className="field span3">
-            <label>Venue Address</label>
-            <input value={form.venue_address ?? ''} onChange={e => set('venue_address', e.target.value)} placeholder="123 Main St, City, CA 90210" />
+
+          <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column' }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.08em' }}>Venue Address</label>
+            <input value={form.venue_address} onChange={e => set('venue_address', e.target.value)} placeholder="123 Main St, City, CA 90210" />
           </div>
-          <div className="field">
-            <label>Date</label>
+
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.08em' }}>Date</label>
             <input type="date" value={form.date} onChange={e => set('date', e.target.value)} />
           </div>
-          <div className="field">
-            <label>Time</label>
+
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.08em' }}>Time</label>
             <input type="time" value={form.time} onChange={e => set('time', e.target.value)} />
           </div>
 
-          <div className="field">
-            <label>Fee ($)</label>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.08em' }}>Fee ($)</label>
             <input type="number" min="0" value={form.fee} onChange={e => set('fee', e.target.value)} />
           </div>
-          <div className="field">
-            <label>Deposit ($)</label>
+
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.08em' }}>Deposit ($)</label>
             <input type="number" min="0" value={form.deposit} onChange={e => set('deposit', e.target.value)} />
           </div>
-          <div className="field">
-            <label>Paid to Date ($)</label>
+
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.08em' }}>Paid to Date ($)</label>
             <input type="number" min="0" value={form.paid} onChange={e => set('paid', e.target.value)} />
           </div>
-          <div className="field span3">
-            <label>Set List</label>
+
+          <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column' }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.08em' }}>Set List</label>
             <textarea value={form.setlist} onChange={e => set('setlist', e.target.value)} placeholder="Song 1, Song 2…" />
           </div>
-          <div className="field span3">
-            <label>Notes</label>
+
+          <div style={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column' }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.08em' }}>Notes</label>
             <textarea value={form.notes} onChange={e => set('notes', e.target.value)} placeholder="Special requests, parking info, contact details…" />
           </div>
+
         </div>
 
-        <div className="modal-footer">
+        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 24, paddingTop: 20, borderTop: '1px solid var(--paper3)' }}>
           <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
           <button className="btn btn-primary" onClick={save} disabled={loading}>
             {loading ? 'Saving…' : gig?.id ? 'Save Changes' : 'Add Gig'}
