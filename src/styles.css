@@ -358,3 +358,80 @@ body[data-theme="dark"] .modal-close { background: #2e2a24; color: #d4cdc4; }
 
 body[data-theme="dark"] .sidebar-logo { color: #e8c8c0; }
 body[data-theme="dark"] .page-header { border-color: #2e2a24; }
+
+/* ── Dark Mode Enhanced Contrast ── */
+body[data-theme="dark"] * { color: #e8e2da; }
+
+body[data-theme="dark"] .muted,
+body[data-theme="dark"] .stat-card .label,
+body[data-theme="dark"] .stat-card .sub,
+body[data-theme="dark"] .mini-cell .mini-label,
+body[data-theme="dark"] th { color: #8a8078 !important; }
+
+body[data-theme="dark"] h1,
+body[data-theme="dark"] h2,
+body[data-theme="dark"] h3,
+body[data-theme="dark"] strong,
+body[data-theme="dark"] .stat-card .value,
+body[data-theme="dark"] .mini-cell .mini-val,
+body[data-theme="dark"] .page-header h1 { color: #f5f0ea !important; }
+
+body[data-theme="dark"] .nav-btn { color: #8a8078 !important; }
+body[data-theme="dark"] .nav-btn.active { color: white !important; }
+body[data-theme="dark"] .nav-btn:hover { color: #f5f0ea !important; }
+
+body[data-theme="dark"] input,
+body[data-theme="dark"] textarea,
+body[data-theme="dark"] select {
+  background: #2e2a24 !important;
+  border-color: #3a342c !important;
+  color: #f5f0ea !important;
+}
+
+body[data-theme="dark"] input::placeholder,
+body[data-theme="dark"] textarea::placeholder { color: #6a6460 !important; }
+
+body[data-theme="dark"] .card,
+body[data-theme="dark"] .stat-card,
+body[data-theme="dark"] .chart-card {
+  background: #242018 !important;
+  border-color: #2e2a24 !important;
+}
+
+body[data-theme="dark"] .btn-ghost {
+  background: #2e2a24 !important;
+  color: #e8e2da !important;
+  border-color: #3a342c !important;
+}
+
+body[data-theme="dark"] .btn-danger {
+  background: #3d1a1a !important;
+  color: #e07070 !important;
+}
+
+body[data-theme="dark"] .tab { color: #8a8078 !important; }
+body[data-theme="dark"] .tab.active { color: #f5f0ea !important; background: #2e2a24 !important; }
+
+body[data-theme="dark"] td { color: #e8e2da !important; border-color: #2e2a24 !important; }
+body[data-theme="dark"] tr:hover td { background: #2e2a24 !important; }
+
+body[data-theme="dark"] .modal { background: #242018 !important; }
+body[data-theme="dark"] .modal h2 { color: #f5f0ea !important; }
+body[data-theme="dark"] label { color: #a09890 !important; }
+
+body[data-theme="dark"] .cal-cell { background: #242018 !important; border-color: #2e2a24 !important; }
+body[data-theme="dark"] .cal-num { color: #e8e2da !important; }
+body[data-theme="dark"] .cal-day-name { color: #6a6460 !important; }
+
+body[data-theme="dark"] .contract-preview {
+  background: #2e2a24 !important;
+  color: #e8e2da !important;
+  border-color: #3a342c !important;
+}
+
+body[data-theme="dark"] .page { background: #1a1714; }
+body[data-theme="dark"] .modal-footer { border-color: #3a342c !important; }
+body[data-theme="dark"] .divider { border-color: #3a342c !important; }
+body[data-theme="dark"] .expense-row { border-color: #3a342c !important; }
+body[data-theme="dark"] .table-wrap { border-color: #2e2a24 !important; }
+body[data-theme="dark"] thead { background: #2e2a24 !important; }
