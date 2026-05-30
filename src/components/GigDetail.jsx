@@ -226,7 +226,7 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
               <Download size={14} /> Download Invoice PDF
             </button>
             <button className="btn btn-ghost btn-sm" onClick={syncToCalendar} disabled={syncingCalendar}>
-              <Calendar size={14} /> {syncingCalendar ? 'Syncing…' : gig.calendar_event_id ? 'Update Calendar' : 'Add to Calendar'}
+              <Calendar size={14} /> {syncingCalendar ? 'Syncing…' : 'Sync to Google Calendar'}
             </button>
             {balance > 0 && (
               <button className="btn btn-primary btn-sm" onClick={() => { setPaymentAmount(balance); setShowPayment(true) }}>
