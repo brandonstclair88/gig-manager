@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { LayoutDashboard, Music, CalendarDays, DollarSign, Users, LogOut, MessageSquare, BookOpen, Star } from 'lucide-react'
+import { LayoutDashboard, Music, CalendarDays, DollarSign, Users, LogOut, MessageSquare, BookOpen, Star, Moon, Sun } from 'lucide-react'
 import { supabase } from './supabase'
 import AuthPage from './pages/AuthPage'
 import DashboardPage from './pages/DashboardPage'
@@ -21,7 +21,7 @@ const NAV = [
   { id: 'finance',    label: 'Finance',    icon: DollarSign },
   { id: 'clients',    label: 'Clients',    icon: Users },
   { id: 'repertoire', label: 'Repertoire', icon: BookOpen },
-  { id: 'testimonials', label: 'Testimonials', icon: Star },
+  { id: 'testimonials', label: 'Testimonials', icon: Star, badge: true },
 ]
 
 export default function App() {
@@ -32,6 +32,12 @@ export default function App() {
   const [clients, setClients] = useState([])
   const [repertoire, setRepertoire] = useState([])
   const [inquiries, setInquiries] = useState([])
+  const [pendingTestimonials, setPendingTestimonials] = useState(0)
+  const [darkMode, setDarkMode] = useState(false)
+
+  useEffect(() => {
+    document.body.setAttribute('data-theme', darkMode ? 'dark' : 'light')
+  }, [darkMode])
 
   // Public pages
   if (window.location.search.includes('gig=')) return <SignPage />
@@ -66,16 +72,22 @@ export default function App() {
     if (!error) setRepertoire(data || [])
   }, [user])
 
+  const loadPendingTestimonials = useCallback(async () => {
+    if (!user) return
+    const { count } = await supabase.from('testimonials').select('*', { count: 'exact', head: true }).eq('approved', false)
+    setPendingTestimonials(count || 0)
+  }, [user])
+
   const loadInquiries = useCallback(async () => {
     if (!user) return
     const { data, error } = await supabase.from('inquiries').select('*').order('created_at', { ascending: false })
     if (!error) setInquiries(data || [])
   }, [user])
 
-  function refresh() { loadGigs(); loadClients(); loadRepertoire(); loadInquiries() }
+  function refresh() { loadGigs(); loadClients(); loadRepertoire(); loadInquiries(); loadPendingTestimonials() }
 
   useEffect(() => {
-    if (user) { loadGigs(); loadClients(); loadRepertoire(); loadInquiries() }
+    if (user) { loadGigs(); loadClients(); loadRepertoire(); loadInquiries(); loadPendingTestimonials() }
     else { setGigs([]); setClients([]); setRepertoire([]); setInquiries([]) }
   }, [user])
 
@@ -100,14 +112,23 @@ export default function App() {
         </div>
 
         <div className="sidebar-nav-group">
-          {NAV.map(({ id, label, icon: Icon }) => (
+          {NAV.map(({ id, label, icon: Icon, badge }) => (
             <button
               key={id}
               className={`nav-btn${page === id ? ' active' : ''}`}
               onClick={() => setPage(id)}
+              style={{ position: 'relative' }}
             >
               <Icon size={17} />
               {label}
+              {badge && pendingTestimonials > 0 && (
+                <span style={{
+                  position: 'absolute', top: 6, right: 6,
+                  background: 'var(--blush)', color: 'white',
+                  borderRadius: 20, fontSize: 10, fontWeight: 700,
+                  padding: '1px 6px', lineHeight: 1.4
+                }}>{pendingTestimonials}</span>
+              )}
             </button>
           ))}
         </div>
@@ -117,6 +138,13 @@ export default function App() {
         <div style={{ fontSize: 12, color: 'var(--ink3)', padding: '0 14px', marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {user.email}
         </div>
+        <button
+          onClick={() => setDarkMode(d => !d)}
+          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 8, border: '1px solid rgba(255,255,255,.08)', background: 'transparent', color: '#8a8078', fontSize: 12, cursor: 'pointer', width: '100%', marginBottom: 6, fontFamily: 'Jost, sans-serif' }}
+        >
+          {darkMode ? <Sun size={14} /> : <Moon size={14} />}
+          {darkMode ? 'Light Mode' : 'Dark Mode'}
+        </button>
         <button className="sign-out-btn" onClick={signOut}>
           <LogOut size={15} /> Sign Out
         </button>

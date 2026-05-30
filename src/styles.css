@@ -276,3 +276,43 @@ tr:hover td { background: var(--paper); }
 /* ── Overrides ── */
 .btn-primary { background: var(--blush) !important; color: white !important; }
 .btn-gold { background: var(--rose) !important; color: white !important; }
+
+/* ── Dark Mode ── */
+body[data-theme="dark"] {
+  --ink:    #f0ece6;
+  --ink2:   #d4cdc4;
+  --ink3:   #8a8078;
+  --paper:  #1a1714;
+  --paper2: #242018;
+  --paper3: #2e2a24;
+  --blush:  #c9a097;
+  --blush2: #e8c8c0;
+  --blush3: #3d2820;
+  --rose:   #d4a098;
+  --green:  #7ab88a;
+  --red:    #e07070;
+  background: #1a1714;
+  color: #f0ece6;
+}
+
+body[data-theme="dark"] .card,
+body[data-theme="dark"] .stat-card,
+body[data-theme="dark"] .chart-card { background: #242018; border-color: #2e2a24; }
+
+body[data-theme="dark"] .modal { background: #242018; }
+
+body[data-theme="dark"] input,
+body[data-theme="dark"] textarea,
+body[data-theme="dark"] select { background: #1a1714; border-color: #2e2a24; color: #f0ece6; }
+
+body[data-theme="dark"] .tab.active { background: #2e2a24; }
+body[data-theme="dark"] .tabs { background: #242018; border-color: #2e2a24; }
+
+body[data-theme="dark"] td { border-color: #2e2a24; }
+body[data-theme="dark"] tr:hover td { background: #2e2a24; }
+body[data-theme="dark"] thead { background: #2e2a24; }
+body[data-theme="dark"] .table-wrap { border-color: #2e2a24; }
+
+body[data-theme="dark"] .mini-cell { background: #2e2a24; }
+body[data-theme="dark"] .btn-ghost { background: #2e2a24; color: #d4cdc4; border-color: #3a342c; }
+body[data-theme="dark"] .auth-card { background: #242018; }
