@@ -14,14 +14,14 @@ import InquiriesPage from './pages/InquiriesPage'
 import PublicSite from './pages/PublicSite'
 
 const NAV = [
-  { id: 'dashboard',  label: 'Dashboard',  icon: LayoutDashboard },
-  { id: 'inquiries',  label: 'Inquiries',  icon: MessageSquare },
-  { id: 'gigs',       label: 'Gigs',       icon: Music },
-  { id: 'calendar',   label: 'Calendar',   icon: CalendarDays },
-  { id: 'finance',    label: 'Finance',    icon: DollarSign },
-  { id: 'clients',    label: 'Clients',    icon: Users },
-  { id: 'repertoire', label: 'Repertoire', icon: BookOpen },
-  { id: 'testimonials', label: 'Testimonials', icon: Star, badge: true },
+  { id: 'dashboard',  label: 'Dashboard',  short: 'Home',    icon: LayoutDashboard },
+  { id: 'inquiries',  label: 'Inquiries',  short: 'Leads',   icon: MessageSquare },
+  { id: 'gigs',       label: 'Gigs',       short: 'Gigs',    icon: Music },
+  { id: 'calendar',   label: 'Calendar',   short: 'Cal',     icon: CalendarDays },
+  { id: 'finance',    label: 'Finance',    short: 'Finance', icon: DollarSign },
+  { id: 'clients',    label: 'Clients',    short: 'Clients', icon: Users },
+  { id: 'repertoire', label: 'Repertoire', short: 'Songs',   icon: BookOpen },
+  { id: 'testimonials', label: 'Testimonials', short: 'Reviews', icon: Star, badge: true },
 ]
 
 export default function App() {
@@ -112,7 +112,7 @@ export default function App() {
         </div>
 
         <div className="sidebar-nav-group">
-          {NAV.map(({ id, label, icon: Icon, badge }) => (
+          {NAV.map(({ id, label, short, icon: Icon, badge }) => (
             <button
               key={id}
               className={`nav-btn${page === id ? ' active' : ''}`}
@@ -120,7 +120,8 @@ export default function App() {
               style={{ position: 'relative' }}
             >
               <Icon size={17} />
-              {label}
+              <span className="nav-label-full">{label}</span>
+              <span className="nav-label-short">{short}</span>
               {badge && pendingTestimonials > 0 && (
                 <span style={{
                   position: 'absolute', top: 6, right: 6,

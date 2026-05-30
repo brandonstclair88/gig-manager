@@ -773,3 +773,29 @@ body[data-theme="dark"] div[style*="background: '#e2ede6'"] p {
   /* Search bar full width */
   .filter-bar > div { width: 100% !important; flex: none !important; }
 }
+
+/* ── Nav label responsive ── */
+.nav-label-short { display: none; }
+.nav-label-full { display: inline; }
+
+@media (max-width: 768px) {
+  .nav-label-full { display: none; }
+  .nav-label-short { display: inline; }
+
+  /* Fix gig detail overflow */
+  .page { overflow-x: hidden !important; }
+  
+  div[style*="minmax(0,1fr) minmax(0,1.4fr)"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Ensure nothing overflows page width */
+  .page > * { max-width: 100% !important; overflow-x: hidden; }
+  
+  /* Detail panel full width */
+  .card { max-width: 100% !important; box-sizing: border-box !important; }
+
+  /* Nav more compact on mobile */
+  .nav-btn { padding: 8px 10px !important; font-size: 11px !important; gap: 6px !important; }
+  .nav-btn svg { width: 14px !important; height: 14px !important; }
+}

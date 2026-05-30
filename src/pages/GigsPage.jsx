@@ -89,7 +89,7 @@ export default function GigsPage({ gigs, userId, onRefresh }) {
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: selectedGig ? '1fr 1.4fr' : '1fr', gap: 16, alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: selectedGig ? 'minmax(0,1fr) minmax(0,1.4fr)' : '1fr', gap: 16, alignItems: 'start', minWidth: 0 }}>
         <div>
           {filtered.length === 0 && (
             <div className="empty card">
