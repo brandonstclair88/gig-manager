@@ -85,11 +85,11 @@ export default function DashboardPage({ gigs, onNavigate }) {
 
       {nextGig && (
         <div style={{
-          background: '#f5e6e2', color: 'var(--ink)',
+          background: 'var(--paper2)', color: 'var(--ink)',
           borderRadius: 'var(--radius)', padding: '24px 28px',
           marginBottom: 20, display: 'flex', justifyContent: 'space-between',
           alignItems: 'center', flexWrap: 'wrap', gap: 16,
-          border: '1px solid #e8c8c0'
+          border: '1px solid var(--paper3)'
         }}>
           <div>
             <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '.12em', color: 'var(--blush)', marginBottom: 6, fontWeight: 500 }}>Next Gig</p>
