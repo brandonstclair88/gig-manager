@@ -92,9 +92,8 @@ export default function SignPage() {
 
       {/* Header */}
       <div style={{ background: '#f2ebe3', borderBottom: '1px solid #ede5dc', padding: '48px 20px 36px', textAlign: 'center' }}>
-        <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.2em', marginBottom: 12, fontWeight: 500 }}>Performance Agreement</p>
-        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', color: '#1a1714', fontSize: 40, fontWeight: 400, fontStyle: 'italic', marginBottom: 8 }}>Paige Camryn Music</h1>
-        <p style={{ color: '#9a9189', fontSize: 14, letterSpacing: '.08em' }}>Luxury Event Harpist</p>
+        <img src="/logo.png" alt="Paige Camryn Music" style={{ height: 80, width: 'auto', marginBottom: 12 }} />
+        <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.2em', fontWeight: 500 }}>Performance Agreement</p>
         <div style={{ width: 40, height: 1, background: '#c9a097', margin: '20px auto 0' }} />
       </div>
 

@@ -6,9 +6,8 @@ const CATEGORIES = ['Classical', 'Wedding', 'Pop', 'Rock', 'Jazz', 'Celtic', 'Ch
 function Nav({ page, setPage }) {
   return (
     <nav style={{ background: '#f2ebe3', borderBottom: '1px solid #ede5dc', padding: '0 5%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
-      <div style={{ padding: '20px 0' }}>
-        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 400, fontStyle: 'italic', color: '#1a1714' }}>Paige Camryn Music</h1>
-        <p style={{ fontSize: 10, letterSpacing: '.16em', textTransform: 'uppercase', color: '#9a9189', marginTop: 2 }}>Luxury Event Harpist</p>
+      <div style={{ padding: '16px 0' }}>
+        <img src="/logo.png" alt="Paige Camryn Music" style={{ height: 60, width: 'auto' }} />
       </div>
       <div style={{ display: 'flex', gap: 4 }}>
         {['home', 'events', 'weddings', 'repertoire', 'contact'].map(p => (
@@ -29,7 +28,7 @@ function Nav({ page, setPage }) {
 function Footer() {
   return (
     <div style={{ textAlign: 'center', padding: '48px 20px', borderTop: '1px solid #ede5dc', marginTop: 60 }}>
-      <p style={{ fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', fontSize: 16, color: '#9a9189', marginBottom: 8 }}>Paige Camryn Music</p>
+      <img src="/logo.png" alt="Paige Camryn Music" style={{ height: 50, width: 'auto', marginBottom: 8, opacity: .7 }} />
       <p style={{ fontSize: 11, color: '#b0a89e', letterSpacing: '.08em' }}>hello@paigecamryn.com</p>
       <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 16 }}>
         {[
@@ -78,10 +77,7 @@ function HomePage({ setPage }) {
       }}>
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, #f5e6e2 0%, #f2ebe3 60%, #ede5dc 100%)', opacity: .6 }} />
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 700 }}>
-          <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.22em', marginBottom: 24, fontWeight: 500, fontFamily: 'Jost, sans-serif' }}>Luxury Event Harpist</p>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(48px, 8vw, 96px)', fontWeight: 300, fontStyle: 'italic', color: '#1a1714', lineHeight: 1.1, marginBottom: 32 }}>
-            Paige Camryn
-          </h1>
+          <img src="/logo.png" alt="Paige Camryn Music" style={{ height: 120, width: 'auto', marginBottom: 32 }} />
           <div style={{ width: 60, height: 1, background: '#c9a097', margin: '0 auto 32px' }} />
           <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(18px, 3vw, 26px)', fontStyle: 'italic', color: '#7a746e', lineHeight: 1.6, marginBottom: 40, fontWeight: 300 }}>
             Infusing Southern California with musical magic<br/>for over a decade
