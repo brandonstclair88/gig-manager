@@ -635,3 +635,52 @@ body[data-theme="dark"] div[style*="background: '#e2ede6'"] {
 body[data-theme="dark"] div[style*="background: '#e2ede6'"] p {
   color: #7ab88a !important;
 }
+
+/* ── Public Site Mobile Fixes ── */
+@media (max-width: 768px) {
+  /* Prevent horizontal overflow */
+  body { overflow-x: hidden; }
+  
+  /* Public site containers */
+  div[style*="maxWidth: 900"],
+  div[style*="maxWidth: 860"],
+  div[style*="maxWidth: 720"],
+  div[style*="maxWidth: 640"] {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  /* Nav tabs scroll horizontally */
+  nav > div:last-child {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap !important;
+    width: 100%;
+  }
+
+  /* Bio grid stacks */
+  div[style*="gridTemplateColumns: '1fr 1fr'"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Services grid stacks */
+  div[style*="gridTemplateColumns: 'repeat(auto-fit, minmax(240px"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Video grid stacks */
+  div[style*="gridTemplateColumns: 'repeat(auto-fit, minmax(400px"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Hero font size */
+  h1[style*="clamp(48px"] {
+    font-size: 40px !important;
+  }
+
+  /* Stats grid */
+  div[style*="gridTemplateColumns: 'repeat(auto-fit, minmax(200px"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
