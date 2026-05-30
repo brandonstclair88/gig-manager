@@ -335,7 +335,7 @@ function MusicPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24 }}>
           {[
             { id: 'E0ihH0jDN3U', title: 'Thirty Minutes of Relaxation', desc: 'A peaceful collection perfect for unwinding and relaxation.' },
-            { id: 'dmT36UVW0Jw', title: 'More Favorites', desc: 'A selection of Paige's favorite harp pieces.' },
+            { id: "dmT36UVW0Jw", title: "More Favorites", desc: "A selection of Paige's favorite harp pieces." },
             { id: 'HYF5x3fE1v8', title: 'Live Performance', desc: 'Experience the beauty of live harp music.' },
             { id: 'k_Ib0HaKOZg', title: 'Featured Performance', desc: 'A stunning performance by Paige Camryn.' },
           ].map(v => (
