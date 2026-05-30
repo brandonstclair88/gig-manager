@@ -75,7 +75,7 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
         <button className="modal-close" onClick={onClose}><X size={18} /></button>
         <h2>{gig?.id ? 'Edit Gig' : 'Add a Gig'}</h2>
 
-        <div className="form-grid">
+        <div className="form-grid" onClick={e => e.stopPropagation()}>
           <div className="field span3">
             <label>Event Title</label>
             <input value={form.title} onChange={e => set('title', e.target.value)} placeholder="Wedding reception, corporate party…" />
