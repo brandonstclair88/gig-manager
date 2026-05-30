@@ -59,9 +59,10 @@ EVENT DETAILS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Event:    ${g.title || '[Event Title]'}
-Venue:    ${g.venue || '[Venue]'}
+Venue:    ${g.venue || '[Venue]'}${g.venue_address ? '\nAddress:  ' + g.venue_address : ''}
 Date:     ${fmtDate(g.date)}
 Time:     ${fmtTime(g.time) || '[Time]'}
+Duration: ${g.duration_hours || 2} hour${Number(g.duration_hours || 2) !== 1 ? 's' : ''}${g.bride_name || g.groom_name ? '\nCouple:   ' + [g.bride_name, g.groom_name].filter(Boolean).join(' & ') : ''}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 FINANCIAL TERMS
