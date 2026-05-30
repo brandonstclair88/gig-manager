@@ -188,6 +188,7 @@ function HomePage({ setPage }) {
             <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.2em', marginBottom: 12, fontWeight: 500, fontFamily: 'Jost, sans-serif' }}>Follow Along</p>
             <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 400, fontStyle: 'italic', color: '#1a1714', marginBottom: 16 }}>@paigetheharpist</h2>
             
+            <a
               href="https://www.instagram.com/paigetheharpist/"
               target="_blank"
               rel="noreferrer"
@@ -200,7 +201,7 @@ function HomePage({ setPage }) {
               }}
             >
               Follow on Instagram
-            </button>
+            </a>
           </div>
 
           {/* Instagram embed via Behold widget - free tier */}
