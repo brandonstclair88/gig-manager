@@ -4,48 +4,67 @@ import { supabase } from '../supabase'
 const CATEGORIES = ['Classical', 'Wedding', 'Pop', 'Rock', 'Jazz', 'Celtic', 'Christmas', 'Hymns', 'Film & TV', 'Other']
 
 function Nav({ page, setPage }) {
+  const [menuOpen, setMenuOpen] = React.useState(false)
+  const [isMobile, setIsMobile] = React.useState(window.innerWidth <= 768)
+  const pages = ['home', 'music', 'events', 'weddings', 'repertoire', 'contact']
+  const labels = { home: 'Home', music: 'Music', events: 'Events', weddings: 'Weddings', repertoire: 'Repertoire', contact: 'Contact' }
+
+  React.useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth <= 768)
+    window.addEventListener('resize', handler)
+    return () => window.removeEventListener('resize', handler)
+  }, [])
+
   return (
-    <nav style={{ background: '#f2ebe3', borderBottom: '1px solid #ede5dc', padding: '0 5%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
-      <div style={{ padding: '20px 0' }}>
-        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 400, fontStyle: 'italic', color: '#1a1714' }}>Paige Camryn Music</h1>
-        <p style={{ fontSize: 10, letterSpacing: '.16em', textTransform: 'uppercase', color: '#9a9189', marginTop: 2 }}>Luxury Event Harpist</p>
+    <nav style={{ background: '#f2ebe3', borderBottom: '1px solid #ede5dc', padding: '0 20px', position: 'relative', zIndex: 50 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 0' }}>
+        <div>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, fontWeight: 400, fontStyle: 'italic', color: '#1a1714', margin: 0 }}>Paige Camryn Music</h1>
+          <p style={{ fontSize: 9, letterSpacing: '.16em', textTransform: 'uppercase', color: '#9a9189', marginTop: 2 }}>Luxury Event Harpist</p>
+        </div>
+
+        {!isMobile && (
+          <div style={{ display: 'flex', gap: 0 }}>
+            {pages.map(p => (
+              <button key={p} onClick={() => setPage(p)} style={{
+                padding: '10px 14px', border: 'none', background: 'transparent',
+                fontFamily: 'Jost, sans-serif', fontSize: 11, fontWeight: 500,
+                letterSpacing: '.08em', textTransform: 'uppercase', cursor: 'pointer',
+                color: page === p ? '#c9a097' : '#9a9189',
+                borderBottom: page === p ? '2px solid #c9a097' : '2px solid transparent',
+                transition: 'all .15s', whiteSpace: 'nowrap'
+              }}>{labels[p]}</button>
+            ))}
+          </div>
+        )}
+
+        {isMobile && (
+          <button
+            onClick={() => setMenuOpen(o => !o)}
+            style={{ background: 'none', border: '1px solid #e8c8c0', borderRadius: 8, padding: '8px 14px', cursor: 'pointer', fontFamily: 'Jost, sans-serif', fontSize: 12, color: '#c9a097', fontWeight: 500 }}
+          >
+            {menuOpen ? '✕ Close' : '☰ Menu'}
+          </button>
+        )}
       </div>
-      <div style={{ display: 'flex', gap: 4 }}>
-        {['home', 'music', 'events', 'weddings', 'repertoire', 'contact'].map(p => (
-          <button key={p} onClick={() => setPage(p)} style={{
-            padding: '8px 18px', border: 'none', background: 'transparent',
-            fontFamily: 'Jost, sans-serif', fontSize: 12, fontWeight: 500,
-            letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer',
-            color: page === p ? '#c9a097' : '#9a9189',
-            borderBottom: page === p ? '2px solid #c9a097' : '2px solid transparent',
-            transition: 'all .15s'
-          }}>{p}</button>
-        ))}
-      </div>
+
+      {menuOpen && isMobile && (
+        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#f2ebe3', borderBottom: '1px solid #ede5dc', boxShadow: '0 8px 24px rgba(26,23,20,.1)', zIndex: 100 }}>
+          {pages.map(p => (
+            <button key={p} onClick={() => { setPage(p); setMenuOpen(false) }} style={{
+              display: 'block', width: '100%', padding: '16px 20px', border: 'none',
+              borderBottom: '1px solid #ede5dc', background: page === p ? '#f5e6e2' : 'transparent',
+              fontFamily: 'Jost, sans-serif', fontSize: 14, fontWeight: page === p ? 600 : 400,
+              letterSpacing: '.06em', textTransform: 'uppercase', cursor: 'pointer',
+              color: page === p ? '#c9a097' : '#3d3733', textAlign: 'left'
+            }}>{labels[p]}</button>
+          ))}
+        </div>
+      )}
     </nav>
   )
 }
 
-function Footer() {
-  return (
-    <div style={{ textAlign: 'center', padding: '48px 20px', borderTop: '1px solid #ede5dc', marginTop: 60 }}>
-      <p style={{ fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', fontSize: 16, color: '#9a9189', marginBottom: 8 }}>Paige Camryn Music</p>
-      <p style={{ fontSize: 11, color: '#b0a89e', letterSpacing: '.08em' }}>hello@paigecamryn.com</p>
-      <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 16 }}>
-        {[
-          { label: 'Instagram', url: 'https://www.instagram.com/paigetheharpist/' },
-          { label: 'YouTube', url: 'https://www.youtube.com/channel/UCX_zOd0pkl_Iu2gl8G5ecdw' },
-          { label: 'Facebook', url: 'https://www.facebook.com/profile.php?id=61551663203147' },
-        ].map(s => (
-          <a key={s.label} href={s.url} target="_blank" rel="noreferrer"
-            style={{ fontSize: 11, color: '#c9a097', letterSpacing: '.08em', textTransform: 'uppercase', textDecoration: 'none' }}>
-            {s.label}
-          </a>
-        ))}
-      </div>
-    </div>
-  )
-}
 
 function Hero({ title, subtitle }) {
   return (
