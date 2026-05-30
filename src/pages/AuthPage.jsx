@@ -23,7 +23,7 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="auth-wrap">
+    <div className="auth-wrap" style={{ width: "100%" }}>
       <div className="auth-card">
         <h1>Paige Camryn Music</h1>
         <p>{mode === 'login' ? 'Sign in to your account' : 'Create a new account'}</p>
