@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { Edit2, Trash2, CheckCircle2, FileText, Download, Link, Plus, X, Send, PenLine, CreditCard } from 'lucide-react'
+import { Edit2, Trash2, CheckCircle2, FileText, Download, Link, Plus, X, Send, PenLine, CreditCard, Archive } from 'lucide-react'
 import { supabase } from '../supabase'
 import { currency, fmtDate, fmtTime, invoiceBadge, contractText, downloadPDFInvoice } from '../utils'
 
-export default function GigDetail({ gig, onEdit, onDelete, onRefresh }) {
+export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh }) {
   const [tab, setTab] = useState('overview')
   const [expense, setExpense] = useState({ description: '', amount: '' })
   const [expenses, setExpenses] = useState(gig.expenses || [])
@@ -130,6 +130,9 @@ export default function GigDetail({ gig, onEdit, onDelete, onRefresh }) {
           {gig.contract_status === 'signed' && <span className="badge badge-green">✍️ Signed</span>}
           <button className="btn btn-ghost btn-sm" onClick={onEdit}><Edit2 size={14} /> Edit</button>
           <button className="btn btn-danger btn-sm" onClick={onDelete}><Trash2 size={14} /> Delete</button>
+          <button className="btn btn-ghost btn-sm" onClick={onArchive}>
+            <Archive size={14} /> {gig.archived ? 'Unarchive' : 'Archive'}
+          </button>
         </div>
       </div>
 

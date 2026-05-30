@@ -12,6 +12,7 @@ export default function GigsPage({ gigs, userId, onRefresh }) {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [sortBy, setSortBy] = useState('date')
+  const [showArchived, setShowArchived] = useState(false)
 
   const selectedGig = gigs.find(g => g.id === selectedId)
 
@@ -21,7 +22,8 @@ export default function GigsPage({ gigs, userId, onRefresh }) {
         const q = search.toLowerCase()
         const matchSearch = !q || g.title?.toLowerCase().includes(q) || g.client?.toLowerCase().includes(q) || g.venue?.toLowerCase().includes(q)
         const matchStatus = statusFilter === 'all' || g.invoice_status === statusFilter
-        return matchSearch && matchStatus
+        const matchArchived = showArchived ? g.archived : !g.archived
+        return matchSearch && matchStatus && matchArchived
       })
       .sort((a, b) => {
         if (sortBy === 'date') return (a.date || '').localeCompare(b.date || '')
@@ -35,6 +37,12 @@ export default function GigsPage({ gigs, userId, onRefresh }) {
     if (!confirm('Delete this gig? This cannot be undone.')) return
     const { error } = await supabase.from('gigs').delete().eq('id', id)
     if (error) { alert(error.message); return }
+    setSelectedId(null)
+    onRefresh()
+  }
+
+  async function toggleArchive(id, archived) {
+    await supabase.from('gigs').update({ archived: !archived }).eq('id', id)
     setSelectedId(null)
     onRefresh()
   }
@@ -71,6 +79,12 @@ export default function GigsPage({ gigs, userId, onRefresh }) {
           <option value="fee">Sort by fee</option>
           <option value="client">Sort by client</option>
         </select>
+        <button
+          className={`btn btn-sm ${showArchived ? 'btn-primary' : 'btn-ghost'}`}
+          onClick={() => setShowArchived(a => !a)}
+        >
+          {showArchived ? '📦 Archived' : '📦 Show Archived'}
+        </button>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: selectedGig ? '1fr 1.4fr' : '1fr', gap: 16, alignItems: 'start' }}>
@@ -117,6 +131,7 @@ export default function GigsPage({ gigs, userId, onRefresh }) {
             gig={selectedGig}
             onEdit={() => openEdit(selectedGig)}
             onDelete={() => deleteGig(selectedGig.id)}
+            onArchive={() => toggleArchive(selectedGig.id, selectedGig.archived)}
             onRefresh={onRefresh}
           />
         )}

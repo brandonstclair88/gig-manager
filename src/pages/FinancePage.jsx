@@ -1,9 +1,64 @@
 import React, { useMemo } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
-import { Download } from 'lucide-react'
+import { Download, FileText } from 'lucide-react'
 import { currency, fmtDate, invoiceBadge, exportCSV } from '../utils'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+
+function exportTaxSummary(gigs, year) {
+  const yearGigs = gigs.filter(g => g.date && new Date(g.date + 'T00:00:00').getFullYear() === year)
+  const income = yearGigs.reduce((s, g) => s + Number(g.paid || 0), 0)
+  const expenses = yearGigs.reduce((s, g) => s + (g.expenses || []).reduce((es, e) => es + Number(e.amount || 0), 0), 0)
+  const netProfit = income - expenses
+  const gigCount = yearGigs.length
+
+  const lines = [
+    `TAX SUMMARY ${year}`,
+    `Paige Camryn Music`,
+    `Generated: ${new Date().toLocaleDateString('en-US')}`,
+    ``,
+    `═══════════════════════════════════════`,
+    `INCOME SUMMARY`,
+    `═══════════════════════════════════════`,
+    `Total Gigs Performed: ${gigCount}`,
+    `Gross Income:         $${income.toFixed(2)}`,
+    `Total Expenses:       $${expenses.toFixed(2)}`,
+    `Net Profit:           $${netProfit.toFixed(2)}`,
+    ``,
+    `═══════════════════════════════════════`,
+    `GIG BREAKDOWN`,
+    `═══════════════════════════════════════`,
+    ...yearGigs.map(g => {
+      const gigExpenses = (g.expenses || []).reduce((s, e) => s + Number(e.amount || 0), 0)
+      return [
+        ``,
+        `Event:    ${g.title}`,
+        `Client:   ${g.client || '—'}`,
+        `Date:     ${g.date}`,
+        `Income:   $${Number(g.paid || 0).toFixed(2)}`,
+        `Expenses: $${gigExpenses.toFixed(2)}`,
+        `Net:      $${(Number(g.paid || 0) - gigExpenses).toFixed(2)}`,
+      ].join('\n')
+    }),
+    ``,
+    `═══════════════════════════════════════`,
+    `EXPENSE DETAIL`,
+    `═══════════════════════════════════════`,
+    ...yearGigs.flatMap(g => (g.expenses || []).map(e => `${g.title}: ${e.description} — $${Number(e.amount).toFixed(2)}`)),
+    ``,
+    `═══════════════════════════════════════`,
+    `This document is for informational purposes only.`,
+    `Please consult a tax professional for filing advice.`,
+  ]
+
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `tax-summary-${year}.txt`
+  a.click()
+  URL.revokeObjectURL(url)
+}
 
 export default function FinancePage({ gigs }) {
   const stats = useMemo(() => {
@@ -52,13 +107,24 @@ export default function FinancePage({ gigs }) {
     )
   }
 
+  const availableYears = [...new Set(gigs.filter(g => g.date).map(g => new Date(g.date + 'T00:00:00').getFullYear()))].sort((a, b) => b - a)
+  const currentYear = new Date().getFullYear()
+  const [taxYear, setTaxYear] = useState(currentYear)
+
+  const taxYearGigs = gigs.filter(g => g.date && new Date(g.date + 'T00:00:00').getFullYear() === taxYear)
+  const taxIncome = taxYearGigs.reduce((s, g) => s + Number(g.paid || 0), 0)
+  const taxExpenses = taxYearGigs.reduce((s, g) => s + (g.expenses || []).reduce((es, e) => es + Number(e.amount || 0), 0), 0)
+  const taxNet = taxIncome - taxExpenses
+
   return (
     <div>
       <div className="page-header">
         <h1>Finance</h1>
-        <button className="btn btn-ghost" onClick={() => exportCSV(gigs)}>
-          <Download size={15} /> Export CSV
-        </button>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button className="btn btn-ghost" onClick={() => exportCSV(gigs)}>
+            <Download size={15} /> Export CSV
+          </button>
+        </div>
       </div>
 
       <div className="stats">
@@ -86,6 +152,44 @@ export default function FinancePage({ gigs }) {
           <div className="label">Upcoming Gigs</div>
           <div className="value">{stats.upcoming}</div>
         </div>
+      </div>
+
+      {/* Tax Year Summary */}
+      <div className="card" style={{ marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
+          <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontStyle: 'italic', margin: 0 }}>Tax Year Summary</h3>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <select value={taxYear} onChange={e => setTaxYear(Number(e.target.value))} style={{ width: 'auto', padding: '8px 12px' }}>
+              {[currentYear, currentYear - 1, currentYear - 2].map(y => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
+            <button className="btn btn-ghost btn-sm" onClick={() => exportTaxSummary(gigs, taxYear)}>
+              <FileText size={14} /> Download Tax Summary
+            </button>
+          </div>
+        </div>
+        <div className="mini-grid">
+          <div className="mini-cell">
+            <div className="mini-label">Gigs Performed</div>
+            <div className="mini-val">{taxYearGigs.length}</div>
+          </div>
+          <div className="mini-cell">
+            <div className="mini-label">Gross Income</div>
+            <div className="mini-val" style={{ color: 'var(--green)' }}>{currency(taxIncome)}</div>
+          </div>
+          <div className="mini-cell">
+            <div className="mini-label">Total Expenses</div>
+            <div className="mini-val" style={{ color: 'var(--red)' }}>{currency(taxExpenses)}</div>
+          </div>
+          <div className="mini-cell">
+            <div className="mini-label">Net Profit</div>
+            <div className="mini-val" style={{ color: taxNet >= 0 ? 'var(--green)' : 'var(--red)' }}>{currency(taxNet)}</div>
+          </div>
+        </div>
+        {taxYearGigs.length === 0 && (
+          <p className="muted" style={{ marginTop: 12 }}>No gigs found for {taxYear}.</p>
+        )}
       </div>
 
       <div className="chart-card" style={{ marginBottom: 20 }}>
