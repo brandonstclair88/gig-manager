@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react'
 import { Plus, X, Edit2, Music } from 'lucide-react'
 import { supabase } from '../supabase'
 
-const CATEGORIES = ['Classical', 'Wedding', 'Pop', 'Rock', 'Jazz', 'Celtic', 'Christmas', 'Hymns', 'Film & TV', 'Other']
+const CATEGORIES = ['Classical', 'Wedding', 'Pop', 'Rock', 'Jazz', 'Celtic', 'Folk', 'Country', 'Christmas', 'Hymns', 'Film & TV', 'Other']
 
 function SongModal({ song, userId, onClose, onSaved }) {
   const [form, setForm] = useState({
