@@ -612,7 +612,7 @@ function RepertoirePage({ setPage, setPreselectedSongs }) {
             <p style={{ color: '#b07870', fontWeight: 500, fontSize: 14 }}>🎵 {selected.length} song{selected.length !== 1 ? 's' : ''} selected</p>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setSelected([])} style={{ background: 'white', border: '1px solid #e8c8c0', color: '#b07870', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontSize: 12, fontFamily: 'Jost, sans-serif' }}>Clear</button>
-              <button onClick={goToContact} style={{ background: '#c9a097', border: 'none', color: 'white', borderRadius: 8, padding: '6px 16px', cursor: 'pointer', fontSize: 12, fontFamily: 'Jost, sans-serif', fontWeight: 500, letterSpacing: '.08em', textTransform: 'uppercase' }}>Enquire Now →</button>
+              <button onClick={goToContact} style={{ background: '#c9a097', border: 'none', color: 'white', borderRadius: 8, padding: '6px 16px', cursor: 'pointer', fontSize: 12, fontFamily: 'Jost, sans-serif', fontWeight: 500, letterSpacing: '.08em', textTransform: 'uppercase' }}>Inquire Now →</button>
             </div>
           </div>
         )}
@@ -663,15 +663,15 @@ function RepertoirePage({ setPage, setPreselectedSongs }) {
           </div>
         )}
 
-        {/* Enquire button at bottom */}
+        {/* Inquire button at bottom */}
         <div style={{ textAlign: 'center', marginTop: 40, paddingTop: 32, borderTop: '1px solid #ede5dc' }}>
-          <p style={{ color: '#9a9189', fontSize: 14, marginBottom: 16 }}>Ready to book? Head to the contact page to send your enquiry.</p>
+          <p style={{ color: '#9a9189', fontSize: 14, marginBottom: 16 }}>Ready to book? Head to the contact page to send your inquiry.</p>
           <button onClick={goToContact} style={{
             padding: '14px 40px', background: '#c9a097', color: 'white', border: 'none',
             borderRadius: 10, fontSize: 12, fontWeight: 500, letterSpacing: '.12em',
             textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Jost, sans-serif'
           }}>
-            {selected.length > 0 ? `Enquire with ${selected.length} song${selected.length !== 1 ? 's' : ''} →` : 'Enquire Now'}
+            {selected.length > 0 ? `Inquire with ${selected.length} song${selected.length !== 1 ? 's' : ''} →` : 'Inquire Now'}
           </button>
         </div>
       </div>
@@ -705,7 +705,7 @@ function ContactPage({ preselectedSongs, setPreselectedSongs, selectedPackage, s
         form.song_requests ? `Custom song requests:\n${form.song_requests}` : '',
         songList ? `Repertoire selections:\n${songList}` : ''
       ].filter(Boolean).join('\n\n'),
-      stage: 'enquired'
+      stage: 'inquired'
     }])
     setSubmitting(false)
     if (error) { alert(error.message); return }
@@ -718,7 +718,7 @@ function ContactPage({ preselectedSongs, setPreselectedSongs, selectedPackage, s
       <div style={{ textAlign: 'center', maxWidth: 420 }}>
         <div style={{ fontSize: 48, marginBottom: 20 }}>🎵</div>
         <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 400, fontStyle: 'italic', marginBottom: 12, color: '#1a1714' }}>Thank you!</h2>
-        <p style={{ color: '#9a9189', fontSize: 15, lineHeight: 1.7 }}>Your enquiry has been received. Paige will be in touch shortly to discuss your event.</p>
+        <p style={{ color: '#9a9189', fontSize: 15, lineHeight: 1.7 }}>Your inquiry has been received. Paige will be in touch shortly to discuss your event.</p>
       </div>
     </div>
   )
@@ -796,7 +796,7 @@ function ContactPage({ preselectedSongs, setPreselectedSongs, selectedPackage, s
             cursor: submitting ? 'not-allowed' : 'pointer',
             fontFamily: 'Jost, sans-serif', opacity: submitting ? .7 : 1
           }}>
-            {submitting ? 'Sending…' : '✉ Send Enquiry'}
+            {submitting ? 'Sending…' : '✉ Send Inquiry'}
           </button>
         </div>
 
