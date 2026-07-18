@@ -164,7 +164,7 @@ function HomePage({ setPage }) {
         src="/photos/paige-meadow.jpg"
         alt="Paige playing the harp among wildflowers at golden hour"
         loading="lazy"
-        style={{ width: '100%', height: 'min(56vw, 460px)', objectFit: 'cover', display: 'block' }}
+        style={{ width: '100%', height: 'min(56vw, 460px)', objectFit: 'cover', objectPosition: 'center 30%', display: 'block' }}
       />
 
       {/* Services section */}
@@ -481,6 +481,7 @@ function WeddingsPage({ setPage, setSelectedPackage }) {
       name: 'Signature Ceremony',
       photo: '/photos/paige-golden-hour.jpg',
       photoAlt: 'Paige playing the harp outdoors at golden hour',
+      photoPosition: 'center 25%',
       price: 'Starting at $500',
       duration: 'One Hour',
       songLimit: 2,
@@ -494,6 +495,7 @@ function WeddingsPage({ setPage, setSelectedPackage }) {
       name: 'C & C Serenade',
       photo: '/photos/paige-garden.jpg',
       photoAlt: 'Paige playing the harp in a flower garden',
+      photoPosition: 'center 22%',
       price: 'Starting at $850',
       duration: 'Two Hours',
       songLimit: 5,
@@ -509,6 +511,7 @@ function WeddingsPage({ setPage, setSelectedPackage }) {
       name: 'Evening Étude',
       photo: '/photos/paige-walking.jpg',
       photoAlt: 'Paige carrying her harp through a garden at dusk',
+      photoPosition: 'top',
       price: 'Starting at $1,100',
       duration: 'Three Hours',
       songLimit: 8,
@@ -534,7 +537,7 @@ function WeddingsPage({ setPage, setSelectedPackage }) {
                 src={pkg.photo}
                 alt={pkg.photoAlt}
                 loading="lazy"
-                style={{ width: '100%', height: 260, objectFit: 'cover', display: 'block' }}
+                style={{ width: '100%', height: 260, objectFit: 'cover', objectPosition: pkg.photoPosition, display: 'block' }}
               />
               <div style={{ background: i === 1 ? '#f5e6e2' : '#f2ebe3', padding: '28px 32px', borderBottom: '1px solid #ede5dc', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
                 <div>
