@@ -221,7 +221,7 @@ function HomePage({ setPage }) {
           <div style={{ borderRadius: 16, overflow: 'hidden' }}>
             <iframe
               src="https://www.instagram.com/paigetheharpist/embed"
-              style={{ width: '100%', height: 800, border: 'none', borderRadius: 16 }}
+              style={{ width: '100%', height: 650, border: 'none', borderRadius: 16 }}
               scrolling="no"
               allowTransparency="true"
             />
