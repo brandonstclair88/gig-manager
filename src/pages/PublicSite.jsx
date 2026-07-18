@@ -108,7 +108,7 @@ function HomePage({ setPage }) {
             src="/photos/paige-portrait.jpg"
             alt="Paige smiling beside her harp"
             loading="lazy"
-            style={{ width: '100%', aspectRatio: '4 / 5', objectFit: 'cover', borderRadius: 20, boxShadow: '0 2px 20px rgba(26,23,20,.08)' }}
+            style={{ width: '100%', aspectRatio: '2 / 3', objectFit: 'cover', borderRadius: 20, boxShadow: '0 2px 20px rgba(26,23,20,.08)' }}
           />
           <div>
             <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.2em', marginBottom: 16, fontWeight: 500, fontFamily: 'Jost, sans-serif' }}>About Paige</p>
@@ -164,7 +164,7 @@ function HomePage({ setPage }) {
         src="/photos/paige-meadow.jpg"
         alt="Paige playing the harp among wildflowers at golden hour"
         loading="lazy"
-        style={{ width: '100%', height: 'min(56vw, 460px)', objectFit: 'cover', objectPosition: 'center 30%', display: 'block' }}
+        style={{ width: '100%', aspectRatio: '2 / 1', objectFit: 'cover', objectPosition: 'center 25%', display: 'block' }}
       />
 
       {/* Services section */}
@@ -374,7 +374,7 @@ function MusicPage() {
             src="/photos/paige-performance.jpg"
             alt="Paige playing the harp indoors"
             loading="lazy"
-            style={{ width: '100%', aspectRatio: '4 / 5', objectFit: 'cover', borderRadius: 20, boxShadow: '0 2px 20px rgba(26,23,20,.08)' }}
+            style={{ width: '100%', aspectRatio: '2 / 3', objectFit: 'cover', borderRadius: 20, boxShadow: '0 2px 20px rgba(26,23,20,.08)' }}
           />
           <div style={{ textAlign: 'center' }}>
             <p style={{ fontSize: 15, lineHeight: 1.8, color: '#3d3733', maxWidth: 400, margin: '0 auto 24px' }}>
@@ -481,7 +481,7 @@ function WeddingsPage({ setPage, setSelectedPackage }) {
       name: 'Signature Ceremony',
       photo: '/photos/paige-golden-hour.jpg',
       photoAlt: 'Paige playing the harp outdoors at golden hour',
-      photoPosition: 'center 25%',
+      photoPosition: 'center 20%',
       price: 'Starting at $500',
       duration: 'One Hour',
       songLimit: 2,
@@ -495,7 +495,7 @@ function WeddingsPage({ setPage, setSelectedPackage }) {
       name: 'C & C Serenade',
       photo: '/photos/paige-garden.jpg',
       photoAlt: 'Paige playing the harp in a flower garden',
-      photoPosition: 'center 22%',
+      photoPosition: 'center 15%',
       price: 'Starting at $850',
       duration: 'Two Hours',
       songLimit: 5,
@@ -537,7 +537,7 @@ function WeddingsPage({ setPage, setSelectedPackage }) {
                 src={pkg.photo}
                 alt={pkg.photoAlt}
                 loading="lazy"
-                style={{ width: '100%', height: 260, objectFit: 'cover', objectPosition: pkg.photoPosition, display: 'block' }}
+                style={{ width: '100%', aspectRatio: '1 / 1', objectFit: 'cover', objectPosition: pkg.photoPosition, display: 'block' }}
               />
               <div style={{ background: i === 1 ? '#f5e6e2' : '#f2ebe3', padding: '28px 32px', borderBottom: '1px solid #ede5dc', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
                 <div>
