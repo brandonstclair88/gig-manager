@@ -164,7 +164,7 @@ function HomePage({ setPage }) {
         src="/photos/paige-meadow.jpg"
         alt="Paige playing the harp among wildflowers at golden hour"
         loading="lazy"
-        style={{ width: '100%', aspectRatio: '2 / 1', objectFit: 'cover', objectPosition: 'center 25%', display: 'block' }}
+        style={{ width: '100%', aspectRatio: '5 / 3', objectFit: 'cover', objectPosition: 'center top', display: 'block' }}
       />
 
       {/* Services section */}
