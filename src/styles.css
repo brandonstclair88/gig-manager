@@ -657,15 +657,6 @@ body[data-theme="dark"] div[style*="background: '#e2ede6'"] p {
     padding-right: 16px !important;
   }
 
-  /* Nav tabs scroll horizontally */
-  nav > div:last-child {
-    overflow-x: auto;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    flex-wrap: nowrap !important;
-    width: 100%;
-  }
-
   /* Bio grid stacks */
   div[style*="gridTemplateColumns: '1fr 1fr'"] {
     grid-template-columns: 1fr !important;
@@ -808,20 +799,37 @@ body[data-theme="dark"] div[style*="background: '#e2ede6'"] p {
 }
 
 /* ── Public site nav mobile scroll hint ── */
+.public-nav-fade, .public-nav-chevron { display: none; }
+
 @media (max-width: 768px) {
   .public-nav-tabs {
-    position: relative;
     overflow-x: auto;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap !important;
+    width: 100%;
   }
-  .public-nav-tabs::after {
-    content: '';
-    position: fixed;
-    right: 0;
-    width: 40px;
-    height: 44px;
-    background: linear-gradient(to right, transparent, #f2ebe3);
+  .public-nav-tabs::-webkit-scrollbar { display: none; }
+
+  .public-nav-fade {
+    display: block;
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 32px;
+    background: linear-gradient(to right, transparent, #f2ebe3 75%);
     pointer-events: none;
   }
+  .public-nav-chevron {
+    display: block;
+    position: absolute;
+    top: 50%; right: 2px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    animation: nav-chevron-nudge 1.8s ease-in-out infinite;
+  }
+}
+
+@keyframes nav-chevron-nudge {
+  0%, 100% { transform: translate(0, -50%); opacity: .5; }
+  50% { transform: translate(4px, -50%); opacity: 1; }
 }

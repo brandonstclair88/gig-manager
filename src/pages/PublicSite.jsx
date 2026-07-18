@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, ChevronRight } from 'lucide-react'
 import { supabase } from '../supabase'
 
 const CATEGORIES = ['Classical', 'Wedding', 'Pop', 'Rock', 'Jazz', 'Celtic', 'Christmas', 'Hymns', 'Film & TV', 'Other']
@@ -11,17 +11,21 @@ function Nav({ page, setPage }) {
         <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 400, fontStyle: 'italic', color: '#1a1714' }}>Paige Camryn Music</h1>
         <p style={{ fontSize: 10, letterSpacing: '.16em', textTransform: 'uppercase', color: '#9a9189', marginTop: 2 }}>Luxury Event Harpist</p>
       </div>
-      <div style={{ display: 'flex', gap: 4 }}>
-        {['home', 'music', 'events', 'weddings', 'repertoire', 'contact'].map(p => (
-          <button key={p} onClick={() => setPage(p)} style={{
-            padding: '8px 18px', border: 'none', background: 'transparent',
-            fontFamily: 'Jost, sans-serif', fontSize: 12, fontWeight: 500,
-            letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer',
-            color: page === p ? '#c9a097' : '#9a9189',
-            borderBottom: page === p ? '2px solid #c9a097' : '2px solid transparent',
-            transition: 'all .15s'
-          }}>{p}</button>
-        ))}
+      <div style={{ position: 'relative', minWidth: 0, flex: '1 1 auto' }}>
+        <div className="public-nav-tabs" style={{ display: 'flex', gap: 4 }}>
+          {['home', 'music', 'events', 'weddings', 'repertoire', 'contact'].map(p => (
+            <button key={p} onClick={() => setPage(p)} style={{
+              padding: '8px 18px', border: 'none', background: 'transparent',
+              fontFamily: 'Jost, sans-serif', fontSize: 12, fontWeight: 500,
+              letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer',
+              color: page === p ? '#c9a097' : '#9a9189',
+              borderBottom: page === p ? '2px solid #c9a097' : '2px solid transparent',
+              transition: 'all .15s'
+            }}>{p}</button>
+          ))}
+        </div>
+        <div className="public-nav-fade" aria-hidden="true" />
+        <ChevronRight className="public-nav-chevron" aria-hidden="true" size={14} strokeWidth={2} color="#c9a097" />
       </div>
     </nav>
   )
