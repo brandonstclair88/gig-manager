@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react'
+import { ChevronDown } from 'lucide-react'
 import { supabase } from '../supabase'
 
 const CATEGORIES = ['Classical', 'Wedding', 'Pop', 'Rock', 'Jazz', 'Celtic', 'Christmas', 'Hymns', 'Film & TV', 'Other']
@@ -98,6 +99,14 @@ function HomePage({ setPage }) {
               letterSpacing: '.12em', textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Jost, sans-serif'
             }}>Browse Repertoire</button>
           </div>
+        </div>
+
+        <div className="hero-scroll-cue" style={{
+          position: 'absolute', bottom: 28, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6
+        }}>
+          <span style={{ fontFamily: 'Jost, sans-serif', fontSize: 10, letterSpacing: '.22em', textTransform: 'uppercase', color: '#c9a097' }}>Scroll</span>
+          <ChevronDown size={18} color="#c9a097" strokeWidth={1.75} />
         </div>
       </div>
 

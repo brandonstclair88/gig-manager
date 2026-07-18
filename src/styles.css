@@ -261,6 +261,13 @@ tr:hover td { background: var(--paper); }
 /* ── Decorative divider ── */
 .ornament { text-align: center; color: var(--blush); font-size: 18px; letter-spacing: .3em; margin: 8px 0; opacity: .6; }
 
+/* ── Hero scroll cue ── */
+@keyframes hero-scroll-bounce {
+  0%, 100% { transform: translateY(0); opacity: .55; }
+  50% { transform: translateY(8px); opacity: 1; }
+}
+.hero-scroll-cue { animation: hero-scroll-bounce 2.2s ease-in-out infinite; }
+
 @media (max-width: 768px) {
   .sidebar { width: 100%; height: auto; flex-direction: row; flex-wrap: wrap; position: relative; padding: 16px; }
   .sidebar-logo { margin-bottom: 0; flex: 1; }
