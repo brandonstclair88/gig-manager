@@ -11,7 +11,7 @@ function Nav({ page, setPage }) {
         <p style={{ fontSize: 10, letterSpacing: '.16em', textTransform: 'uppercase', color: '#9a9189', marginTop: 2 }}>Luxury Event Harpist</p>
       </div>
       <div style={{ display: 'flex', gap: 4 }}>
-        {['home', 'music', 'events', 'weddings', 'repertoire', 'contact'].map(p => (
+        {['home', 'music', 'events', 'weddings', 'gallery', 'repertoire', 'contact'].map(p => (
           <button key={p} onClick={() => setPage(p)} style={{
             padding: '8px 18px', border: 'none', background: 'transparent',
             fontFamily: 'Jost, sans-serif', fontSize: 12, fontWeight: 500,
@@ -165,6 +165,7 @@ function HomePage({ setPage }) {
             { title: 'Weddings', desc: 'From intimate ceremonies to grand celebrations, Paige creates the perfect musical atmosphere for your wedding day.', page: 'weddings' },
             { title: 'Music', desc: 'Listen to Paige perform live. Browse her YouTube channel and get a taste of what she can bring to your event.', page: 'music' },
             { title: 'Events', desc: 'Corporate galas, private parties, fundraisers — live harp music elevates any occasion to something truly special.', page: 'events' },
+            { title: 'Gallery', desc: 'Browse photos of Paige performing at weddings and events throughout Southern California.', page: 'gallery' },
             { title: 'Repertoire', desc: 'Browse hundreds of songs across classical, pop, jazz, Celtic and more. Select your favourites for your event.', page: 'repertoire' },
           ].map(s => (
             <div key={s.title} style={{ background: 'white', border: '1px solid #ede5dc', borderRadius: 20, padding: '32px 28px', boxShadow: '0 2px 20px rgba(26,23,20,.05)' }}>
@@ -542,6 +543,63 @@ function WeddingsPage({ setPage, setSelectedPackage }) {
   )
 }
 
+const GALLERY_PHOTOS = [
+  { src: '/gallery/harpist-golden-hour.jpg', alt: 'Paige playing the harp outdoors at golden hour' },
+  { src: '/gallery/harpist-garden.jpg', alt: 'Paige playing the harp in a flower garden' },
+  { src: '/gallery/harpist-portrait.jpg', alt: 'Portrait of Paige smiling beside her harp' },
+  { src: '/gallery/harpist-performance.jpg', alt: 'Paige performing on the harp indoors' },
+  { src: '/gallery/harpist-smile-closeup.jpg', alt: 'Close-up of Paige smiling through the harp strings' },
+  { src: '/gallery/harpist-walking.jpg', alt: 'Paige carrying her harp through a garden' },
+]
+
+function GalleryPage() {
+  const [active, setActive] = useState(null)
+
+  return (
+    <div>
+      <Hero title="Gallery" subtitle="A glimpse into Paige's world of live harp performance" />
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '60px 20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: 20 }}>
+          {GALLERY_PHOTOS.map(photo => (
+            <button
+              key={photo.src}
+              onClick={() => setActive(photo)}
+              style={{
+                padding: 0, border: '1px solid #ede5dc', borderRadius: 20, overflow: 'hidden',
+                background: 'white', cursor: 'pointer', boxShadow: '0 2px 20px rgba(26,23,20,.06)',
+                aspectRatio: '4 / 5', lineHeight: 0
+              }}
+            >
+              <img
+                src={photo.src}
+                alt={photo.alt}
+                loading="lazy"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {active && (
+        <div
+          onClick={() => setActive(null)}
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(26,23,20,.9)', zIndex: 1000,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, cursor: 'zoom-out'
+          }}
+        >
+          <img
+            src={active.src}
+            alt={active.alt}
+            style={{ maxWidth: '100%', maxHeight: '90vh', borderRadius: 8, boxShadow: '0 10px 60px rgba(0,0,0,.4)' }}
+          />
+        </div>
+      )}
+    </div>
+  )
+}
+
 function RepertoirePage({ setPage, setPreselectedSongs }) {
   const [repertoire, setRepertoire] = useState([])
   const [loading, setLoading] = useState(true)
@@ -822,6 +880,7 @@ export default function PublicSite() {
       {page === 'music'      && <MusicPage />}
       {page === 'events'     && <EventsPage setPage={setPage} />}
       {page === 'weddings'   && <WeddingsPage setPage={setPage} setSelectedPackage={setSelectedPackage} />}
+      {page === 'gallery'    && <GalleryPage />}
       {page === 'repertoire' && <RepertoirePage setPage={setPage} setPreselectedSongs={setPreselectedSongs} />}
       {page === 'contact'    && <ContactPage preselectedSongs={preselectedSongs} setPreselectedSongs={setPreselectedSongs} selectedPackage={selectedPackage} setSelectedPackage={setSelectedPackage} />}
       <Footer />
