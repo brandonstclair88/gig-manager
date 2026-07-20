@@ -6,10 +6,7 @@ const CATEGORIES = ['Classical', 'Wedding', 'Pop', 'Rock', 'Jazz', 'Celtic', 'Ch
 
 function Nav({ page, setPage }) {
   return (
-    <nav style={{ background: '#f2ebe3', borderBottom: '1px solid #ede5dc', padding: '0 5%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
-      <div style={{ padding: '20px 0' }}>
-        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 400, fontStyle: 'italic', color: '#1a1714' }}>Paige Camryn</h1>
-      </div>
+    <nav style={{ background: '#f2ebe3', borderBottom: '1px solid #ede5dc', padding: '0 5%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 16 }}>
       <div style={{ position: 'relative', minWidth: 0, flex: '1 1 auto' }}>
           <div className="public-nav-tabs" style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
             {['home', 'music', 'events', 'weddings', 'repertoire', 'contact'].map(p => (
