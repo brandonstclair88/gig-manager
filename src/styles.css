@@ -663,7 +663,7 @@ body[data-theme="dark"] div[style*="background: '#e2ede6'"] p {
   }
 
   /* Services grid stacks */
-  div[style*="gridTemplateColumns: 'repeat(auto-fit, minmax(240px"] {
+  div[style*="gridTemplateColumns: 'repeat(auto-fit, minmax(min(360px"] {
     grid-template-columns: 1fr !important;
   }
 
