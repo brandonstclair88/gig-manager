@@ -182,7 +182,7 @@ function HomePage({ setPage }) {
           <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.2em', marginBottom: 12, fontWeight: 500, fontFamily: 'Jost, sans-serif' }}>Services</p>
           <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 400, fontStyle: 'italic', color: '#1a1714' }}>How can Paige serve you?</h2>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))', gap: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(360px, 100%), 1fr))', gap: 20 }}>
           {[
             { title: 'Weddings', desc: 'From intimate ceremonies to grand celebrations, Paige creates the perfect musical atmosphere for your wedding day.', page: 'weddings' },
             { title: 'Music', desc: 'Listen to Paige perform live. Browse her YouTube channel and get a taste of what she can bring to your event.', page: 'music' },
@@ -369,6 +369,7 @@ function TestimonialsSection() {
 
 
 function MusicPage() {
+    const [playingId, setPlayingId] = React.useState(null)
   const videos = [
     { id: 'UCX_zOd0pkl_Iu2gl8G5ecdw', title: 'Thirty Minutes of Relaxation', desc: 'A peaceful collection of harp music perfect for relaxation and meditation.' },
   ]
@@ -391,8 +392,8 @@ function MusicPage() {
             </p>
             <a href="https://www.youtube.com/@paigetheharpist" target="_blank" rel="noreferrer" style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
-              padding: '12px 24px', background: '#ff0000', color: 'white',
-              borderRadius: 10, fontSize: 12, fontWeight: 500, letterSpacing: '.08em',
+            padding: '12px 24px', background: '#c9a097', color: 'white',
+                  borderRadius: 10, fontSize: 12, fontWeight: 500, letterSpacing: '.08em',
               textTransform: 'uppercase', textDecoration: 'none', fontFamily: 'Jost, sans-serif'
             }}>▶ View Full YouTube Channel</a>
           </div>
@@ -407,16 +408,10 @@ function MusicPage() {
           ].map(v => (
             <div key={v.id} style={{ background: 'white', border: '1px solid #ede5dc', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 20px rgba(26,23,20,.06)' }}>
               <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}>
-                <iframe
-                  src={`https://www.youtube.com/embed/${v.id}`}
-                  title={v.title}
-                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+                {playingId === v.id ? (<iframe src={`https://www.youtube.com/embed/${v.id}?autoplay=1`} title={v.title} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />) : (<button onClick={() => setPlayingId(v.id)} aria-label={`Play ${v.title}`} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none', padding: 0, cursor: 'pointer', background: `url(https://img.youtube.com/vi/${v.id}/hqdefault.jpg) center/cover no-repeat` }}><span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 56, height: 56, borderRadius: '50%', background: 'rgba(26,23,20,.65)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ width: 0, height: 0, borderTop: '10px solid transparent', borderBottom: '10px solid transparent', borderLeft: '16px solid white', marginLeft: 4 }} /></span></button)}
               </div>
-              <div style={{ padding: '16px 20px' }}>
-                <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, fontWeight: 400, fontStyle: 'italic', color: '#1a1714', marginBottom: 4 }}>{v.title}</h3>
+                          <div style={{ padding: '16px 20px' }}>
+                            <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, fontWeight: 400, fontStyle: 'italic', color: '#1a1714', marginBottom: 4 }}>{v.title}</h3>
                 <p style={{ fontSize: 13, color: '#9a9189' }}>{v.desc}</p>
               </div>
             </div>
@@ -541,8 +536,8 @@ function WeddingsPage({ setPage, setSelectedPackage }) {
       <div style={{ maxWidth: 1000, margin: '0 auto', padding: '60px 20px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, marginBottom: 48 }}>
           {packages.map((pkg, i) => (
-            <div key={pkg.name} style={{ background: 'white', border: '1px solid #ede5dc', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 20px rgba(26,23,20,.06)' }}>
-              <img
+          <div key={pkg.name} style={{ background: 'white', border: '1px solid #ede5dc', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 20px rgba(26,23,20,.06)', display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <img
                 src={pkg.photo}
                 alt={pkg.photoAlt}
                 loading="lazy"
@@ -555,9 +550,8 @@ function WeddingsPage({ setPage, setSelectedPackage }) {
                 </div>
                 <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 28, color: '#c9a097', fontWeight: 400 }}>{pkg.price}</p>
               </div>
-              <div style={{ padding: '28px 32px' }}>
-                <p style={{ fontSize: 14, lineHeight: 1.8, color: '#3d3733', marginBottom: 16 }}>{pkg.description}</p>
-                <ul style={{ listStyle: 'none', display: 'grid', gap: 8 }}>
+              <div  style={{ padding: '28px 32px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+            <ul style={{ listStyle: 'none', display: 'grid', gap: 8 }}>
                   {pkg.details.map((d, j) => (
                     <li key={j} style={{ fontSize: 13, color: '#7a746e', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                       <span style={{ color: '#c9a097', flexShrink: 0, marginTop: 2 }}>·</span>
@@ -566,7 +560,7 @@ function WeddingsPage({ setPage, setSelectedPackage }) {
                   ))}
                 </ul>
                 <button onClick={() => { setSelectedPackage(pkg); setPage('contact') }} style={{
-                  marginTop: 20, padding: '10px 24px', background: '#c9a097', color: 'white',
+                  marginTop: 'auto', padding: '10px 24px', background: '#c9a097', color: 'white',
                   border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 500,
                   letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer',
                   fontFamily: 'Jost, sans-serif'
@@ -671,8 +665,8 @@ function RepertoirePage({ setPage, setPreselectedSongs }) {
                 <div style={{ flex: 1, height: 1, background: '#ede5dc' }} />
               </div>
             )}
-            <div style={{ display: 'grid', gap: 8 }}>
-              {songs.map(s => {
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: 8 }}>
+            {songs.map(s => {
                 const isSelected = selected.includes(s.id)
                 return (
                   <div key={s.id} onClick={() => toggleSong(s.id)} style={{
@@ -800,9 +794,8 @@ function ContactPage({ preselectedSongs, setPreselectedSongs, selectedPackage, s
               { label: 'Event Type', key: 'event_type', placeholder: 'Wedding, corporate, private party…', type: 'text' },
               { label: 'Event Date', key: 'event_date', placeholder: '', type: 'date' },
               { label: 'Venue', key: 'venue', placeholder: 'Venue name or location', type: 'text' },
-              { label: "Bride's Name", key: 'bride_name', placeholder: "Bride's full name", type: 'text' },
-              { label: "Groom's Name", key: 'groom_name', placeholder: "Groom's full name", type: 'text' },
-            ].map(f => (
+          ...(String(form.event_type || '').toLowerCase().includes('wedding') ? [{ label: "Bride's Name", key: 'bride_name', placeholder: "Bride's full name", type: 'text' }, { label: "Groom's Name", key: 'groom_name', placeholder: "Groom's full name", type: 'text' }] : []),
+    ].map(f => (
               <div key={f.key} style={{ display: 'flex', flexDirection: 'column' }}>
                 <label style={{ fontSize: 10, fontWeight: 500, color: '#9a9189', marginBottom: 6, letterSpacing: '.1em', textTransform: 'uppercase', fontFamily: 'Jost, sans-serif' }}>{f.label}</label>
                 <input type={f.type} value={form[f.key]} placeholder={f.placeholder}
