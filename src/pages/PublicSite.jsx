@@ -8,12 +8,11 @@ function Nav({ page, setPage }) {
   return (
     <nav style={{ background: '#f2ebe3', borderBottom: '1px solid #ede5dc', padding: '0 5%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
       <div style={{ padding: '20px 0' }}>
-        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 400, fontStyle: 'italic', color: '#1a1714' }}>Paige Camryn Music</h1>
-        <p style={{ fontSize: 10, letterSpacing: '.16em', textTransform: 'uppercase', color: '#9a9189', marginTop: 2 }}>Luxury Event Harpist</p>
+        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 400, fontStyle: 'italic', color: '#1a1714' }}>Paige Camryn</h1>
       </div>
       <div style={{ position: 'relative', minWidth: 0, flex: '1 1 auto' }}>
-        <div className="public-nav-tabs" style={{ display: 'flex', gap: 4 }}>
-          {['home', 'music', 'events', 'weddings', 'repertoire', 'contact'].map(p => (
+          <div className="public-nav-tabs" style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
+            {['home', 'music', 'events', 'weddings', 'repertoire', 'contact'].map(p => (
             <button key={p} onClick={() => setPage(p)} style={{
               padding: '8px 18px', border: 'none', background: 'transparent',
               fontFamily: 'Jost, sans-serif', fontSize: 12, fontWeight: 500,
@@ -494,7 +493,7 @@ function WeddingsPage({ setPage, setSelectedPackage }) {
       name: 'Signature Ceremony',
       photo: '/photos/paige-golden-hour.jpg',
       photoAlt: 'Paige playing the harp outdoors at golden hour',
-      photoPosition: 'center 20%',
+      photoPosition: 'center 45%',
       price: 'Starting at $500',
       duration: 'One Hour',
       songLimit: 2,
@@ -543,7 +542,7 @@ function WeddingsPage({ setPage, setSelectedPackage }) {
     <div>
       <Hero title="Weddings" subtitle="Creating an unforgettable atmosphere for your most special day" />
       <div style={{ maxWidth: 1000, margin: '0 auto', padding: '60px 20px' }}>
-        <div style={{ display: 'grid', gap: 24, marginBottom: 48 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, marginBottom: 48 }}>
           {packages.map((pkg, i) => (
             <div key={pkg.name} style={{ background: 'white', border: '1px solid #ede5dc', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 20px rgba(26,23,20,.06)' }}>
               <img
