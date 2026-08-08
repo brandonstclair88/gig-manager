@@ -1,14 +1,17 @@
 import React, { useMemo, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { Download, FileText } from 'lucide-react'
-import { currency, fmtDate, invoiceBadge, exportCSV } from '../utils'
+import {
+  currency, fmtDate, invoiceBadge, exportCSV,
+  activeGigs, gigFee, gigPaid, gigOutstanding, gigExpenses,
+} from '../utils'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
 function exportTaxSummary(gigs, year) {
-  const yearGigs = gigs.filter(g => g.date && new Date(g.date + 'T00:00:00').getFullYear() === year)
-  const income = yearGigs.reduce((s, g) => s + Number(g.paid || 0), 0)
-  const expenses = yearGigs.reduce((s, g) => s + (g.expenses || []).reduce((es, e) => es + Number(e.amount || 0), 0), 0)
+  const yearGigs = activeGigs(gigs).filter(g => g.date && new Date(g.date + 'T00:00:00').getFullYear() === year)
+  const income = yearGigs.reduce((s, g) => s + gigPaid(g), 0)
+  const expenses = yearGigs.reduce((s, g) => s + gigExpenses(g), 0)
   const netProfit = income - expenses
   const gigCount = yearGigs.length
 
@@ -29,15 +32,15 @@ function exportTaxSummary(gigs, year) {
     `GIG BREAKDOWN`,
     `═══════════════════════════════════════`,
     ...yearGigs.map(g => {
-      const gigExpenses = (g.expenses || []).reduce((s, e) => s + Number(e.amount || 0), 0)
+      const exp = gigExpenses(g)
       return [
         ``,
         `Event:    ${g.title}`,
         `Client:   ${g.client || '—'}`,
         `Date:     ${g.date}`,
-        `Income:   $${Number(g.paid || 0).toFixed(2)}`,
-        `Expenses: $${gigExpenses.toFixed(2)}`,
-        `Net:      $${(Number(g.paid || 0) - gigExpenses).toFixed(2)}`,
+        `Income:   $${gigPaid(g).toFixed(2)}`,
+        `Expenses: $${exp.toFixed(2)}`,
+        `Net:      $${(gigPaid(g) - exp).toFixed(2)}`,
       ].join('\n')
     }),
     ``,
@@ -61,40 +64,49 @@ function exportTaxSummary(gigs, year) {
 }
 
 export default function FinancePage({ gigs }) {
+  // Every figure on this page reflects live gigs only. Archived gigs stay
+  // in the database but are deliberately excluded from all reporting.
+  const live = useMemo(() => activeGigs(gigs), [gigs])
+
   const stats = useMemo(() => {
-    const total = gigs.reduce((s, g) => s + Number(g.paid || 0), 0)
-    const outstanding = gigs.reduce((s, g) => s + Math.max(Number(g.fee || 0) - Number(g.paid || 0), 0), 0)
-    const fees = gigs.reduce((s, g) => s + Number(g.fee || 0), 0)
-    const upcoming = gigs.filter(g => g.date && new Date(g.date + 'T00:00:00') >= new Date()).length
-    const totalExpenses = gigs.reduce((s, g) => s + (g.expenses || []).reduce((es, e) => es + Number(e.amount || 0), 0), 0)
+    const total = live.reduce((s, g) => s + gigPaid(g), 0)
+    const outstanding = live.reduce((s, g) => s + gigOutstanding(g), 0)
+    const fees = live.reduce((s, g) => s + gigFee(g), 0)
+    const today = new Date(); today.setHours(0, 0, 0, 0)
+    const upcoming = live.filter(g => g.date && new Date(g.date + 'T00:00:00') >= today).length
+    const totalExpenses = live.reduce((s, g) => s + gigExpenses(g), 0)
     const netProfit = total - totalExpenses
     return { total, outstanding, fees, upcoming, totalExpenses, netProfit }
-  }, [gigs])
+  }, [live])
 
   const chartData = useMemo(() => {
     const byMonth = {}
-    gigs.forEach(g => {
+    live.forEach(g => {
       if (!g.date) return
       const d = new Date(g.date + 'T00:00:00')
-      const key = `${d.getFullYear()}-${d.getMonth()}`
-      if (!byMonth[key]) byMonth[key] = { month: `${MONTHS[d.getMonth()]} ${d.getFullYear()}`, income: 0, fees: 0 }
-      byMonth[key].income += Number(g.paid || 0)
-      byMonth[key].fees += Number(g.fee || 0)
+      const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, '0')}`
+      if (!byMonth[key]) byMonth[key] = { key, month: `${MONTHS[d.getMonth()]} ${d.getFullYear()}`, income: 0, fees: 0 }
+      byMonth[key].income += gigPaid(g)
+      byMonth[key].fees += gigFee(g)
     })
-    return Object.values(byMonth).slice(-12)
-  }, [gigs])
+    // Sort chronologically before trimming — object key order is insertion
+    // order, which follows the gig list, not the calendar.
+    return Object.values(byMonth).sort((a, b) => a.key.localeCompare(b.key)).slice(-12)
+  }, [live])
 
   const topClients = useMemo(() => {
     const map = {}
-    gigs.forEach(g => {
+    live.forEach(g => {
       if (!g.client) return
-      if (!map[g.client]) map[g.client] = { client: g.client, gigs: 0, paid: 0, fee: 0 }
-      map[g.client].gigs++
-      map[g.client].paid += Number(g.paid || 0)
-      map[g.client].fee += Number(g.fee || 0)
+      const key = g.client.trim().toLowerCase()
+      if (!key) return
+      if (!map[key]) map[key] = { client: g.client.trim(), gigs: 0, paid: 0, fee: 0 }
+      map[key].gigs++
+      map[key].paid += gigPaid(g)
+      map[key].fee += gigFee(g)
     })
     return Object.values(map).sort((a, b) => b.paid - a.paid).slice(0, 5)
-  }, [gigs])
+  }, [live])
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null
@@ -107,14 +119,30 @@ export default function FinancePage({ gigs }) {
     )
   }
 
-  const availableYears = [...new Set(gigs.filter(g => g.date).map(g => new Date(g.date + 'T00:00:00').getFullYear()))].sort((a, b) => b - a)
   const currentYear = new Date().getFullYear()
   const [taxYear, setTaxYear] = useState(currentYear)
 
-  const taxYearGigs = gigs.filter(g => g.date && new Date(g.date + 'T00:00:00').getFullYear() === taxYear)
-  const taxIncome = taxYearGigs.reduce((s, g) => s + Number(g.paid || 0), 0)
-  const taxExpenses = taxYearGigs.reduce((s, g) => s + (g.expenses || []).reduce((es, e) => es + Number(e.amount || 0), 0), 0)
+  // Offer every year that actually has gigs, not just the last three.
+  const availableYears = useMemo(() => {
+    const years = new Set(live.filter(g => g.date).map(g => new Date(g.date + 'T00:00:00').getFullYear()))
+    years.add(currentYear)
+    return [...years].sort((a, b) => b - a)
+  }, [live, currentYear])
+
+  const taxYearGigs = useMemo(
+    () => live.filter(g => g.date && new Date(g.date + 'T00:00:00').getFullYear() === taxYear),
+    [live, taxYear]
+  )
+  const taxIncome = taxYearGigs.reduce((s, g) => s + gigPaid(g), 0)
+  const taxExpenses = taxYearGigs.reduce((s, g) => s + gigExpenses(g), 0)
   const taxNet = taxIncome - taxExpenses
+
+  // Gigs arrive sorted date-ascending, so slice(0, 6) was showing the OLDEST
+  // gigs under a "Recent" heading. Sort newest-first before trimming.
+  const recentGigs = useMemo(
+    () => [...live].sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 6),
+    [live]
+  )
 
   return (
     <div>
@@ -160,7 +188,7 @@ export default function FinancePage({ gigs }) {
           <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontStyle: 'italic', margin: 0 }}>Tax Year Summary</h3>
           <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             <select value={taxYear} onChange={e => setTaxYear(Number(e.target.value))} style={{ width: 'auto', padding: '8px 12px' }}>
-              {[currentYear, currentYear - 1, currentYear - 2].map(y => (
+              {availableYears.map(y => (
                 <option key={y} value={y}>{y}</option>
               ))}
             </select>
@@ -231,8 +259,8 @@ export default function FinancePage({ gigs }) {
 
         <div className="card">
           <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: 20, marginBottom: 16 }}>Recent Gigs</h3>
-          {gigs.slice(0, 6).map((g, i) => (
-            <div key={g.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: i < 5 ? '1px solid var(--paper3)' : 'none' }}>
+          {recentGigs.map((g, i) => (
+            <div key={g.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: i < recentGigs.length - 1 ? '1px solid var(--paper3)' : 'none' }}>
               <div>
                 <p style={{ fontWeight: 600, fontSize: 14 }}>{g.title}</p>
                 <p className="muted">{fmtDate(g.date)}</p>

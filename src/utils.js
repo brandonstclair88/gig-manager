@@ -2,6 +2,71 @@ export function currency(n) {
   return Number(n || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' })
 }
 
+/* ──────────────────────────────────────────────────────────────
+   Money model — single source of truth.
+
+   fee     total agreed price for the gig
+   deposit portion of the fee collected up front (INCLUDED in paid)
+   paid    everything received to date, deposit included
+
+   balance = fee − paid.  A negative balance means the client
+   overpaid and is owed a credit; we never clamp it to zero,
+   because hiding an overpayment is how books drift.
+   ────────────────────────────────────────────────────────────── */
+
+export function gigFee(g)     { return Number(g?.fee || 0) }
+export function gigDeposit(g) { return Number(g?.deposit || 0) }
+export function gigPaid(g)    { return Number(g?.paid || 0) }
+
+/** Signed balance. Positive = client still owes. Negative = client overpaid. */
+export function gigBalance(g) { return gigFee(g) - gigPaid(g) }
+
+/** Only what's still owed — never negative. Use for "outstanding" totals. */
+export function gigOutstanding(g) { return Math.max(gigBalance(g), 0) }
+
+/** Amount collected beyond the fee, if any. */
+export function gigOverpaid(g) { return Math.max(-gigBalance(g), 0) }
+
+/** Payments received on top of the deposit. */
+export function gigPaidBeyondDeposit(g) { return Math.max(gigPaid(g) - gigDeposit(g), 0) }
+
+export function gigExpenses(g) {
+  return (g?.expenses || []).reduce((s, e) => s + Number(e.amount || 0), 0)
+}
+
+export function gigNetProfit(g) { return gigPaid(g) - gigExpenses(g) }
+
+/** Archived gigs are records, not activity. Exclude them from every total. */
+export function isActiveGig(g) { return !g?.archived }
+export function activeGigs(gigs) { return (gigs || []).filter(isActiveGig) }
+
+/**
+ * Validate the money fields before save. Returns an array of
+ * { level: 'error' | 'warn', message } — errors block, warnings confirm.
+ */
+export function validateGigMoney({ fee, deposit, paid }) {
+  const f = Number(fee || 0), d = Number(deposit || 0), p = Number(paid || 0)
+  const issues = []
+  if (f < 0 || d < 0 || p < 0) issues.push({ level: 'error', message: 'Amounts cannot be negative.' })
+  if (d > f && f > 0) issues.push({ level: 'error', message: `Deposit (${currency(d)}) is more than the total fee (${currency(f)}).` })
+  if (p < d) issues.push({ level: 'error', message: `Paid to date (${currency(p)}) is less than the deposit (${currency(d)}). Paid includes the deposit.` })
+  if (p > f && f > 0) issues.push({ level: 'warn', message: `Paid to date (${currency(p)}) exceeds the fee (${currency(f)}). This will record a ${currency(p - f)} overpayment.` })
+  return issues
+}
+
+/**
+ * Cross-platform maps link. `maps://` only works on Apple devices and
+ * silently fails everywhere else, so use the universal Google Maps URL —
+ * iOS and macOS offer to hand it off to Apple Maps anyway.
+ */
+export function mapsUrl(address, from) {
+  if (!address) return null
+  const q = encodeURIComponent(address)
+  return from
+    ? `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(from)}&destination=${q}`
+    : `https://www.google.com/maps/search/?api=1&query=${q}`
+}
+
 export function fmtDate(d) {
   if (!d) return '—'
   const dt = new Date(d + 'T00:00:00')
@@ -172,7 +237,9 @@ export async function downloadPDFInvoice(gig) {
   const { jsPDF } = await import('jspdf')
   const doc = new jsPDF()
 
-  const balance = Math.max(Number(gig.fee || 0) - Number(gig.paid || 0), 0)
+  const balance = gigBalance(gig)
+  const depositPaid = Math.min(gigDeposit(gig), gigPaid(gig))
+  const otherPayments = gigPaidBeyondDeposit(gig)
   const invoiceNum = `INV-${String(gig.id || '').slice(0, 6).toUpperCase() || Date.now()}`
 
   // Header bar - warm cream
@@ -249,14 +316,21 @@ export async function downloadPDFInvoice(gig) {
   doc.text('Performance Fee', 18, y)
   doc.text(currency(gig.fee), 188, y, { align: 'right' })
 
-  y += 10
-  doc.setTextColor(154, 145, 137)
-  doc.text('Deposit Received', 18, y)
-  doc.text(`-${currency(gig.deposit)}`, 188, y, { align: 'right' })
+  // Deposit and other payments are both components of "paid" — list them
+  // separately for the client's benefit, but only subtract each once.
+  if (depositPaid > 0) {
+    y += 10
+    doc.setTextColor(154, 145, 137)
+    doc.text('Less: Deposit Received', 18, y)
+    doc.text(`-${currency(depositPaid)}`, 188, y, { align: 'right' })
+  }
 
-  y += 10
-  doc.text('Paid to Date', 18, y)
-  doc.text(`-${currency(gig.paid)}`, 188, y, { align: 'right' })
+  if (otherPayments > 0) {
+    y += 10
+    doc.setTextColor(154, 145, 137)
+    doc.text('Less: Payments Received', 18, y)
+    doc.text(`-${currency(otherPayments)}`, 188, y, { align: 'right' })
+  }
 
   // Divider before total
   doc.setDrawColor(237, 229, 220)
@@ -269,14 +343,19 @@ export async function downloadPDFInvoice(gig) {
   doc.setTextColor(255, 255, 255)
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(10)
-  doc.text('BALANCE DUE', 116, y + 1)
-  doc.text(currency(balance), 188, y + 1, { align: 'right' })
+  doc.text(balance < 0 ? 'CREDIT BALANCE' : 'BALANCE DUE', 116, y + 1)
+  doc.text(currency(Math.abs(balance)), 188, y + 1, { align: 'right' })
 
   // Thank you note
   doc.setTextColor(154, 145, 137)
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(8)
-  doc.text('Thank you for choosing Paige Camryn Music. Payment is due on the day of the performance.', 14, y + 24)
+  doc.text(
+    balance < 0
+      ? 'Thank you for choosing Paige Camryn Music. This account is overpaid; a refund or credit will be arranged.'
+      : 'Thank you for choosing Paige Camryn Music. Payment is due on the day of the performance.',
+    14, y + 24
+  )
 
   if (gig.notes) {
     doc.setFontSize(8)
@@ -295,14 +374,16 @@ export async function downloadPDFInvoice(gig) {
 }
 
 
-export function exportCSV(gigs) {
-  const headers = ['Title', 'Client', 'Venue', 'Date', 'Time', 'Fee', 'Deposit', 'Paid', 'Balance', 'Invoice Status', 'Notes']
-  const rows = gigs.map(g => [
+export function exportCSV(gigs, { includeArchived = false } = {}) {
+  const rowsIn = includeArchived ? (gigs || []) : activeGigs(gigs)
+  const headers = ['Title', 'Client', 'Venue', 'Date', 'Time', 'Fee', 'Deposit', 'Paid', 'Balance', 'Expenses', 'Net Profit', 'Invoice Status', 'Archived', 'Notes']
+  const rows = rowsIn.map(g => [
     g.title, g.client, g.venue, g.date, g.time,
-    g.fee, g.deposit, g.paid,
-    Math.max(Number(g.fee || 0) - Number(g.paid || 0), 0),
-    g.invoice_status, g.notes
-  ].map(v => `"${String(v || '').replace(/"/g, '""')}"`))
+    gigFee(g), gigDeposit(g), gigPaid(g),
+    gigBalance(g),
+    gigExpenses(g), gigNetProfit(g),
+    g.invoice_status, g.archived ? 'yes' : 'no', g.notes
+  ].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`))
   const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
   const blob = new Blob([csv], { type: 'text/csv' })
   const url = URL.createObjectURL(blob)

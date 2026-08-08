@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap');
+/* Fonts are loaded from index.html — an @import here is fetched only after
+   this stylesheet parses, delaying first paint. */
 
 /* ── Reset & tokens ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -86,7 +87,12 @@ body { min-height: 100vh; }
 }
 .nav-btn:hover { background: var(--paper3); color: var(--ink); }
 .nav-btn.active { background: var(--blush); color: white; font-weight: 500; }
+.nav-btn.active .nav-label-full,
+.nav-btn.active .nav-label-short { color: white; }
 .nav-btn svg { flex-shrink: 0; opacity: .8; }
+/* Nav items are anchors now (real URLs, middle-clickable) — keep the button look. */
+.nav-btn { text-decoration: none; width: 100%; text-align: left; }
+.nav-btn:focus-visible { outline: 2px solid var(--rose); outline-offset: 2px; }
 
 .sidebar-spacer { flex: 1; }
 
@@ -184,6 +190,36 @@ td { padding: 13px 16px; border-top: 1px solid var(--paper3); vertical-align: mi
 tr:hover td { background: var(--paper); }
 
 /* ── Badges ── */
+/* ── Alerts ──
+   Alert colours were previously inline hex values, which meant they stayed
+   light in dark mode. Defining them as tokens lets the theme override them. */
+.alert {
+  --alert-bg: var(--paper2);
+  --alert-border: var(--paper3);
+  --alert-fg: var(--ink2);
+  background: var(--alert-bg);
+  border: 1px solid var(--alert-border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+}
+.alert:last-child { margin-bottom: 0; }
+.alert .alert-title { font-weight: 600; font-size: 14px; color: var(--alert-fg); }
+.alert .alert-sub   { font-size: 12px; color: var(--alert-fg); opacity: .85; margin-top: 2px; }
+
+.alert-warn    { --alert-bg: #fef3cd; --alert-border: #fde68a; --alert-fg: #856404; }
+.alert-danger  { --alert-bg: #fde8e8; --alert-border: #fca5a5; --alert-fg: #a33030; }
+.alert-success { --alert-bg: #e2ede6; --alert-border: #c3dbc9; --alert-fg: #3f5c4a; }
+.alert-info    { --alert-bg: #f5e6e2; --alert-border: #e8c8c0; --alert-fg: #8a5c54; }
+
+body[data-theme="dark"] .alert-warn    { --alert-bg: #3a2f14; --alert-border: #5c4a1e; --alert-fg: #f0d68a; }
+body[data-theme="dark"] .alert-danger  { --alert-bg: #3d1f1f; --alert-border: #5c2c2c; --alert-fg: #f0a0a0; }
+body[data-theme="dark"] .alert-success { --alert-bg: #1e3327; --alert-border: #2c4d38; --alert-fg: #9ad6ac; }
+body[data-theme="dark"] .alert-info    { --alert-bg: #3d2820; --alert-border: #5c3d33; --alert-fg: #e8c0b4; }
+
+/* Inputs inside an alert need a readable surface in both themes. */
+.alert input, .alert textarea, .alert select { background: var(--paper); color: var(--ink); border-color: var(--alert-border); }
+
 .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; letter-spacing: .04em; }
 .badge-green { background: #e2ede6; color: var(--green); }
 .badge-gold { background: var(--blush3); color: var(--rose); }
@@ -317,13 +353,21 @@ body[data-theme="dark"] .mini-cell { background: #2e2a24; }
 body[data-theme="dark"] .btn-ghost { background: #2e2a24; color: #d4cdc4; border-color: #3a342c; }
 body[data-theme="dark"] .auth-card { background: #242018; }
 
-/* ── Dark Mode Text Fixes ── */
-body[data-theme="dark"] p,
-body[data-theme="dark"] span,
+/* ── Dark Mode Text Fixes ──
+   These are deliberately scoped away from elements that carry their own
+   foreground colour. The blanket `span` rule used to repaint the active
+   nav label and every badge, leaving light-grey text on a blush background. */
+body[data-theme="dark"] p:not([class*="alert"]),
+body[data-theme="dark"] span:not(.badge):not(.nav-label-full):not(.nav-label-short),
 body[data-theme="dark"] td,
 body[data-theme="dark"] th,
 body[data-theme="dark"] label,
 body[data-theme="dark"] .muted { color: #d4cdc4; }
+
+/* The active nav item sits on a blush fill and needs to stay white. */
+body[data-theme="dark"] .nav-btn.active,
+body[data-theme="dark"] .nav-btn.active span,
+body[data-theme="dark"] .nav-btn.active svg { color: #fff; }
 
 body[data-theme="dark"] strong,
 body[data-theme="dark"] h1,

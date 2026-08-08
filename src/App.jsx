@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { LayoutDashboard, Music, CalendarDays, DollarSign, Users, LogOut, MessageSquare, BookOpen, Star, Moon, Sun } from 'lucide-react'
 import { supabase } from './supabase'
+import { useHashRoute } from './useHashRoute'
 import AuthPage from './pages/AuthPage'
 import DashboardPage from './pages/DashboardPage'
 import GigsPage from './pages/GigsPage'
@@ -24,24 +25,33 @@ const NAV = [
   { id: 'testimonials', label: 'Testimonials', short: 'Reviews', icon: Star, badge: true },
 ]
 
+const PAGE_IDS = NAV.map(n => n.id)
+
+// These are public, unauthenticated views chosen by query string. Reading
+// window.location once at module load keeps the value stable for the lifetime
+// of the page, so the branch below can't change hook order between renders.
+const IS_SIGN_PAGE = window.location.search.includes('gig=')
+const IS_PUBLIC_SITE = window.location.search.includes('site=')
+
 export default function App() {
   const [user, setUser] = useState(null)
   const [authLoading, setAuthLoading] = useState(true)
-  const [page, setPage] = useState('dashboard')
+  const { route, navigate, replace } = useHashRoute(PAGE_IDS)
+  const page = route.page
   const [gigs, setGigs] = useState([])
   const [clients, setClients] = useState([])
   const [repertoire, setRepertoire] = useState([])
   const [inquiries, setInquiries] = useState([])
   const [pendingTestimonials, setPendingTestimonials] = useState(0)
-  const [darkMode, setDarkMode] = useState(false)
+  // Remember the theme choice; it previously reset to light on every reload.
+  const [darkMode, setDarkMode] = useState(() => {
+    try { return localStorage.getItem('pcm-theme') === 'dark' } catch { return false }
+  })
 
   useEffect(() => {
     document.body.setAttribute('data-theme', darkMode ? 'dark' : 'light')
+    try { localStorage.setItem('pcm-theme', darkMode ? 'dark' : 'light') } catch { /* private mode */ }
   }, [darkMode])
-
-  // Public pages
-  if (window.location.search.includes('gig=')) return <SignPage />
-  if (window.location.search.includes('site=')) return <PublicSite />
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -95,6 +105,12 @@ export default function App() {
     await supabase.auth.signOut()
   }
 
+  // Public routes are resolved after all hooks have run, so the hook order is
+  // identical on every render. (Returning before the effects above was a
+  // conditional-hook violation that only happened to work.)
+  if (IS_SIGN_PAGE) return <SignPage />
+  if (IS_PUBLIC_SITE) return <PublicSite />
+
   if (authLoading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--ink)' }}>
       <p style={{ color: 'var(--paper)', fontFamily: 'Playfair Display, serif', fontSize: 22 }}>Loading…</p>
@@ -113,11 +129,13 @@ export default function App() {
 
         <div className="sidebar-nav-group">
           {NAV.map(({ id, label, short, icon: Icon, badge }) => (
-            <button
+            <a
               key={id}
+              href={`#/${id}`}
               className={`nav-btn${page === id ? ' active' : ''}`}
-              onClick={() => setPage(id)}
-              style={{ position: 'relative' }}
+              aria-current={page === id ? 'page' : undefined}
+              onClick={e => { e.preventDefault(); navigate(id) }}
+              style={{ position: 'relative', textDecoration: 'none' }}
             >
               <Icon size={17} />
               <span className="nav-label-full">{label}</span>
@@ -130,7 +148,7 @@ export default function App() {
                   padding: '1px 6px', lineHeight: 1.4
                 }}>{pendingTestimonials}</span>
               )}
-            </button>
+            </a>
           ))}
         </div>
 
@@ -152,9 +170,17 @@ export default function App() {
       </nav>
 
       <main className="page">
-        {page === 'dashboard'  && <DashboardPage gigs={gigs} onNavigate={setPage} />}
+        {page === 'dashboard'  && <DashboardPage gigs={gigs} onNavigate={navigate} />}
         {page === 'inquiries'  && <InquiriesPage inquiries={inquiries} userId={user.id} onRefresh={refresh} />}
-        {page === 'gigs'       && <GigsPage gigs={gigs} userId={user.id} onRefresh={refresh} />}
+        {page === 'gigs'       && (
+          <GigsPage
+            gigs={gigs}
+            userId={user.id}
+            onRefresh={refresh}
+            selectedId={route.id}
+            onSelect={id => replace('gigs', id)}
+          />
+        )}
         {page === 'calendar'   && <CalendarPage gigs={gigs} userId={user.id} onRefresh={refresh} />}
         {page === 'finance'    && <FinancePage gigs={gigs} />}
         {page === 'clients'    && <ClientsPage clients={clients} gigs={gigs} userId={user.id} onRefresh={refresh} />}

@@ -1,28 +1,37 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { Plus, Search } from 'lucide-react'
 import { supabase } from '../supabase'
-import { currency, fmtDate, invoiceBadge } from '../utils'
+import { currency, fmtDate, invoiceBadge, gigOutstanding, gigOverpaid } from '../utils'
 import GigModal from '../components/GigModal'
 import GigDetail from '../components/GigDetail'
 
-export default function GigsPage({ gigs, userId, onRefresh }) {
+export default function GigsPage({ gigs, userId, onRefresh, selectedId = null, onSelect }) {
   const [showModal, setShowModal] = useState(false)
   const [editingGig, setEditingGig] = useState(null)
-  const [selectedId, setSelectedId] = useState(null)
+  // Selection lives in the URL (#/gigs/:id) so a gig can be linked and Back works.
+  const setSelectedId = onSelect || (() => {})
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [sortBy, setSortBy] = useState('date')
-  const [showArchived, setShowArchived] = useState(false)
+  // 'active' | 'archived' | 'all' — the old boolean toggle swapped the list
+  // for archived gigs instead of adding them, which read as "hide my gigs".
+  const [archiveView, setArchiveView] = useState('active')
 
   const selectedGig = gigs.find(g => g.id === selectedId)
 
   const filtered = useMemo(() => {
     return gigs
       .filter(g => {
-        const q = search.toLowerCase()
-        const matchSearch = !q || g.title?.toLowerCase().includes(q) || g.client?.toLowerCase().includes(q) || g.venue?.toLowerCase().includes(q)
-        const matchStatus = statusFilter === 'all' || g.invoice_status === statusFilter
-        const matchArchived = showArchived ? g.archived : !g.archived
+        const q = search.trim().toLowerCase()
+        const matchSearch = !q
+          || g.title?.toLowerCase().includes(q)
+          || g.client?.toLowerCase().includes(q)
+          || g.venue?.toLowerCase().includes(q)
+          || g.venue_address?.toLowerCase().includes(q)
+        const matchStatus = statusFilter === 'all' || (g.invoice_status || 'draft') === statusFilter
+        const matchArchived = archiveView === 'all' ? true
+          : archiveView === 'archived' ? !!g.archived
+          : !g.archived
         return matchSearch && matchStatus && matchArchived
       })
       .sort((a, b) => {
@@ -31,7 +40,15 @@ export default function GigsPage({ gigs, userId, onRefresh }) {
         if (sortBy === 'client') return (a.client || '').localeCompare(b.client || '')
         return 0
       })
-  }, [gigs, search, statusFilter, sortBy, showArchived])
+  }, [gigs, search, statusFilter, sortBy, archiveView])
+
+  const archivedCount = useMemo(() => gigs.filter(g => g.archived).length, [gigs])
+
+  // Following a link to an archived gig would otherwise open a detail panel
+  // beside a list that doesn't contain it. Widen the filter to match.
+  useEffect(() => {
+    if (selectedGig?.archived && archiveView === 'active') setArchiveView('all')
+  }, [selectedGig, archiveView])
 
   async function deleteGig(id) {
     if (!confirm('Delete this gig? This cannot be undone.')) return
@@ -56,7 +73,9 @@ export default function GigsPage({ gigs, userId, onRefresh }) {
     if (error) { alert(error.message); return }
     setSelectedId(null)
     onRefresh()
-    alert(archived ? 'Gig unarchived!' : 'Gig archived! Toggle "Show Archived" to view it.')
+    // Archiving removes the gig from the current view, so move the filter to
+    // where it went rather than leaving the user staring at an empty list.
+    setArchiveView(archived ? 'active' : 'archived')
   }
 
   function openAdd() { setEditingGig(null); setShowModal(true) }
@@ -91,12 +110,16 @@ export default function GigsPage({ gigs, userId, onRefresh }) {
           <option value="fee">Sort by fee</option>
           <option value="client">Sort by client</option>
         </select>
-        <button
-          className={`btn btn-sm ${showArchived ? 'btn-primary' : 'btn-ghost'}`}
-          onClick={() => setShowArchived(a => !a)}
+        <select
+          value={archiveView}
+          onChange={e => setArchiveView(e.target.value)}
+          aria-label="Archive filter"
+          style={{ flex: 1, minWidth: 130 }}
         >
-          {showArchived ? '📦 Archived' : '📦 Show Archived'}
-        </button>
+          <option value="active">Active gigs</option>
+          <option value="archived">Archived ({archivedCount})</option>
+          <option value="all">All gigs</option>
+        </select>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: selectedGig ? 'minmax(0,1fr) minmax(0,1.4fr)' : '1fr', gap: 16, alignItems: 'start', minWidth: 0 }}>
@@ -108,7 +131,8 @@ export default function GigsPage({ gigs, userId, onRefresh }) {
           )}
           <div style={{ display: 'grid', gap: 10 }}>
             {filtered.map(g => {
-              const balance = Math.max(Number(g.fee || 0) - Number(g.paid || 0), 0)
+              const owed = gigOutstanding(g)
+              const over = gigOverpaid(g)
               return (
                 <button
                   key={g.id}
@@ -124,13 +148,17 @@ export default function GigsPage({ gigs, userId, onRefresh }) {
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
                     <strong style={{ fontSize: 15 }}>{g.title}</strong>
-                    <span className={`badge ${invoiceBadge(g.invoice_status)}`} style={{ flexShrink: 0 }}>{g.invoice_status || 'draft'}</span>
+                    <span style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+                      {g.archived && <span className="badge badge-grey">archived</span>}
+                      <span className={`badge ${invoiceBadge(g.invoice_status)}`}>{g.invoice_status || 'draft'}</span>
+                    </span>
                   </div>
                   <p style={{ fontSize: 13, opacity: .75, marginTop: 4 }}>{g.client} · {fmtDate(g.date)}</p>
                   <p style={{ fontSize: 13, opacity: .7, marginTop: 2 }}>{g.venue}</p>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
                     <span style={{ fontSize: 13, fontWeight: 600 }}>{currency(g.fee)}</span>
-                    {balance > 0 && <span style={{ fontSize: 12, color: g.id === selectedId ? '#fca5a5' : 'var(--red)' }}>Owes {currency(balance)}</span>}
+                    {owed > 0 && <span style={{ fontSize: 12, color: g.id === selectedId ? '#fca5a5' : 'var(--red)' }}>Owes {currency(owed)}</span>}
+                    {over > 0 && <span style={{ fontSize: 12, color: g.id === selectedId ? '#fca5a5' : 'var(--red)' }}>Overpaid {currency(over)}</span>}
                   </div>
                 </button>
               )

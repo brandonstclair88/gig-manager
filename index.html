@@ -3,10 +3,34 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Paige Camryn Music</title>
+    <meta name="theme-color" content="#f2ebe3" />
+
+    <title>Paige Camryn Music — Gig Manager</title>
+    <meta name="description" content="Booking, contracts, invoicing and repertoire management for Paige Camryn Music, luxury event harpist." />
+
+    <!-- The admin app should never be indexed; the public site is served from
+         the same origin via ?site=true and is linked out separately. -->
+    <meta name="robots" content="noindex, nofollow" />
+
+    <link rel="icon" href="/logo.png" />
+    <link rel="apple-touch-icon" href="/logo.png" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Paige Camryn Music" />
+    <meta property="og:description" content="Luxury event harpist — Thousand Oaks, California." />
+    <meta property="og:image" content="/logo.png" />
+    <meta name="twitter:card" content="summary" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <!-- Loaded here rather than via @import in styles.css: an @import inside a
+         stylesheet is discovered late and blocks rendering twice over. These
+         are the two families the app actually uses, plus Playfair for the
+         handful of headings that still call for it. -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div id="root"></div>

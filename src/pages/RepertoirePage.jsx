@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import { Plus, X, Edit2, Music } from 'lucide-react'
 import { supabase } from '../supabase'
 
@@ -95,47 +95,98 @@ function SongModal({ song, userId, onClose, onSaved }) {
   )
 }
 
+/**
+ * Memoised so that opening the modal, switching tabs, or any other state
+ * change doesn't re-render every row — in the "All" view a song appears once
+ * per category, so the page mounts several hundred icon components.
+ */
+const SongRow = React.memo(function SongRow({ song, onEdit, onDelete }) {
+  // Derived inside the row so the props stay referentially stable and memo
+  // actually holds — passing a freshly-built array would defeat it.
+  const cats = song.categories?.length ? song.categories : (song.category ? [song.category] : [])
+  return (
+    <tr>
+      <td><strong>{song.title}</strong></td>
+      <td>{song.composer || '—'}</td>
+      <td>
+        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+          {cats.map(c => (
+            <span key={c} className="badge badge-gold" style={{ fontSize: 10 }}>{c}</span>
+          ))}
+        </div>
+      </td>
+      <td className="muted">{song.notes || '—'}</td>
+      <td>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <button className="btn btn-ghost btn-icon btn-sm" aria-label={`Edit ${song.title}`} onClick={() => onEdit(song)}>
+            <Edit2 size={13} />
+          </button>
+          <button className="btn btn-danger btn-icon btn-sm" aria-label={`Delete ${song.title}`} onClick={() => onDelete(song.id)}>
+            <X size={13} />
+          </button>
+        </div>
+      </td>
+    </tr>
+  )
+})
+
 export default function RepertoirePage({ repertoire, userId, onRefresh }) {
   const [showModal, setShowModal] = useState(false)
   const [editingSong, setEditingSong] = useState(null)
   const [activeCategory, setActiveCategory] = useState('All')
 
-  const usedCategories = useMemo(() => {
-    const cats = new Set()
+  const catsOf = s => (s.categories?.length ? s.categories : (s.category ? [s.category] : []))
+
+  // One pass over the songs produces both the tab list and the tab counts.
+  // Previously each tab re-filtered the whole repertoire on every render —
+  // 12 categories × 89 songs on every keystroke or state change.
+  const { usedCategories, counts } = useMemo(() => {
+    const tally = new Map()
     repertoire.forEach(s => {
-      if (s.categories?.length) s.categories.forEach(c => cats.add(c))
-      else if (s.category) cats.add(s.category)
+      catsOf(s).forEach(c => tally.set(c, (tally.get(c) || 0) + 1))
     })
-    return ['All', ...CATEGORIES.filter(c => cats.has(c))]
+    return {
+      usedCategories: ['All', ...CATEGORIES.filter(c => tally.has(c))],
+      counts: tally,
+    }
   }, [repertoire])
 
   const filtered = useMemo(() => {
     if (activeCategory === 'All') return repertoire
-    return repertoire.filter(s => {
-      const cats = s.categories?.length ? s.categories : (s.category ? [s.category] : [])
-      return cats.includes(activeCategory)
-    })
+    return repertoire.filter(s => catsOf(s).includes(activeCategory))
   }, [repertoire, activeCategory])
 
   const grouped = useMemo(() => {
     if (activeCategory !== 'All') return { [activeCategory]: filtered }
     const map = {}
+    const seen = new Map()
     filtered.forEach(s => {
-      const cats = s.categories?.length ? s.categories : (s.category ? [s.category] : ['Other'])
+      const cats = catsOf(s).length ? catsOf(s) : ['Other']
       cats.forEach(cat => {
-        if (!map[cat]) map[cat] = []
-        if (!map[cat].find(x => x.id === s.id)) map[cat].push(s)
+        if (!map[cat]) { map[cat] = []; seen.set(cat, new Set()) }
+        // A Set lookup instead of Array.find — the old version was O(n²)
+        // within each category.
+        if (seen.get(cat).has(s.id)) return
+        seen.get(cat).add(s.id)
+        map[cat].push(s)
       })
     })
     return map
   }, [filtered, activeCategory])
 
-  async function deleteSong(id) {
+  // Stable identities keep the memoised rows from re-rendering on every
+  // parent state change.
+  const deleteSong = useCallback(async id => {
     if (!confirm('Delete this song?')) return
     const { error } = await supabase.from('repertoire').delete().eq('id', id)
     if (error) { alert(error.message); return }
     onRefresh()
-  }
+  }, [onRefresh])
+
+  const handleEdit = useCallback(song => {
+    setEditingSong(song)
+    setShowModal(true)
+  }, [])
 
   function copyPublicLink() {
     const url = `${window.location.origin}?site=true`
@@ -165,10 +216,7 @@ export default function RepertoirePage({ repertoire, userId, onRefresh }) {
       <div className="tabs" style={{ marginBottom: 24, flexWrap: 'wrap' }}>
         {usedCategories.map(c => (
           <button key={c} className={`tab${activeCategory === c ? ' active' : ''}`} onClick={() => setActiveCategory(c)}>
-            {c} ({c === 'All' ? repertoire.length : repertoire.filter(s => {
-              const cats = s.categories?.length ? s.categories : (s.category ? [s.category] : [])
-              return cats.includes(c)
-            }).length})
+            {c} ({c === 'All' ? repertoire.length : counts.get(c) || 0})
           </button>
         ))}
       </div>
@@ -199,33 +247,9 @@ export default function RepertoirePage({ repertoire, userId, onRefresh }) {
                 </tr>
               </thead>
               <tbody>
-                {songs.map(s => {
-                  const cats = s.categories?.length ? s.categories : (s.category ? [s.category] : [])
-                  return (
-                    <tr key={s.id}>
-                      <td><strong>{s.title}</strong></td>
-                      <td>{s.composer || '—'}</td>
-                      <td>
-                        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                          {cats.map(c => (
-                            <span key={c} className="badge badge-gold" style={{ fontSize: 10 }}>{c}</span>
-                          ))}
-                        </div>
-                      </td>
-                      <td className="muted">{s.notes || '—'}</td>
-                      <td>
-                        <div style={{ display: 'flex', gap: 6 }}>
-                          <button className="btn btn-ghost btn-icon btn-sm" onClick={() => { setEditingSong(s); setShowModal(true) }}>
-                            <Edit2 size={13} />
-                          </button>
-                          <button className="btn btn-danger btn-icon btn-sm" onClick={() => deleteSong(s.id)}>
-                            <X size={13} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
+                {songs.map(s => (
+                  <SongRow key={s.id} song={s} onEdit={handleEdit} onDelete={deleteSong} />
+                ))}
               </tbody>
             </table>
           </div>

@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
-import { fmtDate, fmtTime } from '../utils'
+import { fmtDate, fmtTime, activeGigs } from '../utils'
 import GigModal from '../components/GigModal'
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -40,9 +40,29 @@ export default function CalendarPage({ gigs, userId, onRefresh }) {
     cells.push({ day: d, currentMonth: false, date: null })
   }
 
+  // Index live gigs by date once per gig-list change instead of scanning the
+  // whole list for each of the 42 cells. Archived gigs stay off the calendar.
+  const gigsByDate = useMemo(() => {
+    const map = new Map()
+    activeGigs(gigs).forEach(g => {
+      if (!g.date) return
+      if (!map.has(g.date)) map.set(g.date, [])
+      map.get(g.date).push(g)
+    })
+    return map
+  }, [gigs])
+
   function gigsForDate(date) {
-    return gigs.filter(g => g.date === date)
+    return gigsByDate.get(date) || []
   }
+
+  // Stable object identity — GigModal resets its form whenever this prop
+  // changes, so a fresh `{ date }` literal on each render would wipe what
+  // the user had typed.
+  const prefilledGig = useMemo(
+    () => (prefilledDate ? { date: prefilledDate } : null),
+    [prefilledDate]
+  )
 
   function isToday(date) {
     return date === today.toISOString().slice(0, 10)
@@ -114,7 +134,7 @@ export default function CalendarPage({ gigs, userId, onRefresh }) {
 
       {showModal && (
         <GigModal
-          gig={prefilledDate ? { date: prefilledDate } : null}
+          gig={prefilledGig}
           userId={userId}
           onClose={() => setShowModal(false)}
           onSaved={onRefresh}

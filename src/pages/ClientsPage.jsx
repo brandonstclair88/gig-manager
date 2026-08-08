@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import { Plus, X, Edit2 } from 'lucide-react'
 import { supabase } from '../supabase'
-import { currency, fmtDate, invoiceBadge } from '../utils'
+import { currency, fmtDate, invoiceBadge, activeGigs, gigFee, gigPaid } from '../utils'
 
 const EMPTY_CLIENT = { name: '', email: '', phone: '', notes: '' }
 
@@ -52,16 +52,49 @@ export default function ClientsPage({ clients, gigs, userId, onRefresh }) {
 
   const selectedClient = clients.find(c => c.id === selectedId)
 
+  const live = useMemo(() => activeGigs(gigs), [gigs])
+
+  // Gigs store the client as free text, so matching is by normalised name.
+  // Trim as well as lowercase — a trailing space shouldn't orphan a gig.
+  const nameKey = n => (n || '').trim().toLowerCase()
+
+  // Index gigs by client name once instead of re-filtering per client row.
+  const gigsByClient = useMemo(() => {
+    const map = new Map()
+    live.forEach(g => {
+      const k = nameKey(g.client)
+      if (!k) return
+      if (!map.has(k)) map.set(k, [])
+      map.get(k).push(g)
+    })
+    return map
+  }, [live])
+
   const clientGigs = useMemo(() => {
     if (!selectedClient) return []
-    return gigs.filter(g => g.client?.toLowerCase() === selectedClient.name?.toLowerCase())
-  }, [selectedClient, gigs])
+    return gigsByClient.get(nameKey(selectedClient.name)) || []
+  }, [selectedClient, gigsByClient])
 
   const clientStats = useMemo(() => {
-    const paid = clientGigs.reduce((s, g) => s + Number(g.paid || 0), 0)
-    const fee = clientGigs.reduce((s, g) => s + Number(g.fee || 0), 0)
+    const paid = clientGigs.reduce((s, g) => s + gigPaid(g), 0)
+    const fee = clientGigs.reduce((s, g) => s + gigFee(g), 0)
     return { paid, fee, count: clientGigs.length }
   }, [clientGigs])
+
+  // Names that appear on gigs but have no client record. These were silently
+  // absent from this page while still showing up in Finance → Top Clients.
+  const unlinked = useMemo(() => {
+    const known = new Set(clients.map(c => nameKey(c.name)))
+    return [...gigsByClient.entries()]
+      .filter(([k]) => !known.has(k))
+      .map(([, gs]) => ({
+        name: gs[0].client.trim(),
+        email: gs.find(g => g.client_email)?.client_email || '',
+        count: gs.length,
+        paid: gs.reduce((s, g) => s + gigPaid(g), 0),
+      }))
+      .sort((a, b) => b.paid - a.paid)
+  }, [clients, gigsByClient])
 
   async function deleteClient(id) {
     if (!confirm('Delete this client?')) return
@@ -85,8 +118,8 @@ export default function ClientsPage({ clients, gigs, userId, onRefresh }) {
             <div className="card empty"><p>No clients yet. Add your first client!</p></div>
           )}
           {clients.map(c => {
-            const cGigs = gigs.filter(g => g.client?.toLowerCase() === c.name?.toLowerCase())
-            const cPaid = cGigs.reduce((s, g) => s + Number(g.paid || 0), 0)
+            const cGigs = gigsByClient.get(nameKey(c.name)) || []
+            const cPaid = cGigs.reduce((s, g) => s + gigPaid(g), 0)
             return (
               <button
                 key={c.id}
@@ -175,6 +208,35 @@ export default function ClientsPage({ clients, gigs, userId, onRefresh }) {
           </div>
         )}
       </div>
+
+      {unlinked.length > 0 && (
+        <div className="card" style={{ marginTop: 20 }}>
+          <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, fontStyle: 'italic', marginBottom: 6 }}>
+            On gigs but not in your client list
+          </h3>
+          <p className="muted" style={{ marginBottom: 14, fontSize: 13 }}>
+            These names are typed on gigs but have no client record, so they don't appear above.
+          </p>
+          <div style={{ display: 'grid', gap: 8 }}>
+            {unlinked.map(u => (
+              <div key={u.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap', padding: '10px 0', borderBottom: '1px solid var(--paper3)' }}>
+                <div>
+                  <strong style={{ fontSize: 14 }}>{u.name}</strong>
+                  <p className="muted" style={{ fontSize: 12, marginTop: 2 }}>
+                    {u.count} gig{u.count !== 1 ? 's' : ''} · {currency(u.paid)} collected
+                  </p>
+                </div>
+                <button
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => { setEditingClient({ name: u.name, email: u.email, phone: '', notes: '' }); setShowModal(true) }}
+                >
+                  <Plus size={14} /> Add as client
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {showModal && (
         <ClientModal

@@ -1,18 +1,30 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Edit2, Trash2, CheckCircle2, FileText, Download, Link, Plus, X, Send, PenLine, CreditCard, Archive, Calendar } from 'lucide-react'
 import { supabase } from '../supabase'
-import { currency, fmtDate, fmtTime, invoiceBadge, contractText, downloadPDFInvoice } from '../utils'
+import {
+  currency, fmtDate, fmtTime, invoiceBadge, contractText, downloadPDFInvoice,
+  gigBalance, gigOutstanding, gigOverpaid, gigPaid, mapsUrl,
+} from '../utils'
+
+const HOME_BASE = 'Thousand Oaks, CA'
 
 export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh }) {
   const [tab, setTab] = useState('overview')
   const [expense, setExpense] = useState({ description: '', amount: '' })
   const [expenses, setExpenses] = useState(gig.expenses || [])
 
-  const balance = Math.max(Number(gig.fee || 0) - Number(gig.paid || 0), 0)
+  // Signed balance: positive = owed to Paige, negative = client overpaid.
+  const balance = gigBalance(gig)
+  const owed = gigOutstanding(gig)
+  const overpaid = gigOverpaid(gig)
+
+  // Expenses live in component state so edits feel instant; re-sync whenever
+  // a different gig is selected, otherwise the previous gig's expenses stick.
+  useEffect(() => { setExpenses(gig.expenses || []) }, [gig.id])
 
   async function markPaid() {
     const { error } = await supabase.from('gigs')
-      .update({ paid: gig.fee, invoice_status: 'paid' })
+      .update({ paid: Number(gig.fee || 0), invoice_status: 'paid' })
       .eq('id', gig.id)
     if (error) { alert(error.message); return }
     onRefresh()
@@ -20,7 +32,8 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
 
   async function saveExpenses(updated) {
     setExpenses(updated)
-    await supabase.from('gigs').update({ expenses: updated }).eq('id', gig.id)
+    const { error } = await supabase.from('gigs').update({ expenses: updated }).eq('id', gig.id)
+    if (error) { alert(error.message); setExpenses(gig.expenses || []); return }
     onRefresh()
   }
 
@@ -36,7 +49,7 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
   }
 
   const totalExpenses = expenses.reduce((s, e) => s + Number(e.amount || 0), 0)
-  const profit = Number(gig.paid || 0) - totalExpenses
+  const profit = gigPaid(gig) - totalExpenses
 
   async function sendContractEmail() {
     if (!gig.client_email) {
@@ -78,7 +91,7 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
       }
       if (data.eventId) {
         await supabase.from('gigs').update({ calendar_event_id: data.eventId }).eq('id', gig.id)
-        alert('✅ Synced to Google Calendar! Check June ' + (gig.date || 'unknown date'))
+        alert(`✅ Synced to Google Calendar — ${gig.date ? fmtDate(gig.date) : 'no date set'}`)
       }
       onRefresh()
     } catch (e) {
@@ -187,19 +200,31 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
               <div className="mini-val" style={{ color: 'var(--green)' }}>{currency(gig.paid)}</div>
             </div>
             <div className="mini-cell">
-              <div className="mini-label">Balance Due</div>
-              <div className="mini-val" style={{ color: 'var(--ink)' }}>{currency(balance)}</div>
+              <div className="mini-label">{overpaid > 0 ? 'Overpaid' : 'Balance Due'}</div>
+              <div className="mini-val" style={{ color: overpaid > 0 ? 'var(--red)' : 'var(--ink)' }}>
+                {currency(Math.abs(balance))}
+              </div>
             </div>
           </div>
+
+          {overpaid > 0 && (
+            <div className="alert alert-warn" style={{ marginTop: 12 }}>
+              <p className="alert-title">Overpayment recorded</p>
+              <p className="alert-sub">
+                Paid to date is {currency(overpaid)} more than the fee. Refund the client or raise the fee to match.
+              </p>
+            </div>
+          )}
 
           {gig.venue_address && (
             <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
               <p><strong>📍 Venue:</strong> {gig.venue_address}</p>
-              
-              <button
+              <a
                 className="btn btn-ghost btn-sm"
-                onClick={() => window.open(`maps://maps.apple.com/?q=${encodeURIComponent(gig.venue_address)}`, '_blank')}
-              >📍 Open in Apple Maps</button>
+                href={mapsUrl(gig.venue_address)}
+                target="_blank"
+                rel="noreferrer noopener"
+              >📍 Open in Maps</a>
             </div>
           )}
 
@@ -210,14 +235,14 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
           )}
 
           {gig.signed_at && (
-            <div style={{ background: '#d4edda', borderRadius: 10, padding: '10px 14px', marginTop: 12 }}>
-              <p style={{ color: 'var(--green)', fontWeight: 600, fontSize: 14 }}>✍️ Signed by {gig.signed_by}</p>
-              <p style={{ color: 'var(--green)', fontSize: 12, marginTop: 2 }}>on {fmtDate(gig.signed_at?.slice(0, 10))}</p>
+            <div className="alert alert-success" style={{ marginTop: 12 }}>
+              <p className="alert-title">✍️ Signed by {gig.signed_by}</p>
+              <p className="alert-sub">on {fmtDate(gig.signed_at?.slice(0, 10))}</p>
             </div>
           )}
 
           <div className="actions-row" style={{ marginTop: 20 }}>
-            {balance > 0 && (
+            {owed > 0 && (
               <button className="btn btn-gold btn-sm" onClick={markPaid}>
                 <CheckCircle2 size={14} /> Mark Fully Paid
               </button>
@@ -228,16 +253,16 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
             <button className="btn btn-ghost btn-sm" onClick={syncToCalendar} disabled={syncingCalendar}>
               <Calendar size={14} /> {syncingCalendar ? 'Syncing…' : 'Sync to Google Calendar'}
             </button>
-            {balance > 0 && (
-              <button className="btn btn-primary btn-sm" onClick={() => { setPaymentAmount(balance); setShowPayment(true) }}>
+            {owed > 0 && (
+              <button className="btn btn-primary btn-sm" onClick={() => { setPaymentAmount(String(owed)); setShowPayment(true) }}>
                 <CreditCard size={14} /> Request Payment
               </button>
             )}
           </div>
 
           {showPayment && (
-            <div style={{ background: '#f5e6e2', borderRadius: 12, padding: 20, marginTop: 16, border: '1px solid #e8c8c0' }}>
-              <p style={{ fontWeight: 600, fontSize: 14, color: 'var(--rose)', marginBottom: 14 }}>💳 Create Payment Link</p>
+            <div className="alert alert-info" style={{ padding: 20, marginTop: 16 }}>
+              <p className="alert-title" style={{ marginBottom: 14 }}>💳 Create Payment Link</p>
               <div style={{ display: 'grid', gap: 10, marginBottom: 14 }}>
                 <div className="field">
                   <label>Amount ($)</label>
@@ -251,7 +276,7 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
                   <input
                     type="checkbox"
                     id="passFee"
-                    checked={passfee}
+                    checked={passFee}
                     onChange={e => setPassFee(e.target.checked)}
                     style={{ width: 'auto', margin: 0 }}
                   />
@@ -292,8 +317,10 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
               <div className="mini-val">{currency(gig.paid)}</div>
             </div>
             <div className="mini-cell">
-              <div className="mini-label">Balance</div>
-              <div className="mini-val" style={{ color: 'var(--ink)' }}>{currency(balance)}</div>
+              <div className="mini-label">{overpaid > 0 ? 'Overpaid' : 'Balance'}</div>
+              <div className="mini-val" style={{ color: overpaid > 0 ? 'var(--red)' : 'var(--ink)' }}>
+                {currency(Math.abs(balance))}
+              </div>
             </div>
             <div className="mini-cell">
               <div className="mini-label">Expenses</div>
@@ -309,9 +336,10 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
               <Download size={14} /> Download Invoice PDF
             </button>
             {gig.venue_address && (
-              
               <a
-                href={`maps://maps.apple.com/?q=${encodeURIComponent(gig.venue_address)}&saddr=Thousand+Oaks,CA`}
+                href={mapsUrl(gig.venue_address, HOME_BASE)}
+                target="_blank"
+                rel="noreferrer noopener"
                 style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 13px', background: 'var(--paper2)', color: 'var(--ink2)', borderRadius: 8, fontSize: 11, fontWeight: 500, textDecoration: 'none', border: '1px solid var(--paper3)', letterSpacing: '.06em' }}
               >
                 📍 Get Directions
@@ -354,24 +382,24 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
 
           {/* Client signature status */}
           {gig.signed_at ? (
-            <div style={{ background: '#e2ede6', borderRadius: 10, padding: '12px 16px', marginBottom: 12, border: '1px solid #c3dbc9' }}>
-              <p style={{ color: 'var(--green)', fontWeight: 600 }}>✍️ Client signed: {gig.signed_by}</p>
-              <p style={{ color: 'var(--green)', fontSize: 13, marginTop: 2 }}>on {fmtDate(gig.signed_at?.slice(0, 10))}</p>
+            <div className="alert alert-success" style={{ marginBottom: 12 }}>
+              <p className="alert-title">✍️ Client signed: {gig.signed_by}</p>
+              <p className="alert-sub">on {fmtDate(gig.signed_at?.slice(0, 10))}</p>
             </div>
           ) : (
-            <div style={{ background: '#fef3cd', borderRadius: 10, padding: '12px 16px', marginBottom: 12, fontSize: 13, color: '#856404', border: '1px solid #fde68a' }}>
-              ⏳ Awaiting client signature. Copy the signing link and send it to your client.
+            <div className="alert alert-warn" style={{ marginBottom: 12 }}>
+              <p className="alert-sub">⏳ Awaiting client signature. Copy the signing link and send it to your client.</p>
             </div>
           )}
 
           {/* Performer signature */}
           {gig.performer_signed_at ? (
-            <div style={{ background: '#e2ede6', borderRadius: 10, padding: '12px 16px', marginBottom: 14, border: '1px solid #c3dbc9' }}>
-              <p style={{ color: 'var(--green)', fontWeight: 600 }}>✍️ Performer signed: {gig.performer_signature}</p>
-              <p style={{ color: 'var(--green)', fontSize: 13, marginTop: 2 }}>on {fmtDate(gig.performer_signed_at?.slice(0, 10))}</p>
+            <div className="alert alert-success" style={{ marginBottom: 14 }}>
+              <p className="alert-title">✍️ Performer signed: {gig.performer_signature}</p>
+              <p className="alert-sub">on {fmtDate(gig.performer_signed_at?.slice(0, 10))}</p>
             </div>
           ) : (
-            <div style={{ background: '#f5e6e2', borderRadius: 10, padding: '16px', marginBottom: 14, border: '1px solid #e8c8c0' }}>
+            <div className="alert alert-info" style={{ padding: 16, marginBottom: 14 }}>
               <p style={{ fontWeight: 600, fontSize: 14, color: 'var(--rose)', marginBottom: 10 }}>✍️ Sign as Performer</p>
               <div style={{ display: 'flex', gap: 8 }}>
                 <input

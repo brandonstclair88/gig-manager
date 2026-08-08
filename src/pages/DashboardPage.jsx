@@ -1,6 +1,9 @@
 import React, { useMemo, useState } from 'react'
 import { CalendarDays, Bell, Mail } from 'lucide-react'
-import { currency, fmtDate, fmtTime, invoiceBadge } from '../utils'
+import {
+  currency, fmtDate, fmtTime, invoiceBadge,
+  activeGigs, gigPaid, gigOutstanding, gigExpenses,
+} from '../utils'
 
 export default function DashboardPage({ gigs, onNavigate }) {
   const [sendingDigest, setSendingDigest] = useState(false)
@@ -8,27 +11,37 @@ export default function DashboardPage({ gigs, onNavigate }) {
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)
+  const todayKey = today.getTime()
+
+  // Archived gigs are history, not activity — they must not move any total.
+  const live = useMemo(() => activeGigs(gigs), [gigs])
 
   const stats = useMemo(() => {
-    const paid = gigs.reduce((s, g) => s + Number(g.paid || 0), 0)
-    const outstanding = gigs.reduce((s, g) => s + Math.max(Number(g.fee || 0) - Number(g.paid || 0), 0), 0)
-    const upcoming = gigs.filter(g => g.date && new Date(g.date + 'T00:00:00') >= today)
-    const overdue = gigs.filter(g => g.invoice_status === 'overdue' || (
-      g.date && new Date(g.date + 'T00:00:00') < today && g.invoice_status !== 'paid'
-    ))
-    const totalExpenses = gigs.reduce((s, g) => s + (g.expenses || []).reduce((es, e) => es + Number(e.amount || 0), 0), 0)
-    const depositReminders = gigs.filter(g => {
+    const paid = live.reduce((s, g) => s + gigPaid(g), 0)
+    const outstanding = live.reduce((s, g) => s + gigOutstanding(g), 0)
+    const upcoming = live.filter(g => g.date && new Date(g.date + 'T00:00:00') >= today)
+    // A draft invoice hasn't been sent yet, so it can't be overdue.
+    const overdue = live.filter(g => {
+      if (gigOutstanding(g) <= 0) return false
+      if (g.invoice_status === 'overdue') return true
+      return g.date
+        && new Date(g.date + 'T00:00:00') < today
+        && g.invoice_status !== 'paid'
+        && g.invoice_status !== 'draft'
+    })
+    const totalExpenses = live.reduce((s, g) => s + gigExpenses(g), 0)
+    const depositReminders = live.filter(g => {
       if (!g.date) return false
       const gigDate = new Date(g.date + 'T00:00:00')
       const daysUntil = (gigDate - today) / (1000 * 60 * 60 * 24)
       return daysUntil >= 0 && daysUntil <= 30 && Number(g.deposit || 0) === 0 && g.invoice_status !== 'paid'
     })
     return { paid, outstanding, upcoming, overdue, totalExpenses, netProfit: paid - totalExpenses, depositReminders }
-  }, [gigs])
+  }, [live, todayKey])
 
   const nextGig = stats.upcoming[0]
 
-  const practiceReminders = gigs.filter(g => {
+  const practiceReminders = live.filter(g => {
     if (!g.practice_date) return false
     const pd = new Date(g.practice_date + 'T00:00:00')
     const diff = (pd - today) / (1000 * 60 * 60 * 24)
@@ -39,7 +52,7 @@ export default function DashboardPage({ gigs, onNavigate }) {
     setSendingDigest(true)
     setDigestSent(false)
 
-    const upcomingGigs = gigs
+    const upcomingGigs = live
       .filter(g => g.date && new Date(g.date + 'T00:00:00') >= today)
       .sort((a, b) => a.date.localeCompare(b.date))
       .map(g => ({
@@ -155,23 +168,23 @@ export default function DashboardPage({ gigs, onNavigate }) {
           )}
 
           {stats.depositReminders.map(g => (
-            <div key={g.id} style={{ background: '#fef3cd', borderRadius: 10, padding: '10px 14px', marginBottom: 10, border: '1px solid #fde68a' }}>
-              <p style={{ fontWeight: 600, fontSize: 14, color: '#856404' }}>💰 Deposit not received: {g.title}</p>
-              <p style={{ fontSize: 12, color: '#856404', opacity: .8, marginTop: 2 }}>{fmtDate(g.date)} · No deposit recorded yet</p>
+            <div key={g.id} className="alert alert-warn">
+              <p className="alert-title">💰 Deposit not received: {g.title}</p>
+              <p className="alert-sub">{fmtDate(g.date)} · No deposit recorded yet</p>
             </div>
           ))}
 
           {stats.overdue.map(g => (
-            <div key={g.id} style={{ background: '#fde8e8', borderRadius: 10, padding: '10px 14px', marginBottom: 10, border: '1px solid #fca5a5' }}>
-              <p style={{ fontWeight: 600, fontSize: 14, color: 'var(--red)' }}>⚠ Unpaid: {g.title}</p>
-              <p style={{ fontSize: 12, color: 'var(--red)', opacity: .8, marginTop: 2 }}>{fmtDate(g.date)} · {currency(Math.max(Number(g.fee || 0) - Number(g.paid || 0), 0))} outstanding</p>
+            <div key={g.id} className="alert alert-danger">
+              <p className="alert-title">⚠ Unpaid: {g.title}</p>
+              <p className="alert-sub">{fmtDate(g.date)} · {currency(gigOutstanding(g))} outstanding</p>
             </div>
           ))}
 
           {practiceReminders.map(g => (
-            <div key={g.id} style={{ background: '#f5e6e2', borderRadius: 10, padding: '10px 14px', marginBottom: 10, border: '1px solid #e8c8c0' }}>
-              <p style={{ fontWeight: 600, fontSize: 14, color: 'var(--rose)' }}>🎵 Practice reminder: {g.title}</p>
-              <p style={{ fontSize: 12, color: 'var(--rose)', opacity: .8, marginTop: 2 }}>Practice on {fmtDate(g.practice_date)} for {fmtDate(g.date)} gig</p>
+            <div key={g.id} className="alert alert-info">
+              <p className="alert-title">🎵 Practice reminder: {g.title}</p>
+              <p className="alert-sub">Practice on {fmtDate(g.practice_date)} for {fmtDate(g.date)} gig</p>
             </div>
           ))}
         </div>
