@@ -245,6 +245,10 @@ body[data-theme="dark"] .alert-info    { --alert-bg: #3d2820; --alert-border: #5
   width: 100%; max-width: 640px; max-height: 90vh;
   overflow-y: auto; box-shadow: var(--shadow-lg);
   position: relative;
+  /* Without this, inserting the validation summary above the current scroll
+     position makes the browser compensate by scrolling down by the same
+     amount — silently cancelling our scroll-to-the-error. */
+  overflow-anchor: none;
 }
 .modal h2 { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 400; font-style: italic; margin-bottom: 24px; }
 .modal-close {

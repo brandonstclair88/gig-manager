@@ -56,6 +56,18 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
     }
   }, [onClose])
 
+  // The error summary renders at the top of a scrollable dialog while the Save
+  // button sits at the bottom, so on a long form a failed save would look like
+  // nothing happened. This has to run *after* the render that adds the summary:
+  // scrolling first and inserting content above the viewport afterwards lets
+  // the browser's scroll anchoring undo the scroll. (.modal also sets
+  // overflow-anchor: none so anchoring can't fight this.)
+  useEffect(() => {
+    if (errors.some(e => e.level === 'error')) {
+      dialogRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }, [errors])
+
   function set(key, val) {
     setForm(prev => ({ ...prev, [key]: val }))
   }
@@ -75,13 +87,9 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
     const issues = validate()
     const blocking = issues.filter(i => i.level === 'error')
     setErrors(issues)
-    if (blocking.length) {
-      // The error summary sits at the top of a scrollable dialog. On a long
-      // form the Save button is well below it, so without this the click
-      // appears to do nothing at all.
-      dialogRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
-      return
-    }
+    // Scrolling to the error summary is handled by the effect below, once
+    // React has actually rendered it.
+    if (blocking.length) return
 
     const warnings = issues.filter(i => i.level === 'warn')
     if (warnings.length && !confirm(warnings.map(w => w.message).join('\n\n') + '\n\nSave anyway?')) return
