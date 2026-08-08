@@ -1,26 +1,27 @@
 import React, { useState, useEffect, useMemo } from 'react'
+import { ChevronDown, ChevronRight } from 'lucide-react'
 import { supabase } from '../supabase'
 
 const CATEGORIES = ['Classical', 'Wedding', 'Pop', 'Rock', 'Jazz', 'Celtic', 'Christmas', 'Hymns', 'Film & TV', 'Other']
 
 function Nav({ page, setPage }) {
   return (
-    <nav style={{ background: '#f2ebe3', borderBottom: '1px solid #ede5dc', padding: '0 5%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
-      <div style={{ padding: '20px 0' }}>
-        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 400, fontStyle: 'italic', color: '#1a1714' }}>Paige Camryn Music</h1>
-        <p style={{ fontSize: 10, letterSpacing: '.16em', textTransform: 'uppercase', color: '#9a9189', marginTop: 2 }}>Luxury Event Harpist</p>
-      </div>
-      <div style={{ display: 'flex', gap: 4 }}>
-        {['home', 'music', 'events', 'weddings', 'repertoire', 'contact'].map(p => (
-          <button key={p} onClick={() => setPage(p)} style={{
-            padding: '8px 18px', border: 'none', background: 'transparent',
-            fontFamily: 'Jost, sans-serif', fontSize: 12, fontWeight: 500,
-            letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer',
-            color: page === p ? '#c9a097' : '#9a9189',
-            borderBottom: page === p ? '2px solid #c9a097' : '2px solid transparent',
-            transition: 'all .15s'
-          }}>{p}</button>
-        ))}
+    <nav style={{ background: '#f2ebe3', borderBottom: '1px solid #ede5dc', padding: '0 5%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 16 }}>
+      <div style={{ position: 'relative', minWidth: 0, flex: '1 1 auto' }}>
+          <div className="public-nav-tabs" style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
+            {['home', 'music', 'events', 'weddings', 'repertoire', 'contact'].map(p => (
+            <button key={p} onClick={() => setPage(p)} style={{
+              padding: '8px 18px', border: 'none', background: 'transparent',
+              fontFamily: 'Jost, sans-serif', fontSize: 12, fontWeight: 500,
+              letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer',
+              color: page === p ? '#c9a097' : '#9a9189',
+              borderBottom: page === p ? '2px solid #c9a097' : '2px solid transparent',
+              transition: 'all .15s'
+            }}>{p}</button>
+          ))}
+        </div>
+        <div className="public-nav-fade" aria-hidden="true" />
+        <ChevronRight className="public-nav-chevron" aria-hidden="true" size={14} strokeWidth={2} color="#c9a097" />
       </div>
     </nav>
   )
@@ -99,46 +100,59 @@ function HomePage({ setPage }) {
             }}>Browse Repertoire</button>
           </div>
         </div>
+
+        <div className="hero-scroll-cue" style={{
+          position: 'absolute', bottom: 28, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6
+        }}>
+          <span style={{ fontFamily: 'Jost, sans-serif', fontSize: 10, letterSpacing: '.22em', textTransform: 'uppercase', color: '#c9a097' }}>Scroll</span>
+          <ChevronDown size={18} color="#c9a097" strokeWidth={1.75} />
+        </div>
       </div>
 
       {/* Bio section */}
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: '48px 20px', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 40, alignItems: 'center' }}>
-        <div>
-          <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.2em', marginBottom: 16, fontWeight: 500, fontFamily: 'Jost, sans-serif' }}>About Paige</p>
-          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 400, fontStyle: 'italic', color: '#1a1714', marginBottom: 20, lineHeight: 1.2 }}>
-            A Southern California native with a distinctive harp origin story
-          </h2>
-          <p style={{ fontSize: 15, lineHeight: 1.9, color: '#3d3733', marginBottom: 16 }}>
-            Paige began her musical journey at the age of five, inspired by the music production process for one of her favorite childhood movies, <em>Barbie of Swan Lake</em>. One instrument in particular seemed to command her attention — and while her interest in Barbie quickly faded, her love of the harp was just beginning.
-          </p>
-          <p style={{ fontSize: 15, lineHeight: 1.9, color: '#3d3733', marginBottom: 24 }}>
-            Paige has performed at venues including the Civic Arts Plaza, Four Seasons Westlake Village, Ronald Reagan Presidential Library, Sherwood Country Club, Jonathan Club, and Calamigos Ranch. She is also passionate about providing instrumental relaxation for those in hospice and private homes.
-          </p>
-          <p style={{ fontSize: 15, lineHeight: 1.9, color: '#3d3733', marginBottom: 32 }}>
-            As a 2021 graduate from Bushnell University with a Bachelor of Arts in Interpersonal Communication and a minor in Music, Paige is well-equipped to provide an unforgettable experience.
-          </p>
-          <button onClick={() => setPage('contact')} style={{
-            padding: '12px 30px', background: '#1a1714', color: 'white', border: 'none',
-            borderRadius: 10, fontSize: 12, fontWeight: 500, letterSpacing: '.12em',
-            textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Jost, sans-serif'
-          }}>Book Her</button>
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: '48px 20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))', gap: 40, alignItems: 'center', marginBottom: 40 }}>
+          <img
+            src="/photos/paige-portrait.jpg"
+            alt="Paige smiling beside her harp"
+            loading="lazy"
+            style={{ width: '100%', aspectRatio: '2 / 3', objectFit: 'cover', borderRadius: 20, boxShadow: '0 2px 20px rgba(26,23,20,.08)' }}
+          />
+          <div>
+            <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.2em', marginBottom: 16, fontWeight: 500, fontFamily: 'Jost, sans-serif' }}>About Paige</p>
+            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 400, fontStyle: 'italic', color: '#1a1714', marginBottom: 20, lineHeight: 1.2 }}>
+              A Southern California native with a distinctive harp origin story
+            </h2>
+            <p style={{ fontSize: 15, lineHeight: 1.9, color: '#3d3733', marginBottom: 16 }}>
+              Paige began her musical journey at the age of five, inspired by the music production process for one of her favorite childhood movies, <em>Barbie of Swan Lake</em>. One instrument in particular seemed to command her attention — and while her interest in Barbie quickly faded, her love of the harp was just beginning.
+            </p>
+            <p style={{ fontSize: 15, lineHeight: 1.9, color: '#3d3733', marginBottom: 24 }}>
+              Paige has performed at venues including the Civic Arts Plaza, Four Seasons Westlake Village, Ronald Reagan Presidential Library, Sherwood Country Club, Jonathan Club, and Calamigos Ranch. She is also passionate about providing instrumental relaxation for those in hospice and private homes.
+            </p>
+            <p style={{ fontSize: 15, lineHeight: 1.9, color: '#3d3733', marginBottom: 32 }}>
+              As a 2021 graduate from Bushnell University with a Bachelor of Arts in Interpersonal Communication and a minor in Music, Paige is well-equipped to provide an unforgettable experience.
+            </p>
+            <button onClick={() => setPage('contact')} style={{
+              padding: '12px 30px', background: '#1a1714', color: 'white', border: 'none',
+              borderRadius: 10, fontSize: 12, fontWeight: 500, letterSpacing: '.12em',
+              textTransform: 'uppercase', cursor: 'pointer', fontFamily: 'Jost, sans-serif'
+            }}>Book Her</button>
+          </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {/* Decorative card */}
-          <div style={{ background: '#f5e6e2', borderRadius: 20, padding: '40px 32px', border: '1px solid #e8c8c0', textAlign: 'center' }}>
-            <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 48, color: '#c9a097', fontWeight: 300, marginBottom: 4 }}>10+</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(160px, 100%), 1fr))', gap: 12 }}>
+          <div style={{ background: '#f5e6e2', borderRadius: 20, padding: '32px 24px', border: '1px solid #e8c8c0', textAlign: 'center' }}>
+            <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 40, color: '#c9a097', fontWeight: 300, marginBottom: 4 }}>10+</p>
             <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '.14em', color: '#9a9189', fontFamily: 'Jost, sans-serif' }}>Years performing</p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <div style={{ background: '#f2ebe3', borderRadius: 16, padding: '24px 20px', border: '1px solid #ede5dc', textAlign: 'center' }}>
-              <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, color: '#c9a097', fontWeight: 300, marginBottom: 4 }}>50+</p>
-              <p style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '.12em', color: '#9a9189', fontFamily: 'Jost, sans-serif' }}>Venues</p>
-            </div>
-            <div style={{ background: '#f2ebe3', borderRadius: 16, padding: '24px 20px', border: '1px solid #ede5dc', textAlign: 'center' }}>
-              <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, color: '#c9a097', fontWeight: 300, marginBottom: 4 }}>∞</p>
-              <p style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '.12em', color: '#9a9189', fontFamily: 'Jost, sans-serif' }}>Memories</p>
-            </div>
+          <div style={{ background: '#f2ebe3', borderRadius: 20, padding: '32px 24px', border: '1px solid #ede5dc', textAlign: 'center' }}>
+            <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 40, color: '#c9a097', fontWeight: 300, marginBottom: 4 }}>50+</p>
+            <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '.14em', color: '#9a9189', fontFamily: 'Jost, sans-serif' }}>Venues</p>
+          </div>
+          <div style={{ background: '#f2ebe3', borderRadius: 20, padding: '32px 24px', border: '1px solid #ede5dc', textAlign: 'center' }}>
+            <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 40, color: '#c9a097', fontWeight: 300, marginBottom: 4 }}>∞</p>
+            <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '.14em', color: '#9a9189', fontFamily: 'Jost, sans-serif' }}>Memories</p>
           </div>
         </div>
       </div>
@@ -154,13 +168,21 @@ function HomePage({ setPage }) {
         </div>
       </div>
 
+      {/* Photo banner */}
+      <img
+        src="/photos/paige-meadow.jpg"
+        alt="Paige playing the harp among wildflowers at golden hour"
+        loading="lazy"
+        style={{ width: '100%', aspectRatio: '5 / 3', objectFit: 'cover', objectPosition: 'center top', display: 'block' }}
+      />
+
       {/* Services section */}
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '80px 20px' }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <p style={{ color: '#c9a097', fontSize: 11, textTransform: 'uppercase', letterSpacing: '.2em', marginBottom: 12, fontWeight: 500, fontFamily: 'Jost, sans-serif' }}>Services</p>
           <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 36, fontWeight: 400, fontStyle: 'italic', color: '#1a1714' }}>How can Paige serve you?</h2>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))', gap: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(360px, 100%), 1fr))', gap: 20 }}>
           {[
             { title: 'Weddings', desc: 'From intimate ceremonies to grand celebrations, Paige creates the perfect musical atmosphere for your wedding day.', page: 'weddings' },
             { title: 'Music', desc: 'Listen to Paige perform live. Browse her YouTube channel and get a taste of what she can bring to your event.', page: 'music' },
@@ -208,7 +230,7 @@ function HomePage({ setPage }) {
           <div style={{ borderRadius: 16, overflow: 'hidden' }}>
             <iframe
               src="https://www.instagram.com/paigetheharpist/embed"
-              style={{ width: '100%', height: 800, border: 'none', borderRadius: 16 }}
+              style={{ width: '100%', height: 650, border: 'none', borderRadius: 16 }}
               scrolling="no"
               allowTransparency="true"
             />
@@ -347,6 +369,7 @@ function TestimonialsSection() {
 
 
 function MusicPage() {
+    const [playingId, setPlayingId] = React.useState(null)
   const videos = [
     { id: 'UCX_zOd0pkl_Iu2gl8G5ecdw', title: 'Thirty Minutes of Relaxation', desc: 'A peaceful collection of harp music perfect for relaxation and meditation.' },
   ]
@@ -356,16 +379,24 @@ function MusicPage() {
       <Hero title="Music" subtitle="Listen to Paige perform live and in the studio" />
       <div style={{ maxWidth: 900, margin: '0 auto', padding: '60px 20px' }}>
 
-        <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <p style={{ fontSize: 15, lineHeight: 1.8, color: '#3d3733', maxWidth: 560, margin: '0 auto 24px' }}>
-            Experience the beauty of live harp music. Browse Paige's performances and get a taste of what she can bring to your event.
-          </p>
-          <a href="https://www.youtube.com/@paigetheharpist" target="_blank" rel="noreferrer" style={{
-            display: 'inline-flex', alignItems: 'center', gap: 8,
-            padding: '12px 24px', background: '#ff0000', color: 'white',
-            borderRadius: 10, fontSize: 12, fontWeight: 500, letterSpacing: '.08em',
-            textTransform: 'uppercase', textDecoration: 'none', fontFamily: 'Jost, sans-serif'
-          }}>▶ View Full YouTube Channel</a>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: 40, alignItems: 'center', marginBottom: 56 }}>
+          <img
+            src="/photos/paige-performance.jpg"
+            alt="Paige playing the harp indoors"
+            loading="lazy"
+            style={{ width: '100%', aspectRatio: '2 / 3', objectFit: 'cover', borderRadius: 20, boxShadow: '0 2px 20px rgba(26,23,20,.08)' }}
+          />
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ fontSize: 15, lineHeight: 1.8, color: '#3d3733', maxWidth: 400, margin: '0 auto 24px' }}>
+              Experience the beauty of live harp music. Browse Paige's performances and get a taste of what she can bring to your event.
+            </p>
+            <a href="https://www.youtube.com/@paigetheharpist" target="_blank" rel="noreferrer" style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+            padding: '12px 24px', background: '#c9a097', color: 'white',
+                  borderRadius: 10, fontSize: 12, fontWeight: 500, letterSpacing: '.08em',
+              textTransform: 'uppercase', textDecoration: 'none', fontFamily: 'Jost, sans-serif'
+            }}>▶ View Full YouTube Channel</a>
+          </div>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(360px, 100%), 1fr))', gap: 24 }}>
@@ -377,16 +408,10 @@ function MusicPage() {
           ].map(v => (
             <div key={v.id} style={{ background: 'white', border: '1px solid #ede5dc', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 20px rgba(26,23,20,.06)' }}>
               <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}>
-                <iframe
-                  src={`https://www.youtube.com/embed/${v.id}`}
-                  title={v.title}
-                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+                {playingId === v.id ? (<iframe src={`https://www.youtube.com/embed/${v.id}?autoplay=1`} title={v.title} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />) : (<button onClick={() => setPlayingId(v.id)} aria-label={`Play ${v.title}`} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none', padding: 0, cursor: 'pointer', background: `url(https://img.youtube.com/vi/${v.id}/hqdefault.jpg) center/cover no-repeat` }}><span style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 56, height: 56, borderRadius: '50%', background: 'rgba(26,23,20,.65)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><span style={{ width: 0, height: 0, borderTop: '10px solid transparent', borderBottom: '10px solid transparent', borderLeft: '16px solid white', marginLeft: 4 }} /></span></button>)}
               </div>
-              <div style={{ padding: '16px 20px' }}>
-                <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, fontWeight: 400, fontStyle: 'italic', color: '#1a1714', marginBottom: 4 }}>{v.title}</h3>
+                          <div style={{ padding: '16px 20px' }}>
+                            <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, fontWeight: 400, fontStyle: 'italic', color: '#1a1714', marginBottom: 4 }}>{v.title}</h3>
                 <p style={{ fontSize: 13, color: '#9a9189' }}>{v.desc}</p>
               </div>
             </div>
@@ -458,6 +483,9 @@ function WeddingsPage({ setPage, setSelectedPackage }) {
   const packages = [
     {
       name: 'Signature Ceremony',
+      photo: '/photos/paige-golden-hour.jpg',
+      photoAlt: 'Paige playing the harp outdoors at golden hour',
+      photoPosition: 'center 45%',
       price: 'Starting at $500',
       duration: 'One Hour',
       songLimit: 2,
@@ -469,6 +497,9 @@ function WeddingsPage({ setPage, setSelectedPackage }) {
     },
     {
       name: 'C & C Serenade',
+      photo: '/photos/paige-garden.jpg',
+      photoAlt: 'Paige playing the harp in a flower garden',
+      photoPosition: 'center 15%',
       price: 'Starting at $850',
       duration: 'Two Hours',
       songLimit: 5,
@@ -482,6 +513,9 @@ function WeddingsPage({ setPage, setSelectedPackage }) {
     },
     {
       name: 'Evening Étude',
+      photo: '/photos/paige-walking.jpg',
+      photoAlt: 'Paige carrying her harp through a garden at dusk',
+      photoPosition: 'top',
       price: 'Starting at $1,100',
       duration: 'Three Hours',
       songLimit: 8,
@@ -500,9 +534,15 @@ function WeddingsPage({ setPage, setSelectedPackage }) {
     <div>
       <Hero title="Weddings" subtitle="Creating an unforgettable atmosphere for your most special day" />
       <div style={{ maxWidth: 1000, margin: '0 auto', padding: '60px 20px' }}>
-        <div style={{ display: 'grid', gap: 24, marginBottom: 48 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24, marginBottom: 48 }}>
           {packages.map((pkg, i) => (
-            <div key={pkg.name} style={{ background: 'white', border: '1px solid #ede5dc', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 20px rgba(26,23,20,.06)' }}>
+          <div key={pkg.name} style={{ background: 'white', border: '1px solid #ede5dc', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 20px rgba(26,23,20,.06)', display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <img
+                src={pkg.photo}
+                alt={pkg.photoAlt}
+                loading="lazy"
+                style={{ width: '100%', aspectRatio: '1 / 1', objectFit: 'cover', objectPosition: pkg.photoPosition, display: 'block' }}
+              />
               <div style={{ background: i === 1 ? '#f5e6e2' : '#f2ebe3', padding: '28px 32px', borderBottom: '1px solid #ede5dc', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
                 <div>
                   <p style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '.16em', color: '#9a9189', marginBottom: 6, fontWeight: 500 }}>{pkg.duration}</p>
@@ -510,9 +550,8 @@ function WeddingsPage({ setPage, setSelectedPackage }) {
                 </div>
                 <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 28, color: '#c9a097', fontWeight: 400 }}>{pkg.price}</p>
               </div>
-              <div style={{ padding: '28px 32px' }}>
-                <p style={{ fontSize: 14, lineHeight: 1.8, color: '#3d3733', marginBottom: 16 }}>{pkg.description}</p>
-                <ul style={{ listStyle: 'none', display: 'grid', gap: 8 }}>
+              <div  style={{ padding: '28px 32px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+            <ul style={{ listStyle: 'none', display: 'grid', gap: 8 }}>
                   {pkg.details.map((d, j) => (
                     <li key={j} style={{ fontSize: 13, color: '#7a746e', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                       <span style={{ color: '#c9a097', flexShrink: 0, marginTop: 2 }}>·</span>
@@ -521,7 +560,7 @@ function WeddingsPage({ setPage, setSelectedPackage }) {
                   ))}
                 </ul>
                 <button onClick={() => { setSelectedPackage(pkg); setPage('contact') }} style={{
-                  marginTop: 20, padding: '10px 24px', background: '#c9a097', color: 'white',
+                  marginTop: 'auto', padding: '10px 24px', background: '#c9a097', color: 'white',
                   border: 'none', borderRadius: 8, fontSize: 11, fontWeight: 500,
                   letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer',
                   fontFamily: 'Jost, sans-serif'
@@ -626,8 +665,8 @@ function RepertoirePage({ setPage, setPreselectedSongs }) {
                 <div style={{ flex: 1, height: 1, background: '#ede5dc' }} />
               </div>
             )}
-            <div style={{ display: 'grid', gap: 8 }}>
-              {songs.map(s => {
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: 8 }}>
+            {songs.map(s => {
                 const isSelected = selected.includes(s.id)
                 return (
                   <div key={s.id} onClick={() => toggleSong(s.id)} style={{
@@ -755,9 +794,8 @@ function ContactPage({ preselectedSongs, setPreselectedSongs, selectedPackage, s
               { label: 'Event Type', key: 'event_type', placeholder: 'Wedding, corporate, private party…', type: 'text' },
               { label: 'Event Date', key: 'event_date', placeholder: '', type: 'date' },
               { label: 'Venue', key: 'venue', placeholder: 'Venue name or location', type: 'text' },
-              { label: "Bride's Name", key: 'bride_name', placeholder: "Bride's full name", type: 'text' },
-              { label: "Groom's Name", key: 'groom_name', placeholder: "Groom's full name", type: 'text' },
-            ].map(f => (
+          ...(String(form.event_type || '').toLowerCase().includes('wedding') ? [{ label: "Bride's Name", key: 'bride_name', placeholder: "Bride's full name", type: 'text' }, { label: "Groom's Name", key: 'groom_name', placeholder: "Groom's full name", type: 'text' }] : []),
+    ].map(f => (
               <div key={f.key} style={{ display: 'flex', flexDirection: 'column' }}>
                 <label style={{ fontSize: 10, fontWeight: 500, color: '#9a9189', marginBottom: 6, letterSpacing: '.1em', textTransform: 'uppercase', fontFamily: 'Jost, sans-serif' }}>{f.label}</label>
                 <input type={f.type} value={form[f.key]} placeholder={f.placeholder}
