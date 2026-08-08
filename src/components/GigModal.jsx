@@ -75,7 +75,13 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
     const issues = validate()
     const blocking = issues.filter(i => i.level === 'error')
     setErrors(issues)
-    if (blocking.length) return
+    if (blocking.length) {
+      // The error summary sits at the top of a scrollable dialog. On a long
+      // form the Save button is well below it, so without this the click
+      // appears to do nothing at all.
+      dialogRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
 
     const warnings = issues.filter(i => i.level === 'warn')
     if (warnings.length && !confirm(warnings.map(w => w.message).join('\n\n') + '\n\nSave anyway?')) return

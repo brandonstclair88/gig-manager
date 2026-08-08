@@ -1,1 +1,16 @@
 node_modules
+
+# Build output
+dist
+
+# Local env files — never commit these. Vite exposes anything prefixed
+# VITE_ to the browser bundle, so treat them as configuration, not secrets,
+# but keep server-side keys (Stripe, Google, Resend) out of the repo entirely.
+.env
+.env.*
+!.env.example
+
+# Tooling
+.vercel
+.DS_Store
+*.log
