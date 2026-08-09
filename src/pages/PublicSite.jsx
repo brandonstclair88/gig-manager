@@ -729,10 +729,22 @@ function ContactPage({ preselectedSongs, setPreselectedSongs, selectedPackage, s
     if (!form.name.trim() || !form.email.trim()) { alert('Please enter your name and email.'); return }
     setSubmitting(true)
     const songList = preselectedSongs.map(s => `${s.title}${s.composer ? ` (${s.composer})` : ''}`).join('\n')
+    // Row level security blocks anonymous reads of `gigs`, so the old
+    // fallback that looked up the owner there returned undefined and the
+    // inquiry was saved with no user_id — invisible to the dashboard, with
+    // no error shown to the visitor. `repertoire` is readable anonymously,
+    // so use it for both paths.
+    const { data: owner, error: ownerError } =
+      await supabase.from('repertoire').select('user_id').limit(1).single()
+
+    if (ownerError || !owner?.user_id) {
+      setSubmitting(false)
+      alert('Sorry — we could not submit your inquiry just now. Please email hello@paigecamryn.com and we will get straight back to you.')
+      return
+    }
+
     const { error } = await supabase.from('inquiries').insert([{
-      user_id: preselectedSongs.length > 0
-        ? (await supabase.from('repertoire').select('user_id').limit(1).single()).data?.user_id
-        : (await supabase.from('gigs').select('user_id').limit(1).single()).data?.user_id,
+      user_id: owner.user_id,
       name: form.name, email: form.email, phone: form.phone,
       event_type: form.event_type, event_date: form.event_date || null,
       venue: form.venue,
