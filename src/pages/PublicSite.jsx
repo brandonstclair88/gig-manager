@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { supabase } from '../supabase'
+import { OWNER_USER_ID, hasOwner } from '../owner'
 
 const CATEGORIES = ['Classical', 'Wedding', 'Pop', 'Rock', 'Jazz', 'Celtic', 'Christmas', 'Hymns', 'Film & TV', 'Other']
 
@@ -267,9 +268,17 @@ function TestimonialForm() {
   async function submit() {
     if (!form.name.trim() || !form.message.trim()) { alert('Please enter your name and review.'); return }
     setSubmitting(true)
+    if (!hasOwner()) {
+      setSubmitting(false)
+      alert('Sorry — reviews cannot be submitted right now. Please email hello@paigecamryn.com.')
+      return
+    }
     const { createClient } = await import('@supabase/supabase-js')
     const sb = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ANON_KEY)
     const { error } = await sb.from('testimonials').insert([{
+      // Was omitted entirely, so every submitted review was stored with a
+      // null owner and never appeared on the Testimonials page.
+      user_id: OWNER_USER_ID,
       name: form.name,
       event_type: form.event_type,
       message: form.message
@@ -729,22 +738,17 @@ function ContactPage({ preselectedSongs, setPreselectedSongs, selectedPackage, s
     if (!form.name.trim() || !form.email.trim()) { alert('Please enter your name and email.'); return }
     setSubmitting(true)
     const songList = preselectedSongs.map(s => `${s.title}${s.composer ? ` (${s.composer})` : ''}`).join('\n')
-    // Row level security blocks anonymous reads of `gigs`, so the old
-    // fallback that looked up the owner there returned undefined and the
-    // inquiry was saved with no user_id — invisible to the dashboard, with
-    // no error shown to the visitor. `repertoire` is readable anonymously,
-    // so use it for both paths.
-    const { data: owner, error: ownerError } =
-      await supabase.from('repertoire').select('user_id').limit(1).single()
-
-    if (ownerError || !owner?.user_id) {
+    // The owner is configured, never inferred — see src/owner.js. Looking it
+    // up from a table returned another account's id, filing inquiries where
+    // the dashboard could not see them.
+    if (!hasOwner()) {
       setSubmitting(false)
-      alert('Sorry — we could not submit your inquiry just now. Please email hello@paigecamryn.com and we will get straight back to you.')
+      alert('Sorry — the booking form is not configured correctly right now. Please email hello@paigecamryn.com and we will get straight back to you.')
       return
     }
 
     const { error } = await supabase.from('inquiries').insert([{
-      user_id: owner.user_id,
+      user_id: OWNER_USER_ID,
       name: form.name, email: form.email, phone: form.phone,
       event_type: form.event_type, event_date: form.event_date || null,
       venue: form.venue,
@@ -756,7 +760,11 @@ function ContactPage({ preselectedSongs, setPreselectedSongs, selectedPackage, s
         form.song_requests ? `Custom song requests:\n${form.song_requests}` : '',
         songList ? `Repertoire selections:\n${songList}` : ''
       ].filter(Boolean).join('\n\n'),
-      stage: 'inquired'
+      // Must match the dashboard's STAGES list in InquiriesPage.jsx. The
+      // public site was reworded from "enquire" to "inquire" and this value
+      // was reworded with it, so submissions landed in a stage bucket the
+      // dashboard does not render — invisible even with the right owner.
+      stage: 'enquired'
     }])
     setSubmitting(false)
     if (error) { alert(error.message); return }
