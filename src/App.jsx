@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { LayoutDashboard, Music, CalendarDays, DollarSign, Users, LogOut, MessageSquare, BookOpen, Star, Moon, Sun } from 'lucide-react'
 import { supabase } from './supabase'
 import { useHashRoute } from './useHashRoute'
+import { IS_SIGN, IS_PUBLIC, normaliseLegacyUrl } from './surface'
 import AuthPage from './pages/AuthPage'
 import DashboardPage from './pages/DashboardPage'
 import GigsPage from './pages/GigsPage'
@@ -27,11 +28,13 @@ const NAV = [
 
 const PAGE_IDS = NAV.map(n => n.id)
 
-// These are public, unauthenticated views chosen by query string. Reading
-// window.location once at module load keeps the value stable for the lifetime
-// of the page, so the branch below can't change hook order between renders.
-const IS_SIGN_PAGE = window.location.search.includes('gig=')
-const IS_PUBLIC_SITE = window.location.search.includes('site=')
+// Which surface this page load is (public site / contract signing / dashboard)
+// is decided once in surface.js, from the hostname and path.
+const IS_SIGN_PAGE = IS_SIGN
+const IS_PUBLIC_SITE = IS_PUBLIC
+
+// Bring a legacy ?site= / ?gig= address bar in line with the new paths.
+normaliseLegacyUrl()
 
 export default function App() {
   const [user, setUser] = useState(null)
@@ -53,6 +56,21 @@ export default function App() {
     document.body.setAttribute('data-theme', darkMode ? 'dark' : 'light')
     try { localStorage.setItem('pcm-theme', darkMode ? 'dark' : 'light') } catch { /* private mode */ }
   }, [darkMode])
+
+  // index.html carries the public site's metadata, because that is what gets
+  // shared and indexed. The dashboard shares the same document, so it swaps in
+  // its own title and asks crawlers to skip it.
+  useEffect(() => {
+    if (IS_SIGN_PAGE || IS_PUBLIC_SITE) return
+    document.title = 'Gig Manager — Paige Camryn Music'
+    let tag = document.querySelector('meta[name="robots"]')
+    if (!tag) {
+      tag = document.createElement('meta')
+      tag.setAttribute('name', 'robots')
+      document.head.appendChild(tag)
+    }
+    tag.setAttribute('content', 'noindex, nofollow')
+  }, [])
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {

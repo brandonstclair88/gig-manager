@@ -50,7 +50,7 @@ export default async function handler(req, res) {
     if (!data.client_email) return res.status(400).json({ error: 'No client email' })
     to = [data.client_email]
     subject = `Your Performance Agreement — ${data.title}`
-    const signingLink = `${data.origin}?gig=${data.id}`
+    const signingLink = `${String(data.origin || '').replace(/\/$/, '')}/sign/${encodeURIComponent(data.id)}`
     html = `
       <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; color: #1a1714;">
         <h1 style="font-size: 28px; font-weight: 400; font-style: italic; color: #c9a097; margin-bottom: 8px;">Performance Agreement</h1>

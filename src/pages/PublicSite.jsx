@@ -421,7 +421,7 @@ function MusicPage() {
         <div style={{ textAlign: 'center', marginTop: 48, padding: '40px', background: '#f5e6e2', borderRadius: 20, border: '1px solid #e8c8c0' }}>
           <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 28, fontWeight: 400, fontStyle: 'italic', color: '#1a1714', marginBottom: 12 }}>Love what you hear?</h3>
           <p style={{ color: '#9a9189', fontSize: 14, marginBottom: 24 }}>Book Paige for your next event and experience live harp music in person.</p>
-          <a href="?site=true" onClick={e => { e.preventDefault(); window.dispatchEvent(new CustomEvent('navigate', { detail: 'contact' })) }}
+          <a href="/" onClick={e => { e.preventDefault(); window.dispatchEvent(new CustomEvent('navigate', { detail: 'contact' })) }}
             style={{ display: 'inline-block', padding: '14px 36px', background: '#c9a097', color: 'white', borderRadius: 10, fontSize: 12, fontWeight: 500, letterSpacing: '.12em', textTransform: 'uppercase', textDecoration: 'none', fontFamily: 'Jost, sans-serif', cursor: 'pointer' }}>
             Book Paige
           </a>

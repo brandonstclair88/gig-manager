@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../supabase'
 import { contractText, fmtDate } from '../utils'
+import { surface } from '../surface'
 
 export default function SignPage() {
   const [gig, setGig] = useState(null)
@@ -10,7 +11,8 @@ export default function SignPage() {
   const [signed, setSigned] = useState(false)
   const [error, setError] = useState('')
 
-  const gigId = new URLSearchParams(window.location.search).get('gig')
+  // Comes from /sign/:gigId, or from a legacy ?gig= link.
+  const gigId = surface.gigId
 
   useEffect(() => {
     if (!gigId) { setError('Invalid link.'); setLoading(false); return }

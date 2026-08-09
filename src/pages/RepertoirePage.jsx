@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import { Plus, X, Edit2, Music } from 'lucide-react'
 import { supabase } from '../supabase'
+import { publicSiteUrl } from '../surface'
 
 const CATEGORIES = ['Classical', 'Wedding', 'Pop', 'Rock', 'Jazz', 'Celtic', 'Folk', 'Country', 'Christmas', 'Hymns', 'Film & TV', 'Other']
 
@@ -189,7 +190,7 @@ export default function RepertoirePage({ repertoire, userId, onRefresh }) {
   }, [])
 
   function copyPublicLink() {
-    const url = `${window.location.origin}?site=true`
+    const url = publicSiteUrl()
     navigator.clipboard.writeText(url)
     alert('Public site link copied!\n\n' + url)
   }

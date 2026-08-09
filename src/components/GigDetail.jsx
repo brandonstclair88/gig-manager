@@ -5,6 +5,7 @@ import {
   currency, fmtDate, fmtTime, invoiceBadge, contractText, downloadPDFInvoice,
   gigBalance, gigOutstanding, gigOverpaid, gigPaid, mapsUrl,
 } from '../utils'
+import { signingUrl, publicSiteUrl } from '../surface'
 
 const HOME_BASE = 'Thousand Oaks, CA'
 
@@ -61,7 +62,9 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         type: 'contract',
-        data: { ...gig, origin: window.location.origin }
+        // The public host, not wherever the dashboard happens to be served
+        // from — this becomes the link in the client's email.
+        data: { ...gig, origin: publicSiteUrl() }
       })
     })
     if (res.ok) {
@@ -146,7 +149,7 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
   }
 
   function copySigningLink() {
-    const url = `${window.location.origin}?gig=${gig.id}`
+    const url = signingUrl(gig.id)
     navigator.clipboard.writeText(url)
     alert('Signing link copied! Send this to your client:\n\n' + url)
   }
