@@ -764,7 +764,10 @@ function ContactPage({ preselectedSongs, setPreselectedSongs, selectedPackage, s
       // public site was reworded from "enquire" to "inquire" and this value
       // was reworded with it, so submissions landed in a stage bucket the
       // dashboard does not render — invisible even with the right owner.
-      stage: 'enquired'
+      stage: 'enquired',
+      // The one lead source that never needs guessing: this row exists
+      // because someone filled in the form on the public site.
+      lead_source: 'Website'
     }])
     setSubmitting(false)
     if (error) { alert(error.message); return }

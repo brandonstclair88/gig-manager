@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import { Plus, X, Edit2 } from 'lucide-react'
 import { supabase } from '../supabase'
-import { currency, fmtDate, invoiceBadge, activeGigs, gigFee, gigPaid } from '../utils'
+import { currency, fmtDate, invoiceBadge, reportableGigs, gigFee, gigPaid } from '../utils'
 
 const EMPTY_CLIENT = { name: '', email: '', phone: '', notes: '' }
 
@@ -52,7 +52,7 @@ export default function ClientsPage({ clients, gigs, userId, onRefresh }) {
 
   const selectedClient = clients.find(c => c.id === selectedId)
 
-  const live = useMemo(() => activeGigs(gigs), [gigs])
+  const live = useMemo(() => reportableGigs(gigs), [gigs])
 
   // Gigs store the client as free text, so matching is by normalised name.
   // Trim as well as lowercase — a trailing space shouldn't orphan a gig.

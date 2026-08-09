@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react'
 import { Plus, X, Edit2, ChevronRight, Music, FileText } from 'lucide-react'
 import { supabase } from '../supabase'
 import { currency, fmtDate } from '../utils'
+import { LEAD_SOURCES } from '../salesOrder'
 
 const STAGES = ['enquired', 'quoted', 'deposit received', 'confirmed', 'completed', 'lost']
 
@@ -14,7 +15,7 @@ const STAGE_COLORS = {
   'lost':             { bg: '#fde8e8', color: '#a33030' },
 }
 
-const EMPTY = { name: '', email: '', phone: '', event_type: '', event_date: '', venue: '', budget: '', notes: '', stage: 'enquired', quoted_amount: '' }
+const EMPTY = { name: '', email: '', phone: '', event_type: '', event_date: '', venue: '', budget: '', notes: '', stage: 'enquired', quoted_amount: '', lead_source: '' }
 
 function InquiryModal({ inquiry, userId, onClose, onSaved }) {
   const [form, setForm] = useState(inquiry || EMPTY)
@@ -30,7 +31,8 @@ function InquiryModal({ inquiry, userId, onClose, onSaved }) {
       event_type: form.event_type, event_date: form.event_date || null,
       venue: form.venue, budget: Number(form.budget || 0),
       notes: form.notes, stage: form.stage,
-      quoted_amount: Number(form.quoted_amount || 0)
+      quoted_amount: Number(form.quoted_amount || 0),
+      lead_source: form.lead_source || null
     }
     let error
     if (inquiry?.id) {
@@ -86,6 +88,13 @@ function InquiryModal({ inquiry, userId, onClose, onSaved }) {
           <div className="field">
             <label>Quoted Amount ($)</label>
             <input type="number" value={form.quoted_amount} onChange={e => set('quoted_amount', e.target.value)} />
+          </div>
+          <div className="field">
+            <label>How They Found You</label>
+            <select value={form.lead_source || ''} onChange={e => set('lead_source', e.target.value)}>
+              <option value="">— not recorded —</option>
+              {LEAD_SOURCES.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
           </div>
           <div className="field span3">
             <label>Notes</label>
@@ -227,7 +236,12 @@ export default function InquiriesPage({ inquiries, userId, onRefresh }) {
       paid: 0,
       notes: inquiry.notes,
       invoice_status: 'draft',
-      contract_status: 'not sent'
+      contract_status: 'not sent',
+      // Carry the source across. This is the only moment it's knowable —
+      // once the inquiry becomes a gig, nothing else remembers where the
+      // lead came from, and the channel report goes blind.
+      lead_source: inquiry.lead_source || null,
+      performance_type: 'One-time'
     }])
     if (error) { alert(error.message); setConverting(false); return }
 

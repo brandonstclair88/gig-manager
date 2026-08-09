@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
-import { fmtDate, fmtTime, activeGigs } from '../utils'
+import { fmtDate, fmtTime, reportableGigs } from '../utils'
 import GigModal from '../components/GigModal'
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -44,7 +44,8 @@ export default function CalendarPage({ gigs, userId, onRefresh }) {
   // whole list for each of the 42 cells. Archived gigs stay off the calendar.
   const gigsByDate = useMemo(() => {
     const map = new Map()
-    activeGigs(gigs).forEach(g => {
+    // A canceled booking is not a date you are busy on.
+    reportableGigs(gigs).forEach(g => {
       if (!g.date) return
       if (!map.has(g.date)) map.set(g.date, [])
       map.get(g.date).push(g)

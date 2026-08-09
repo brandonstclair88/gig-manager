@@ -2,6 +2,14 @@ import React, { useState, useMemo, useEffect } from 'react'
 import { Plus, Search } from 'lucide-react'
 import { supabase } from '../supabase'
 import { currency, fmtDate, invoiceBadge, gigOutstanding, gigOverpaid } from '../utils'
+import { LEAD_SOURCES, UNRECORDED, gigHourlyRate } from '../salesOrder'
+
+/** Sort key for "highest hourly rate". Gigs with no hours recorded sort last
+ *  rather than to the top, which is where a null would land unaltered. */
+function hourlyRate(g) {
+  const r = gigHourlyRate(g)
+  return r === null ? -1 : r
+}
 import GigModal from '../components/GigModal'
 import GigDetail from '../components/GigDetail'
 
@@ -12,6 +20,7 @@ export default function GigsPage({ gigs, userId, onRefresh, selectedId = null, o
   const setSelectedId = onSelect || (() => {})
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [sourceFilter, setSourceFilter] = useState('all')
   const [sortBy, setSortBy] = useState('date')
   // 'active' | 'archived' | 'all' — the old boolean toggle swapped the list
   // for archived gigs instead of adding them, which read as "hide my gigs".
@@ -28,19 +37,25 @@ export default function GigsPage({ gigs, userId, onRefresh, selectedId = null, o
           || g.client?.toLowerCase().includes(q)
           || g.venue?.toLowerCase().includes(q)
           || g.venue_address?.toLowerCase().includes(q)
+          || g.event_category?.toLowerCase().includes(q)
+          || g.lead_source?.toLowerCase().includes(q)
         const matchStatus = statusFilter === 'all' || (g.invoice_status || 'draft') === statusFilter
+        // '' is the sentinel for "no source recorded" — it can't be 'all' and
+        // can't collide with a real source, since those are non-empty strings.
+        const matchSource = sourceFilter === 'all' || (g.lead_source || '') === sourceFilter
         const matchArchived = archiveView === 'all' ? true
           : archiveView === 'archived' ? !!g.archived
           : !g.archived
-        return matchSearch && matchStatus && matchArchived
+        return matchSearch && matchStatus && matchSource && matchArchived
       })
       .sort((a, b) => {
         if (sortBy === 'date') return (a.date || '').localeCompare(b.date || '')
         if (sortBy === 'fee') return Number(b.fee || 0) - Number(a.fee || 0)
         if (sortBy === 'client') return (a.client || '').localeCompare(b.client || '')
+        if (sortBy === 'rate') return hourlyRate(b) - hourlyRate(a)
         return 0
       })
-  }, [gigs, search, statusFilter, sortBy, archiveView])
+  }, [gigs, search, statusFilter, sourceFilter, sortBy, archiveView])
 
   const archivedCount = useMemo(() => gigs.filter(g => g.archived).length, [gigs])
 
@@ -105,9 +120,15 @@ export default function GigsPage({ gigs, userId, onRefresh, selectedId = null, o
           <option value="paid">Paid</option>
           <option value="overdue">Overdue</option>
         </select>
+        <select value={sourceFilter} onChange={e => setSourceFilter(e.target.value)} aria-label="Lead source filter" style={{ flex: 1, minWidth: 140 }}>
+          <option value="all">All sources</option>
+          {LEAD_SOURCES.map(s => <option key={s} value={s}>{s}</option>)}
+          <option value="">{UNRECORDED}</option>
+        </select>
         <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{ flex: 1, minWidth: 120 }}>
           <option value="date">Sort by date</option>
           <option value="fee">Sort by fee</option>
+          <option value="rate">Sort by hourly rate</option>
           <option value="client">Sort by client</option>
         </select>
         <select

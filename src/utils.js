@@ -41,6 +41,22 @@ export function isActiveGig(g) { return !g?.archived }
 export function activeGigs(gigs) { return (gigs || []).filter(isActiveGig) }
 
 /**
+ * A canceled booking is a record of something that didn't happen. Its fee was
+ * never earned and its balance is not owed, so it must not reach any money
+ * total — otherwise a canceled event shows up as outstanding revenue, which is
+ * exactly the sort of phantom figure the archived-gig fix was about.
+ *
+ * Lives here rather than in salesOrder.js so utils.js stays free of imports
+ * and remains the single source of truth for what counts as money.
+ */
+export function isCanceledGig(g) { return g?.performance_type === 'Canceled' }
+
+/** Gigs that count toward income, booking and tax figures. */
+export function reportableGigs(gigs) {
+  return (gigs || []).filter(g => isActiveGig(g) && !isCanceledGig(g))
+}
+
+/**
  * Validate the money fields before save. Returns an array of
  * { level: 'error' | 'warn', message } — errors block, warnings confirm.
  */
@@ -376,14 +392,24 @@ export async function downloadPDFInvoice(gig) {
 
 export function exportCSV(gigs, { includeArchived = false } = {}) {
   const rowsIn = includeArchived ? (gigs || []) : activeGigs(gigs)
-  const headers = ['Title', 'Client', 'Venue', 'Date', 'Time', 'Fee', 'Deposit', 'Paid', 'Balance', 'Expenses', 'Net Profit', 'Invoice Status', 'Archived', 'Notes']
-  const rows = rowsIn.map(g => [
-    g.title, g.client, g.venue, g.date, g.time,
-    gigFee(g), gigDeposit(g), gigPaid(g),
-    gigBalance(g),
-    gigExpenses(g), gigNetProfit(g),
-    g.invoice_status, g.archived ? 'yes' : 'no', g.notes
-  ].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`))
+  const headers = [
+    'Title', 'Client', 'Venue', 'Date', 'Time', 'Hours',
+    'Event Category', 'Booking Type', 'Lead Source',
+    'Fee', 'Hourly Rate', 'Deposit', 'Paid', 'Balance', 'Expenses', 'Net Profit',
+    'Invoice Status', 'Archived', 'Notes'
+  ]
+  const rows = rowsIn.map(g => {
+    const hours = Number(g.duration_hours || 0)
+    return [
+      g.title, g.client, g.venue, g.date, g.time, hours || '',
+      g.event_category, g.performance_type, g.lead_source,
+      gigFee(g), hours > 0 ? (gigFee(g) / hours).toFixed(2) : '',
+      gigDeposit(g), gigPaid(g),
+      gigBalance(g),
+      gigExpenses(g), gigNetProfit(g),
+      g.invoice_status, g.archived ? 'yes' : 'no', g.notes
+    ].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`)
+  })
   const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
   const blob = new Blob([csv], { type: 'text/csv' })
   const url = URL.createObjectURL(blob)

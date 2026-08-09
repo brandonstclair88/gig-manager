@@ -2,11 +2,13 @@ import React, { useState, useEffect, useRef } from 'react'
 import { X } from 'lucide-react'
 import { supabase } from '../supabase'
 import { validateGigMoney, currency } from '../utils'
+import { LEAD_SOURCES, EVENT_CATEGORIES, PERFORMANCE_TYPES } from '../salesOrder'
 
 const EMPTY = {
   title: '', client: '', client_email: '', venue: '', venue_address: '',
   date: '', time: '', duration_hours: '2', fee: '', deposit: '', paid: '',
-  setlist: '', notes: '', invoice_status: 'draft'
+  setlist: '', notes: '', invoice_status: 'draft',
+  lead_source: '', event_category: '', performance_type: 'One-time'
 }
 
 export default function GigModal({ gig, userId, onClose, onSaved }) {
@@ -32,7 +34,10 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
         paid: gig.paid ?? '',
         setlist: gig.setlist || '',
         notes: gig.notes || '',
-        invoice_status: gig.invoice_status || 'draft'
+        invoice_status: gig.invoice_status || 'draft',
+        lead_source: gig.lead_source || '',
+        event_category: gig.event_category || '',
+        performance_type: gig.performance_type || 'One-time'
       })
     } else {
       setForm(EMPTY)
@@ -120,7 +125,13 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
       setlist: form.setlist,
       notes: form.notes,
       invoice_status,
-      contract_status: gig?.contract_status || 'not sent'
+      contract_status: gig?.contract_status || 'not sent',
+      // Store an unanswered dropdown as NULL rather than ''. Both are falsy in
+      // JS, but only NULL reads as "not recorded" in SQL, and the lead-source
+      // report is only worth trusting if "blank" means one thing.
+      lead_source: form.lead_source || null,
+      event_category: form.event_category || null,
+      performance_type: form.performance_type || 'One-time'
     }
 
     let error, savedId = gig?.id
@@ -187,6 +198,8 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
   const feeNum = Number(form.fee || 0)
   const paidNum = Number(form.paid || 0)
   const balancePreview = feeNum - paidNum
+  const hoursNum = Number(form.duration_hours || 0)
+  const ratePreview = feeNum > 0 && hoursNum > 0 ? feeNum / hoursNum : null
 
   return (
     <div
@@ -248,6 +261,32 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
             </select>
           </div>
 
+          {/* Sales order fields — these three replaced the spreadsheet tab.
+              Lead source is the one worth filling in every time: it's the only
+              record of which channel actually produces paying work. */}
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.08em' }}>How They Found You</label>
+            <select value={form.lead_source} onChange={e => set('lead_source', e.target.value)}>
+              <option value="">— not recorded —</option>
+              {LEAD_SOURCES.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.08em' }}>Event Category</label>
+            <select value={form.event_category} onChange={e => set('event_category', e.target.value)}>
+              <option value="">— not recorded —</option>
+              {EVENT_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.08em' }}>Booking Type</label>
+            <select value={form.performance_type} onChange={e => set('performance_type', e.target.value)}>
+              {PERFORMANCE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </div>
+
           <div style={{ gridColumn: 'span 2', display: 'flex', flexDirection: 'column' }}>
             <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.08em' }}>Venue Name</label>
             <input value={form.venue} onChange={e => set('venue', e.target.value)} placeholder="Venue name" />
@@ -270,7 +309,9 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '.08em' }}>Duration (hours)</label>
-            <input type="number" min="0.5" max="8" step="0.5" value={form.duration_hours} onChange={e => set('duration_hours', e.target.value)} />
+            {/* Quarter-hour steps: the booking history has 1.25, 2.25 and 2.75
+                hour gigs that a 0.5 step silently refused to accept. */}
+            <input type="number" min="0.25" max="12" step="0.25" value={form.duration_hours} onChange={e => set('duration_hours', e.target.value)} />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -301,6 +342,9 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
                     {balancePreview < 0 ? ' overpaid' : balancePreview === 0 ? ' — paid in full' : ' still owed'}
                   </strong>
                 </>
+              )}
+              {ratePreview !== null && (
+                <> {' · '}<strong style={{ color: 'var(--ink2)' }}>{currency(ratePreview)}/hr</strong></>
               )}
             </p>
           </div>

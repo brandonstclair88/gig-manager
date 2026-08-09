@@ -5,6 +5,7 @@ import {
   currency, fmtDate, fmtTime, invoiceBadge, contractText, downloadPDFInvoice,
   gigBalance, gigOutstanding, gigOverpaid, gigPaid, mapsUrl,
 } from '../utils'
+import { leadSource, eventCategory, performanceType, gigHours, gigHourlyRate, isCanceled } from '../salesOrder'
 import { signingUrl, publicSiteUrl } from '../surface'
 
 const HOME_BASE = 'Thousand Oaks, CA'
@@ -18,6 +19,7 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
   const balance = gigBalance(gig)
   const owed = gigOutstanding(gig)
   const overpaid = gigOverpaid(gig)
+  const hourlyRate = gigHourlyRate(gig)
 
   // Expenses live in component state so edits feel instant; re-sync whenever
   // a different gig is selected, otherwise the previous gig's expenses stick.
@@ -213,6 +215,28 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
               </div>
             </div>
           </div>
+
+          {/* Sales record — what the spreadsheet's Sales orders tab held. */}
+          <div style={{ marginTop: 14, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            <span className="badge badge-grey">{eventCategory(gig)}</span>
+            <span className="badge badge-grey">{performanceType(gig)}</span>
+            <span className="badge badge-grey">via {leadSource(gig)}</span>
+            {gigHours(gig) > 0 && (
+              <span className="badge badge-grey">
+                {gigHours(gig)} hr{gigHours(gig) !== 1 ? 's' : ''}
+                {hourlyRate !== null && ` · ${currency(hourlyRate)}/hr`}
+              </span>
+            )}
+          </div>
+
+          {isCanceled(gig) && (
+            <div className="alert alert-warn" style={{ marginTop: 12 }}>
+              <p className="alert-title">Booking canceled</p>
+              <p className="alert-sub">
+                Kept as a record. It is excluded from income, lead-source reporting and the tax summary.
+              </p>
+            </div>
+          )}
 
           {overpaid > 0 && (
             <div className="alert alert-warn" style={{ marginTop: 12 }}>

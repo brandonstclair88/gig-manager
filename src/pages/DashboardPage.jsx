@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { CalendarDays, Bell, Mail } from 'lucide-react'
 import {
   currency, fmtDate, fmtTime, invoiceBadge,
-  activeGigs, gigPaid, gigOutstanding, gigExpenses,
+  reportableGigs, gigPaid, gigOutstanding, gigExpenses,
 } from '../utils'
 
 export default function DashboardPage({ gigs, onNavigate }) {
@@ -14,7 +14,7 @@ export default function DashboardPage({ gigs, onNavigate }) {
   const todayKey = today.getTime()
 
   // Archived gigs are history, not activity — they must not move any total.
-  const live = useMemo(() => activeGigs(gigs), [gigs])
+  const live = useMemo(() => reportableGigs(gigs), [gigs])
 
   const stats = useMemo(() => {
     const paid = live.reduce((s, g) => s + gigPaid(g), 0)

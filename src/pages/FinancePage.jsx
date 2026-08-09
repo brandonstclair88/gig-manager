@@ -3,13 +3,14 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGri
 import { Download, FileText } from 'lucide-react'
 import {
   currency, fmtDate, invoiceBadge, exportCSV,
-  activeGigs, gigFee, gigPaid, gigOutstanding, gigExpenses,
+  reportableGigs, gigFee, gigPaid, gigOutstanding, gigExpenses,
 } from '../utils'
+import { byLeadSource, byEventCategory, salesSummary, UNRECORDED } from '../salesOrder'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
 function exportTaxSummary(gigs, year) {
-  const yearGigs = activeGigs(gigs).filter(g => g.date && new Date(g.date + 'T00:00:00').getFullYear() === year)
+  const yearGigs = reportableGigs(gigs).filter(g => g.date && new Date(g.date + 'T00:00:00').getFullYear() === year)
   const income = yearGigs.reduce((s, g) => s + gigPaid(g), 0)
   const expenses = yearGigs.reduce((s, g) => s + gigExpenses(g), 0)
   const netProfit = income - expenses
@@ -63,10 +64,51 @@ function exportTaxSummary(gigs, year) {
   URL.revokeObjectURL(url)
 }
 
+/**
+ * Shared renderer for the two sales breakdowns. Each row carries a share bar
+ * sized against the largest row, because the ranking question ("is Website
+ * twice word-of-mouth or barely ahead?") is much easier to read as a bar than
+ * as five dollar figures.
+ */
+function BreakdownTable({ rows, emptyText }) {
+  if (!rows.length) return <p className="muted">{emptyText}</p>
+  const max = Math.max(...rows.map(r => r.paid), 1)
+
+  return (
+    <div>
+      {rows.map((r, i) => (
+        <div
+          key={r.key}
+          style={{ padding: '11px 0', borderBottom: i < rows.length - 1 ? '1px solid var(--paper3)' : 'none' }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10 }}>
+            <p style={{ fontWeight: 600, fontSize: 14, opacity: r.key === UNRECORDED ? .6 : 1 }}>{r.key}</p>
+            <p style={{ fontWeight: 700, color: 'var(--green)', flexShrink: 0 }}>{currency(r.paid)}</p>
+          </div>
+
+          <div
+            aria-hidden="true"
+            style={{ height: 5, background: 'var(--paper3)', borderRadius: 3, margin: '7px 0 6px' }}
+          >
+            <div style={{ width: `${(r.paid / max) * 100}%`, height: '100%', background: 'var(--blush)', borderRadius: 3 }} />
+          </div>
+
+          <p className="muted" style={{ fontSize: 12 }}>
+            {r.gigs} gig{r.gigs !== 1 ? 's' : ''}
+            {r.hours > 0 && ` · ${+r.hours.toFixed(2)} hr${r.hours !== 1 ? 's' : ''}`}
+            {r.avgRate !== null && ` · ${currency(r.avgRate)}/hr avg`}
+            {r.comps > 0 && ` · ${r.comps} comp${r.comps !== 1 ? 's' : ''}`}
+          </p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export default function FinancePage({ gigs }) {
-  // Every figure on this page reflects live gigs only. Archived gigs stay
-  // in the database but are deliberately excluded from all reporting.
-  const live = useMemo(() => activeGigs(gigs), [gigs])
+  // Every figure on this page reflects live gigs only. Archived and canceled
+  // gigs stay in the database but are deliberately excluded from all reporting.
+  const live = useMemo(() => reportableGigs(gigs), [gigs])
 
   const stats = useMemo(() => {
     const total = live.reduce((s, g) => s + gigPaid(g), 0)
@@ -107,6 +149,10 @@ export default function FinancePage({ gigs }) {
     })
     return Object.values(map).sort((a, b) => b.paid - a.paid).slice(0, 5)
   }, [live])
+
+  const leadSources = useMemo(() => byLeadSource(gigs), [gigs])
+  const categories = useMemo(() => byEventCategory(gigs), [gigs])
+  const sales = useMemo(() => salesSummary(gigs), [gigs])
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null
@@ -236,6 +282,40 @@ export default function FinancePage({ gigs }) {
               </BarChart>
             </ResponsiveContainer>
           )}
+      </div>
+
+      {/* Sales orders — replaces the tab of the same name in PC records.xlsx */}
+      <div className="card" style={{ marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, marginBottom: 4 }}>
+          <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontStyle: 'italic', margin: 0 }}>Where Bookings Come From</h3>
+          <p className="muted" style={{ fontSize: 12 }}>
+            {sales.avgRate !== null && <>{currency(sales.avgRate)}/hr average · </>}
+            {+sales.hours.toFixed(2)} hours played
+            {sales.comps > 0 && <> · {sales.comps} comp{sales.comps !== 1 ? 's' : ''}</>}
+            {sales.canceled > 0 && <> · {sales.canceled} canceled</>}
+          </p>
+        </div>
+
+        {/* A channel ranking is only as good as its coverage. Say so plainly
+            rather than letting a table built on half the bookings look
+            like the whole picture. */}
+        {sales.coverage < 1 && (
+          <p className="muted" style={{ fontSize: 12, marginBottom: 14 }}>
+            {sales.recorded} of {sales.gigs} gigs have a source recorded
+            ({Math.round(sales.coverage * 100)}%). The rest are grouped under “{UNRECORDED}”.
+          </p>
+        )}
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28 }}>
+          <div>
+            <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 6 }}>By source</p>
+            <BreakdownTable rows={leadSources} emptyText="No sources recorded yet." />
+          </div>
+          <div>
+            <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 6 }}>By event type</p>
+            <BreakdownTable rows={categories} emptyText="No event types recorded yet." />
+          </div>
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
