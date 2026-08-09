@@ -11,32 +11,45 @@ export default function SignPage() {
   const [signed, setSigned] = useState(false)
   const [error, setError] = useState('')
 
-  // Comes from /sign/:gigId, or from a legacy ?gig= link.
-  const gigId = surface.gigId
+  // The contract_token from /sign/:token, or from a legacy ?gig= link.
+  const token = surface.token
 
+  // Clients are anonymous, and row level security hides `gigs` from them —
+  // reading the table directly is what made every contract link show
+  // "Contract not found". These two RPCs are the only anonymous access:
+  // one returns the contract fields, the other records a signature once.
   useEffect(() => {
-    if (!gigId) { setError('Invalid link.'); setLoading(false); return }
-    supabase.from('gigs').select('*').eq('id', gigId).single()
+    if (!token) { setError('Invalid link.'); setLoading(false); return }
+    supabase.rpc('get_contract', { p_token: token })
       .then(({ data, error }) => {
-        if (error || !data) { setError('Contract not found.') }
-        else {
+        if (error) {
+          console.error('get_contract failed', error)
+          setError('We could not load this contract. Please contact Paige at hello@paigecamryn.com.')
+        } else if (!data) {
+          setError('Contract not found. The link may have expired — please contact Paige for a new one.')
+        } else {
           setGig(data)
           if (data.signed_at) setSigned(true)
         }
         setLoading(false)
       })
-  }, [gigId])
+  }, [token])
 
   async function sign() {
     if (!name.trim()) { alert('Please enter your full name to sign.'); return }
     setSigning(true)
-    const { error } = await supabase.from('gigs').update({
-      signed_by: name.trim(),
-      signed_at: new Date().toISOString(),
-      contract_status: 'signed'
-    }).eq('id', gigId)
+    const { data, error } = await supabase.rpc('sign_contract', {
+      p_token: token,
+      p_name: name.trim()
+    })
     setSigning(false)
     if (error) { alert(error.message); return }
+    if (!data?.ok) {
+      alert(data?.reason === 'not_found_or_already_signed'
+        ? 'This contract has already been signed.'
+        : 'Please enter your full name to sign.')
+      return
+    }
 
     // Send email notification
     try {

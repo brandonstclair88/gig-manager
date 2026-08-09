@@ -50,7 +50,9 @@ export default async function handler(req, res) {
     if (!data.client_email) return res.status(400).json({ error: 'No client email' })
     to = [data.client_email]
     subject = `Your Performance Agreement — ${data.title}`
-    const signingLink = `${String(data.origin || '').replace(/\/$/, '')}/sign/${encodeURIComponent(data.id)}`
+    // Keyed on contract_token, not the gig id — the emailed link is the one
+    // thing a client ever receives, and a token can be rotated to revoke it.
+    const signingLink = `${String(data.origin || '').replace(/\/$/, '')}/sign/${encodeURIComponent(data.contract_token || '')}`
     html = `
       <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; color: #1a1714;">
         <h1 style="font-size: 28px; font-weight: 400; font-style: italic; color: #c9a097; margin-bottom: 8px;">Performance Agreement</h1>

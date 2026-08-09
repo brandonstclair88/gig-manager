@@ -149,7 +149,11 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
   }
 
   function copySigningLink() {
-    const url = signingUrl(gig.id)
+    if (!gig.contract_token) {
+      alert('This gig has no contract link yet. Run the contract-signing migration in Supabase, then reload.')
+      return
+    }
+    const url = signingUrl(gig.contract_token)
     navigator.clipboard.writeText(url)
     alert('Signing link copied! Send this to your client:\n\n' + url)
   }

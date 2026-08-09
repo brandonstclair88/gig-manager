@@ -2,7 +2,7 @@
  * Which of the three surfaces this page load is.
  *
  *   public  paigecamryn.com/                → marketing site
- *   sign    paigecamryn.com/sign/:gigId     → client contract signing
+ *   sign    paigecamryn.com/sign/:token     → client contract signing
  *   admin   app.paigecamryn.com/  or  /admin → the dashboard
  *
  * Resolved once at module load: the answer cannot change without a navigation,
@@ -26,12 +26,12 @@ function resolve(loc = window.location) {
   // Legacy query-string entry points. Nothing should generate these any more,
   // but a bookmark or an already-sent email might still use them.
   const legacyGig = params.get('gig')
-  if (legacyGig) return { kind: 'sign', gigId: legacyGig, legacy: true }
+  if (legacyGig) return { kind: 'sign', token: legacyGig, legacy: true }
   if (params.has('site')) return { kind: 'public', legacy: true }
 
   if (path.startsWith(SIGN_PATH)) {
-    const gigId = decodeURIComponent(path.slice(SIGN_PATH.length).split('/')[0] || '')
-    return { kind: 'sign', gigId: gigId || null, legacy: false }
+    const token = decodeURIComponent(path.slice(SIGN_PATH.length).split('/')[0] || '')
+    return { kind: 'sign', token: token || null, legacy: false }
   }
 
   // An explicit /admin path works on any host, which is what makes preview
@@ -63,9 +63,15 @@ export function publicSiteUrl() {
   return window.location.origin
 }
 
-/** Client-facing signing link. Always on the public host, never on app.* */
-export function signingUrl(gigId) {
-  return `${publicSiteUrl()}/sign/${encodeURIComponent(gigId)}`
+/**
+ * Client-facing signing link. Always on the public host, never on app.*
+ *
+ * Keyed on the gig's contract_token rather than its id: the id shows up in
+ * dashboard URLs and exports, whereas a token is only ever shared with the
+ * one client, and can be rotated to revoke a single link.
+ */
+export function signingUrl(contractToken) {
+  return `${publicSiteUrl()}/sign/${encodeURIComponent(contractToken)}`
 }
 
 /**
@@ -74,6 +80,6 @@ export function signingUrl(gigId) {
  */
 export function normaliseLegacyUrl() {
   if (!surface.legacy) return
-  const next = surface.kind === 'sign' ? `/sign/${encodeURIComponent(surface.gigId)}` : '/'
+  const next = surface.kind === 'sign' ? `/sign/${encodeURIComponent(surface.token)}` : '/'
   window.history.replaceState(null, '', next)
 }
