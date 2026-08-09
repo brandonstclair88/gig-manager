@@ -36,7 +36,8 @@ const IS_PUBLIC_SITE = window.location.search.includes('site=')
 export default function App() {
   const [user, setUser] = useState(null)
   const [authLoading, setAuthLoading] = useState(true)
-  const { route, navigate, replace } = useHashRoute(PAGE_IDS)
+  // Disabled on the public/sign pages so their URLs stay clean.
+  const { route, navigate, replace } = useHashRoute(PAGE_IDS, !IS_SIGN_PAGE && !IS_PUBLIC_SITE)
   const page = route.page
   const [gigs, setGigs] = useState([])
   const [clients, setClients] = useState([])

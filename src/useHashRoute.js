@@ -28,23 +28,32 @@ export function buildHash(page, id) {
     : `#/${encodeURIComponent(page)}`
 }
 
-export function useHashRoute(validPages) {
+/**
+ * @param validPages routes that are allowed; anything else normalises to the dashboard
+ * @param enabled    set false on public pages (?site=true, ?gig=…) so the router
+ *                   leaves their URLs alone. Without this the normalisation below
+ *                   appends "#/dashboard" to every public link — including the
+ *                   contract signing URL that gets sent to clients.
+ */
+export function useHashRoute(validPages, enabled = true) {
   const [route, setRoute] = useState(() => parseHash())
 
   useEffect(() => {
+    if (!enabled) return
     const onChange = () => setRoute(parseHash())
     window.addEventListener('hashchange', onChange)
     return () => window.removeEventListener('hashchange', onChange)
-  }, [])
+  }, [enabled])
 
   // An unknown or empty hash normalises to the dashboard, replacing the entry
   // so Back doesn't bounce the user through a URL that was never valid.
   useEffect(() => {
+    if (!enabled) return
     if (!window.location.hash || (validPages && !validPages.includes(route.page))) {
       window.history.replaceState(null, '', buildHash(DEFAULT_PAGE))
       setRoute({ page: DEFAULT_PAGE, id: null })
     }
-  }, [route.page, validPages])
+  }, [route.page, validPages, enabled])
 
   /** Push a new entry — use for navigation the user should be able to undo. */
   const navigate = useCallback((page, id) => {
