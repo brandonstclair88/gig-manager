@@ -6,7 +6,7 @@ import GigModal from '../components/GigModal'
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
 
-export default function CalendarPage({ gigs, userId, onRefresh }) {
+export default function CalendarPage({ gigs, userId, onRefresh, onOpenGig }) {
   const today = new Date()
   const [year, setYear] = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth())
@@ -52,6 +52,11 @@ export default function CalendarPage({ gigs, userId, onRefresh }) {
     })
     return map
   }, [gigs])
+
+  const monthGigs = useMemo(() => {
+    const prefix = `${year}-${String(month + 1).padStart(2, '0')}`
+    return reportableGigs(gigs).filter(g => g.date?.startsWith(prefix)).sort((a, b) => (a.date + (a.time || '')).localeCompare(b.date + (b.time || '')))
+  }, [gigs, year, month])
 
   function gigsForDate(date) {
     return gigsByDate.get(date) || []
@@ -109,6 +114,7 @@ export default function CalendarPage({ gigs, userId, onRefresh }) {
                     title={`${g.title} — ${g.client}`}
                     onMouseEnter={() => setHoverGig(g)}
                     onMouseLeave={() => setHoverGig(null)}
+                    onClick={e => { if (onOpenGig) { e.stopPropagation(); onOpenGig(g.id) } }}
                   >
                     {g.title}
                   </div>
@@ -117,6 +123,25 @@ export default function CalendarPage({ gigs, userId, onRefresh }) {
             )
           })}
         </div>
+      </div>
+
+      {/* Phones: cells are too small for titles, so list the month's gigs. */}
+      <div className="cal-agenda">
+        <h3>{MONTHS[month]} gigs</h3>
+        {monthGigs.length === 0
+          ? <p className="muted">No gigs this month.</p>
+          : monthGigs.map(g => (
+            <button key={g.id} className="cal-agenda-item" onClick={() => onOpenGig && onOpenGig(g.id)}>
+              <div className="cal-agenda-date">
+                <span>{new Date(g.date + 'T00:00').toLocaleDateString('en-US', { weekday: 'short' })}</span>
+                <strong>{Number(g.date.slice(8, 10))}</strong>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 600, fontSize: 14 }}>{g.title}</div>
+                <div className="muted" style={{ fontSize: 12 }}>{[g.time && fmtTime(g.time), g.venue].filter(Boolean).join(' · ')}</div>
+              </div>
+            </button>
+          ))}
       </div>
 
       {hoverGig && (

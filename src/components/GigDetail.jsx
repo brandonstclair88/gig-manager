@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Edit2, Trash2, CheckCircle2, FileText, Download, Link, Plus, X, Send, PenLine, CreditCard, Archive, Calendar } from 'lucide-react'
+import { Edit2, Trash2, CheckCircle2, FileText, Download, Link, Plus, X, Send, PenLine, CreditCard, Archive, Calendar, ArrowLeft } from 'lucide-react'
 import { supabase } from '../supabase'
 import {
   currency, fmtDate, fmtTime, invoiceBadge, contractText, downloadPDFInvoice,
@@ -11,7 +11,7 @@ import { apiFetch } from '../apiFetch'
 
 const HOME_BASE = 'Thousand Oaks, CA'
 
-export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh }) {
+export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh, onClose }) {
   const [tab, setTab] = useState('overview')
   const [expense, setExpense] = useState({ description: '', amount: '' })
   const [expenses, setExpenses] = useState(gig.expenses || [])
@@ -167,7 +167,12 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
   }
 
   return (
-    <div className="card" style={{ marginTop: 0 }}>
+    <div className="card gig-detail-card" style={{ marginTop: 0 }}>
+      {onClose && (
+        <button className="btn btn-ghost btn-sm gig-detail-back" onClick={onClose}>
+          <ArrowLeft size={14} /> All gigs
+        </button>
+      )}
       <div className="detail-header">
         <div>
           <h2>{gig.title}</h2>
@@ -179,7 +184,6 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
           <span className={`badge ${invoiceBadge(gig.invoice_status)}`}>{gig.invoice_status || 'draft'}</span>
           {gig.contract_status === 'signed' && <span className="badge badge-green">✍️ Signed</span>}
           <button className="btn btn-ghost btn-sm" onClick={onEdit}><Edit2 size={14} /> Edit</button>
-          <button className="btn btn-danger btn-sm" onClick={onDelete}><Trash2 size={14} /> Delete</button>
           <button className="btn btn-ghost btn-sm" onClick={onArchive}>
             <Archive size={14} /> {gig.archived ? 'Unarchive' : 'Archive'}
           </button>
@@ -493,6 +497,12 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
           )}
         </div>
       )}
+      {/* Kept away from Edit so it isn't tapped by accident. */}
+      <div style={{ marginTop: 24, paddingTop: 14, borderTop: '1px solid var(--paper3)', textAlign: 'right' }}>
+        <button onClick={onDelete} style={{ background: 'none', border: 'none', color: 'var(--red)', fontSize: 12, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: 'Jost, sans-serif' }}>
+          <Trash2 size={13} /> Delete gig
+        </button>
+      </div>
     </div>
   )
 }

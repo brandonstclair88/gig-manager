@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { LayoutDashboard, Music, CalendarDays, DollarSign, Users, LogOut, MessageSquare, BookOpen, Star, Moon, Sun } from 'lucide-react'
+import { LayoutDashboard, Music, CalendarDays, DollarSign, Users, LogOut, MessageSquare, BookOpen, Star, Moon, Sun, MoreHorizontal, X } from 'lucide-react'
 import { supabase } from './supabase'
 import { useHashRoute } from './useHashRoute'
 import { IS_SIGN, IS_PUBLIC, normaliseLegacyUrl } from './surface'
@@ -28,6 +28,10 @@ const NAV = [
 
 const PAGE_IDS = NAV.map(n => n.id)
 
+// Phones get a bottom tab bar with the four most-used pages; the rest live
+// behind "More".
+const PRIMARY_TABS = ['dashboard', 'inquiries', 'gigs', 'calendar']
+
 // Which surface this page load is (public site / contract signing / dashboard)
 // is decided once in surface.js, from the hostname and path.
 const IS_SIGN_PAGE = IS_SIGN
@@ -47,6 +51,7 @@ export default function App() {
   const [repertoire, setRepertoire] = useState([])
   const [inquiries, setInquiries] = useState([])
   const [pendingTestimonials, setPendingTestimonials] = useState(0)
+  const [moreOpen, setMoreOpen] = useState(false)
   // Remember the theme choice; it previously reset to light on every reload.
   const [darkMode, setDarkMode] = useState(() => {
     try { return localStorage.getItem('pcm-theme') === 'dark' } catch { return false }
@@ -188,6 +193,54 @@ export default function App() {
         </button>
       </nav>
 
+      {/* Phone navigation: bottom tab bar + "More" sheet (sidebar is hidden) */}
+      <nav className="mobile-tabbar" aria-label="Main">
+        {NAV.filter(n => PRIMARY_TABS.includes(n.id)).map(({ id, short, icon: Icon }) => (
+          <a key={id} href={`#/${id}`}
+            className={`mobile-tab${page === id && !moreOpen ? ' active' : ''}`}
+            aria-current={page === id ? 'page' : undefined}
+            onClick={e => { e.preventDefault(); setMoreOpen(false); navigate(id) }}>
+            <Icon size={20} />
+            <span>{short}</span>
+          </a>
+        ))}
+        <button className={`mobile-tab${moreOpen || !PRIMARY_TABS.includes(page) ? ' active' : ''}`}
+          onClick={() => setMoreOpen(o => !o)} aria-expanded={moreOpen}>
+          <span style={{ position: 'relative', display: 'inline-flex' }}>
+            <MoreHorizontal size={20} />
+            {pendingTestimonials > 0 && <span className="mobile-tab-dot" />}
+          </span>
+          <span>More</span>
+        </button>
+      </nav>
+      {moreOpen && (
+        <>
+          <div className="mobile-sheet-backdrop" onClick={() => setMoreOpen(false)} />
+          <div className="mobile-sheet" role="dialog" aria-label="More">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <div className="sidebar-logo" style={{ margin: 0 }}>Paige Camryn Music</div>
+              <button className="btn btn-ghost btn-sm" onClick={() => setMoreOpen(false)} aria-label="Close"><X size={18} /></button>
+            </div>
+            {NAV.filter(n => !PRIMARY_TABS.includes(n.id)).map(({ id, label, icon: Icon, badge }) => (
+              <a key={id} href={`#/${id}`} className={`nav-btn${page === id ? ' active' : ''}`}
+                style={{ textDecoration: 'none', padding: '14px 14px' }}
+                onClick={e => { e.preventDefault(); setMoreOpen(false); navigate(id) }}>
+                <Icon size={18} />
+                <span style={{ flex: 1 }}>{label}</span>
+                {badge && pendingTestimonials > 0 && <span className="mobile-sheet-badge">{pendingTestimonials}</span>}
+              </a>
+            ))}
+            <div style={{ borderTop: '1px solid var(--paper3)', margin: '10px 0', paddingTop: 10, fontSize: 12, color: 'var(--ink3)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button className="btn btn-ghost" style={{ flex: 1 }} onClick={() => setDarkMode(d => !d)}>
+                {darkMode ? <Sun size={14} /> : <Moon size={14} />} {darkMode ? 'Light Mode' : 'Dark Mode'}
+              </button>
+              <button className="btn btn-ghost" style={{ flex: 1 }} onClick={signOut}><LogOut size={14} /> Sign Out</button>
+            </div>
+          </div>
+        </>
+      )}
+
       <main className="page">
         {page === 'dashboard'  && <DashboardPage gigs={gigs} onNavigate={navigate} />}
         {page === 'inquiries'  && <InquiriesPage inquiries={inquiries} userId={user.id} onRefresh={refresh} />}
@@ -200,7 +253,7 @@ export default function App() {
             onSelect={id => replace('gigs', id)}
           />
         )}
-        {page === 'calendar'   && <CalendarPage gigs={gigs} userId={user.id} onRefresh={refresh} />}
+        {page === 'calendar'   && <CalendarPage gigs={gigs} userId={user.id} onRefresh={refresh} onOpenGig={id => navigate('gigs', id)} />}
         {page === 'finance'    && <FinancePage gigs={gigs} />}
         {page === 'clients'    && <ClientsPage clients={clients} gigs={gigs} userId={user.id} onRefresh={refresh} />}
         {page === 'repertoire' && <RepertoirePage repertoire={repertoire} userId={user.id} onRefresh={refresh} />}

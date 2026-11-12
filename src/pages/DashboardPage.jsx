@@ -141,7 +141,7 @@ export default function DashboardPage({ gigs, onNavigate }) {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+      <div className="two-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         <div className="card">
           <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8, fontStyle: 'italic' }}>
             <CalendarDays size={18} /> Upcoming Gigs
