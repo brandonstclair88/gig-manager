@@ -3,6 +3,7 @@ import { Plus, X, Edit2, ChevronRight, Music, FileText } from 'lucide-react'
 import { supabase } from '../supabase'
 import { currency, fmtDate } from '../utils'
 import { LEAD_SOURCES } from '../salesOrder'
+import { apiFetch } from '../apiFetch'
 
 const STAGES = ['enquired', 'quoted', 'deposit received', 'confirmed', 'completed', 'lost']
 
@@ -127,7 +128,7 @@ function QuoteModal({ inquiry, onClose }) {
     }).eq('id', inquiry.id)
 
     // Send email
-    const res = await fetch('/api/notify', {
+    const res = await apiFetch('/api/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

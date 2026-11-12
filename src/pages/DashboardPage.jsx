@@ -4,6 +4,7 @@ import {
   currency, fmtDate, fmtTime, invoiceBadge,
   reportableGigs, gigPaid, gigOutstanding, gigExpenses,
 } from '../utils'
+import { apiFetch } from '../apiFetch'
 
 export default function DashboardPage({ gigs, onNavigate }) {
   const [sendingDigest, setSendingDigest] = useState(false)
@@ -60,7 +61,7 @@ export default function DashboardPage({ gigs, onNavigate }) {
         days_until: Math.ceil((new Date(g.date + 'T00:00:00') - today) / (1000 * 60 * 60 * 24))
       }))
 
-    const res = await fetch('/api/notify', {
+    const res = await apiFetch('/api/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

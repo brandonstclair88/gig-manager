@@ -1,11 +1,16 @@
 import Stripe from 'stripe'
+import { requireOwner } from './_lib/auth.js'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
 
+  if (!(await requireOwner(req, res))) return
+
   const { amount, gigId, gigTitle, client, description, passFeeToCient } = req.body
+
+  const publicOrigin = String(req.headers.origin || '').replace('://app.', '://')
 
   try {
     // Calculate amount in cents
@@ -32,8 +37,10 @@ export default async function handler(req, res) {
         },
       ],
       mode: 'payment',
-      success_url: `${req.headers.origin}?payment=success&gig=${gigId}`,
-      cancel_url: `${req.headers.origin}?payment=cancelled&gig=${gigId}`,
+      // Clients land on the public site, not the dashboard host. (The old
+      // ?gig= parameter is read as a contract-signing link and showed an error.)
+      success_url: `${publicOrigin}/?payment=success`,
+      cancel_url: `${publicOrigin}/?payment=cancelled`,
       customer_email: req.body.client_email || undefined,
       metadata: {
         gig_id: gigId,

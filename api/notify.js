@@ -1,13 +1,36 @@
+import { requireOwner } from './_lib/auth.js'
+
+// Anyone can trigger these: they only ever email Paige herself.
+const PUBLIC_TYPES = new Set(['inquiry', 'signed'])
+const OWNER_EMAIL = process.env.OWNER_EMAIL || 'paigestclair19@gmail.com'
+const FROM = process.env.RESEND_FROM || 'Paige Camryn Music <onboarding@resend.dev>'
+
+// Every value interpolated into the HTML below comes from a form or the
+// database, so escape it — otherwise a visitor can inject links or markup
+// into an email sent under Paige's name.
+function esc(v) {
+  return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+}
+function escapeDeep(v) {
+  if (typeof v === 'string') return esc(v)
+  if (Array.isArray(v)) return v.map(escapeDeep)
+  if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, escapeDeep(x)]))
+  return v
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
 
-  const { type, data } = req.body
+  const { type } = req.body || {}
+  if (!PUBLIC_TYPES.has(type) && !(await requireOwner(req, res))) return
+  const data = escapeDeep((req.body && req.body.data) || {})
   const apiKey = process.env.RESEND_API_KEY
 
   let subject, html, to
 
   if (type === 'inquiry') {
-    to = ['paigestclair19@gmail.com']
+    to = [OWNER_EMAIL]
     subject = `New Enquiry from ${data.name}`
     html = `
       <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; color: #1a1714;">
@@ -28,7 +51,7 @@ export default async function handler(req, res) {
       </div>
     `
   } else if (type === 'signed') {
-    to = ['paigestclair19@gmail.com']
+    to = [OWNER_EMAIL]
     subject = `Contract Signed — ${data.title}`
     html = `
       <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; color: #1a1714;">
@@ -101,7 +124,7 @@ export default async function handler(req, res) {
       </div>
     `
   } else if (type === 'weekly_digest') {
-    to = ['paigestclair19@gmail.com']
+    to = [OWNER_EMAIL]
     subject = `🎵 Weekly Practice Digest — ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`
     
     const gigs = data.gigs || []
@@ -172,7 +195,8 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: 'Paige Camryn Music <onboarding@resend.dev>',
+        from: FROM,
+        reply_to: 'hello@paigecamryn.com',
         to,
         subject,
         html

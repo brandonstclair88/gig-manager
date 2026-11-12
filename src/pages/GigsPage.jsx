@@ -12,6 +12,7 @@ function hourlyRate(g) {
 }
 import GigModal from '../components/GigModal'
 import GigDetail from '../components/GigDetail'
+import { apiFetch } from '../apiFetch'
 
 export default function GigsPage({ gigs, userId, onRefresh, selectedId = null, onSelect }) {
   const [showModal, setShowModal] = useState(false)
@@ -70,7 +71,7 @@ export default function GigsPage({ gigs, userId, onRefresh, selectedId = null, o
     const gig = gigs.find(g => g.id === id)
     if (gig?.calendar_event_id) {
       try {
-        await fetch('/api/calendar', {
+        await apiFetch('/api/calendar', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'delete', gig })
