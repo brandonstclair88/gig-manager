@@ -3,6 +3,7 @@ import { X } from 'lucide-react'
 import { supabase } from '../supabase'
 import { validateGigMoney, currency } from '../utils'
 import { LEAD_SOURCES, EVENT_CATEGORIES, PERFORMANCE_TYPES } from '../salesOrder'
+import { apiFetch } from '../apiFetch'
 
 const EMPTY = {
   title: '', client: '', client_email: '', venue: '', venue_address: '',
@@ -153,7 +154,7 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
     try {
       if (gig?.id && gig?.calendar_event_id) {
         // Update existing calendar event
-        await fetch('/api/calendar', {
+        await apiFetch('/api/calendar', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
@@ -163,7 +164,7 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
         })
       } else if (gig?.id) {
         // Gig exists but no calendar event yet - create one
-        const calRes = await fetch('/api/calendar', {
+        const calRes = await apiFetch('/api/calendar', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'create', gig: { ...payload, id: gig.id } })
@@ -174,7 +175,7 @@ export default function GigModal({ gig, userId, onClose, onSaved }) {
         }
       } else if (savedId) {
         // Brand new gig - create calendar event for the row we just inserted
-        const calRes = await fetch('/api/calendar', {
+        const calRes = await apiFetch('/api/calendar', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'create', gig: { ...payload, id: savedId } })

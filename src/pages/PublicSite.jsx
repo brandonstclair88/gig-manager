@@ -11,14 +11,14 @@ function Nav({ page, setPage }) {
       <div style={{ position: 'relative', minWidth: 0, flex: '1 1 auto' }}>
           <div className="public-nav-tabs" style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
             {['home', 'music', 'events', 'weddings', 'repertoire', 'contact'].map(p => (
-            <button key={p} onClick={() => setPage(p)} style={{
+            <a key={p} href={pathFor(p)} onClick={e => { e.preventDefault(); setPage(p) }} style={{ textDecoration: 'none',
               padding: '8px 18px', border: 'none', background: 'transparent',
               fontFamily: 'Jost, sans-serif', fontSize: 12, fontWeight: 500,
               letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer',
               color: page === p ? '#c9a097' : '#9a9189',
               borderBottom: page === p ? '2px solid #c9a097' : '2px solid transparent',
               transition: 'all .15s'
-            }}>{p}</button>
+            }}>{p}</a>
           ))}
         </div>
         <div className="public-nav-fade" aria-hidden="true" />
@@ -285,6 +285,16 @@ function TestimonialForm() {
     }])
     setSubmitting(false)
     if (error) { alert(error.message); return }
+    // Email Paige. Best-effort: the inquiry is already saved either way.
+    fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'inquiry', data: {
+        name: form.name, email: form.email, phone: form.phone,
+        event_type: form.event_type, event_date: form.event_date,
+        venue: form.venue, notes: form.notes
+      } })
+    }).catch(() => {})
     setSubmitted(true)
   }
 
@@ -771,6 +781,16 @@ function ContactPage({ preselectedSongs, setPreselectedSongs, selectedPackage, s
     }])
     setSubmitting(false)
     if (error) { alert(error.message); return }
+    // Email Paige. Best-effort: the inquiry is already saved either way.
+    fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'inquiry', data: {
+        name: form.name, email: form.email, phone: form.phone,
+        event_type: form.event_type, event_date: form.event_date,
+        venue: form.venue, notes: form.notes
+      } })
+    }).catch(() => {})
     setSubmitted(true)
     setPreselectedSongs([])
   }
@@ -870,8 +890,49 @@ function ContactPage({ preselectedSongs, setPreselectedSongs, selectedPackage, s
   )
 }
 
+// Each page gets its own URL (/weddings, /contact…) so Back works, pages can
+// be linked and shared, and search engines index more than the home page.
+const PAGES = ['home', 'music', 'events', 'weddings', 'repertoire', 'contact']
+const META = {
+  home:       ['Paige Camryn — Luxury Event Harpist | Southern California', 'Live harp music for weddings, ceremonies, and private events across Southern California. Over a decade of performances, with a custom song list tailored to your event.'],
+  music:      ['Music — Paige Camryn, Harpist', 'Watch and listen to Paige Camryn perform live harp music.'],
+  events:     ['Events — Paige Camryn, Harpist', 'Live harp for corporate events, private parties, and celebrations across Southern California.'],
+  weddings:   ['Wedding Harpist — Paige Camryn | Southern California', 'Wedding ceremony and cocktail-hour harp packages, with a custom song list for your day.'],
+  repertoire: ['Repertoire — Paige Camryn, Harpist', 'Browse Paige Camryn\'s harp repertoire — classical, wedding, pop, film, Celtic and more.'],
+  contact:    ['Book Paige — Paige Camryn, Harpist', 'Check availability and request a quote for live harp at your event.'],
+}
+const pathFor = p => (p === 'home' ? '/' : `/${p}`)
+function pageFromPath(path = window.location.pathname) {
+  const p = path.replace(/^\/+|\/+$/g, '').toLowerCase()
+  return PAGES.includes(p) ? p : 'home'
+}
+function applyMeta(page) {
+  const [title, desc] = META[page] || META.home
+  document.title = title
+  document.querySelector('meta[name="description"]')?.setAttribute('content', desc)
+  let canon = document.querySelector('link[rel="canonical"]')
+  if (!canon) { canon = document.createElement('link'); canon.rel = 'canonical'; document.head.appendChild(canon) }
+  canon.href = window.location.origin + pathFor(page)
+}
+
 export default function PublicSite() {
-  const [page, setPage] = useState('home')
+  const [page, setPageState] = useState(() => pageFromPath())
+
+  useEffect(() => {
+    const onPop = () => setPageState(pageFromPath())
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+
+  useEffect(() => { applyMeta(page) }, [page])
+
+  const setPage = p => {
+    const path = pathFor(p)
+    if (window.location.pathname !== path) window.history.pushState(null, '', path)
+    setPageState(p)
+    window.scrollTo(0, 0)
+  }
+
   const [preselectedSongs, setPreselectedSongs] = useState([])
   const [selectedPackage, setSelectedPackage] = useState(null)
 

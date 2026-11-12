@@ -7,6 +7,7 @@ import {
 } from '../utils'
 import { leadSource, eventCategory, performanceType, gigHours, gigHourlyRate, isCanceled } from '../salesOrder'
 import { signingUrl, publicSiteUrl } from '../surface'
+import { apiFetch } from '../apiFetch'
 
 const HOME_BASE = 'Thousand Oaks, CA'
 
@@ -59,7 +60,7 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
       alert('No client email on this gig. Edit the gig to add one.')
       return
     }
-    const res = await fetch('/api/notify', {
+    const res = await apiFetch('/api/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -83,7 +84,7 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
     setSyncingCalendar(true)
     try {
       const action = gig.calendar_event_id ? 'update' : 'create'
-      const res = await fetch('/api/calendar', {
+      const res = await apiFetch('/api/calendar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action, gig })
@@ -113,7 +114,7 @@ export default function GigDetail({ gig, onEdit, onDelete, onArchive, onRefresh 
   async function sendPaymentLink() {
     if (!paymentAmount) { alert('Please enter an amount.'); return }
     setSendingPayment(true)
-    const res = await fetch('/api/payment', {
+    const res = await apiFetch('/api/payment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
