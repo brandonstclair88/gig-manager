@@ -201,7 +201,7 @@ export default function FinancePage({ gigs }) {
         </div>
       </div>
 
-      <div className="stats">
+      <div className="stats stats-6">
         <div className="stat-card green">
           <div className="label">Collected Income</div>
           <div className="value">{currency(stats.total)}</div>
@@ -306,7 +306,7 @@ export default function FinancePage({ gigs }) {
           </p>
         )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28 }}>
+        <div className="two-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28 }}>
           <div>
             <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--ink3)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 6 }}>By source</p>
             <BreakdownTable rows={leadSources} emptyText="No sources recorded yet." />
@@ -318,7 +318,7 @@ export default function FinancePage({ gigs }) {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+      <div className="two-col" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         <div className="card">
           <h3 style={{ fontFamily: 'Playfair Display, serif', fontSize: 20, marginBottom: 16 }}>Top Clients</h3>
           {topClients.length === 0

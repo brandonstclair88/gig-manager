@@ -107,17 +107,17 @@ const SongRow = React.memo(function SongRow({ song, onEdit, onDelete }) {
   const cats = song.categories?.length ? song.categories : (song.category ? [song.category] : [])
   return (
     <tr>
-      <td><strong>{song.title}</strong></td>
-      <td>{song.composer || '—'}</td>
-      <td>
+      <td className="song-title"><strong>{song.title}</strong></td>
+      <td className="song-composer">{song.composer || '—'}</td>
+      <td className="song-cats">
         <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
           {cats.map(c => (
             <span key={c} className="badge badge-gold" style={{ fontSize: 10 }}>{c}</span>
           ))}
         </div>
       </td>
-      <td className="muted">{song.notes || '—'}</td>
-      <td>
+      <td className={`muted song-notes${song.notes ? '' : ' empty'}`}>{song.notes || '—'}</td>
+      <td className="song-actions">
         <div style={{ display: 'flex', gap: 6 }}>
           <button className="btn btn-ghost btn-icon btn-sm" aria-label={`Edit ${song.title}`} onClick={() => onEdit(song)}>
             <Edit2 size={13} />
@@ -237,7 +237,7 @@ export default function RepertoirePage({ repertoire, userId, onRefresh }) {
             </h3>
           )}
           <div className="table-wrap">
-            <table>
+            <table className="song-table">
               <thead>
                 <tr>
                   <th>Title</th>

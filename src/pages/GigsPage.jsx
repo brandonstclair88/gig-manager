@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react'
-import { Plus, Search } from 'lucide-react'
+import { Plus, Search, SlidersHorizontal } from 'lucide-react'
 import { supabase } from '../supabase'
 import { currency, fmtDate, invoiceBadge, gigOutstanding, gigOverpaid } from '../utils'
 import { LEAD_SOURCES, UNRECORDED, gigHourlyRate } from '../salesOrder'
@@ -20,6 +20,7 @@ export default function GigsPage({ gigs, userId, onRefresh, selectedId = null, o
   // Selection lives in the URL (#/gigs/:id) so a gig can be linked and Back works.
   const setSelectedId = onSelect || (() => {})
   const [search, setSearch] = useState('')
+  const [filtersOpen, setFiltersOpen] = useState(false)
   const [statusFilter, setStatusFilter] = useState('all')
   const [sourceFilter, setSourceFilter] = useState('all')
   const [sortBy, setSortBy] = useState('date')
@@ -57,6 +58,13 @@ export default function GigsPage({ gigs, userId, onRefresh, selectedId = null, o
         return 0
       })
   }, [gigs, search, statusFilter, sourceFilter, sortBy, archiveView])
+
+  const activeFilterCount = [statusFilter !== 'all', sourceFilter !== 'all', sortBy !== 'date', archiveView !== 'active'].filter(Boolean).length
+
+  // On phones the detail replaces the list, so start it at the top.
+  useEffect(() => {
+    if (selectedId && window.matchMedia('(max-width: 768px)').matches) window.scrollTo(0, 0)
+  }, [selectedId])
 
   const archivedCount = useMemo(() => gigs.filter(g => g.archived).length, [gigs])
 
@@ -98,14 +106,14 @@ export default function GigsPage({ gigs, userId, onRefresh, selectedId = null, o
   function openEdit(g) { setEditingGig(g); setShowModal(true) }
 
   return (
-    <div>
+    <div className={selectedGig ? 'gigs-page has-selection' : 'gigs-page'}>
       <div className="page-header">
         <h1>Gigs</h1>
         <button className="btn btn-primary" onClick={openAdd}><Plus size={16} /> Add Gig</button>
       </div>
 
-      <div className="filter-bar">
-        <div style={{ position: 'relative', flex: 2, minWidth: 180 }}>
+      <div className={`filter-bar${filtersOpen ? ' filters-open' : ''}`}>
+        <div className="filter-search-row" style={{ position: 'relative', flex: 2, minWidth: 180 }}>
           <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--ink3)' }} />
           <input
             placeholder="Search gigs, clients, venues…"
@@ -113,6 +121,11 @@ export default function GigsPage({ gigs, userId, onRefresh, selectedId = null, o
             onChange={e => setSearch(e.target.value)}
             style={{ paddingLeft: 36 }}
           />
+          {/* Phones: the dropdowns hide behind this button */}
+          <button type="button" className="btn btn-ghost filter-toggle" onClick={() => setFiltersOpen(o => !o)} aria-expanded={filtersOpen}>
+            <SlidersHorizontal size={15} />
+            {activeFilterCount > 0 ? `Filters (${activeFilterCount})` : 'Filters'}
+          </button>
         </div>
         <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ flex: 1, minWidth: 130 }}>
           <option value="all">All statuses</option>
@@ -144,8 +157,8 @@ export default function GigsPage({ gigs, userId, onRefresh, selectedId = null, o
         </select>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: selectedGig ? 'minmax(0,1fr) minmax(0,1.4fr)' : '1fr', gap: 16, alignItems: 'start', minWidth: 0 }}>
-        <div>
+      <div className="gigs-split" style={{ display: 'grid', gridTemplateColumns: selectedGig ? 'minmax(0,1fr) minmax(0,1.4fr)' : '1fr', gap: 16, alignItems: 'start', minWidth: 0 }}>
+        <div className="gigs-list">
           {filtered.length === 0 && (
             <div className="empty card">
               <p>No gigs found. Add your first gig!</p>
@@ -195,6 +208,7 @@ export default function GigsPage({ gigs, userId, onRefresh, selectedId = null, o
             onDelete={() => deleteGig(selectedGig.id)}
             onArchive={() => toggleArchive(selectedGig.id, selectedGig.archived)}
             onRefresh={onRefresh}
+            onClose={() => setSelectedId(null)}
           />
         )}
       </div>
