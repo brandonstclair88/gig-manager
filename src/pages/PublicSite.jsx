@@ -1,28 +1,72 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { ChevronDown, ChevronRight } from 'lucide-react'
+import { ChevronDown, ChevronRight, Menu, X } from 'lucide-react'
 import { supabase } from '../supabase'
 import { OWNER_USER_ID, hasOwner } from '../owner'
 
 const CATEGORIES = ['Classical', 'Wedding', 'Pop', 'Rock', 'Jazz', 'Celtic', 'Christmas', 'Hymns', 'Film & TV', 'Other']
 
 function Nav({ page, setPage }) {
+  const [open, setOpen] = useState(false)
+  const go = p => { setOpen(false); setPage(p) }
+
+  // Close the mobile menu on Escape.
+  useEffect(() => {
+    if (!open) return
+    const onKey = e => { if (e.key === 'Escape') setOpen(false) }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open])
+
+  const link = (p, mobile) => (
+    <a key={p} href={pathFor(p)} onClick={e => { e.preventDefault(); go(p) }}
+      aria-current={page === p ? 'page' : undefined}
+      className={mobile ? 'public-nav-item' : undefined}
+      style={mobile ? {
+        display: 'block', padding: '14px 5%', textDecoration: 'none',
+        fontFamily: 'Jost, sans-serif', fontSize: 13, fontWeight: 500,
+        letterSpacing: '.12em', textTransform: 'uppercase',
+        color: page === p ? '#c9a097' : '#5c544d',
+        background: page === p ? '#f5e6e2' : 'transparent',
+        borderTop: '1px solid #ede5dc'
+      } : {
+        textDecoration: 'none', padding: '8px 18px',
+        fontFamily: 'Jost, sans-serif', fontSize: 12, fontWeight: 500,
+        letterSpacing: '.1em', textTransform: 'uppercase',
+        color: page === p ? '#c9a097' : '#9a9189',
+        borderBottom: page === p ? '2px solid #c9a097' : '2px solid transparent',
+        transition: 'all .15s'
+      }}>{p}</a>
+  )
+
   return (
-    <nav style={{ background: '#f2ebe3', borderBottom: '1px solid #ede5dc', padding: '0 5%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 16 }}>
-      <div style={{ position: 'relative', minWidth: 0, flex: '1 1 auto' }}>
-          <div className="public-nav-tabs" style={{ display: 'flex', gap: 4, justifyContent: 'center' }}>
-            {['home', 'music', 'events', 'weddings', 'repertoire', 'contact'].map(p => (
-            <a key={p} href={pathFor(p)} onClick={e => { e.preventDefault(); setPage(p) }} style={{ textDecoration: 'none',
-              padding: '8px 18px', border: 'none', background: 'transparent',
-              fontFamily: 'Jost, sans-serif', fontSize: 12, fontWeight: 500,
-              letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer',
-              color: page === p ? '#c9a097' : '#9a9189',
-              borderBottom: page === p ? '2px solid #c9a097' : '2px solid transparent',
-              transition: 'all .15s'
-            }}>{p}</a>
-          ))}
+    <nav style={{ background: '#f2ebe3', borderBottom: '1px solid #ede5dc', position: 'relative', zIndex: 20 }}>
+      {/* Desktop: a row of tabs */}
+      <div className="public-nav-desktop" style={{ display: 'flex', gap: 4, justifyContent: 'center', padding: '0 5%' }}>
+        {PAGES.map(p => link(p, false))}
+      </div>
+
+      {/* Mobile: a Menu button that drops down the full list */}
+      <div className="public-nav-mobile">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 5%', position: 'relative', zIndex: 2, background: '#f2ebe3' }}>
+          <span style={{ fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', fontSize: 20, color: '#1a1714' }}>Paige Camryn</span>
+          <button onClick={() => setOpen(o => !o)} aria-expanded={open} aria-controls="public-nav-menu" style={{
+            display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px',
+            border: '1px solid #c9a097', borderRadius: 999, background: open ? '#c9a097' : 'transparent',
+            color: open ? '#fff' : '#c9a097', fontFamily: 'Jost, sans-serif', fontSize: 12, fontWeight: 500,
+            letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer'
+          }}>
+            {open ? <X size={16} /> : <Menu size={16} />} Menu
+          </button>
         </div>
-        <div className="public-nav-fade" aria-hidden="true" />
-        <ChevronRight className="public-nav-chevron" aria-hidden="true" size={14} strokeWidth={2} color="#c9a097" />
+        {open && (
+          <>
+            <div onClick={() => setOpen(false)} aria-hidden="true"
+              style={{ position: 'fixed', inset: 0, top: 0, background: 'rgba(26,23,20,.25)', zIndex: 1 }} />
+            <div id="public-nav-menu" style={{ position: 'absolute', zIndex: 2, left: 0, right: 0, top: '100%', background: '#fdfaf7', borderBottom: '1px solid #ede5dc', boxShadow: '0 12px 24px rgba(26,23,20,.08)' }}>
+              {PAGES.map(p => link(p, true))}
+            </div>
+          </>
+        )}
       </div>
     </nav>
   )

@@ -855,34 +855,11 @@ body[data-theme="dark"] div[style*="background: '#e2ede6'"] p {
 }
 
 /* ── Public site nav mobile scroll hint ── */
-.public-nav-fade, .public-nav-chevron { display: none; }
+.public-nav-mobile { display: none; }
 
 @media (max-width: 768px) {
-  .public-nav-tabs {
-    overflow-x: auto;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    flex-wrap: nowrap !important;
-    width: 100%;
-  }
-  .public-nav-tabs::-webkit-scrollbar { display: none; }
-
-  .public-nav-fade {
-    display: block;
-    position: absolute;
-    top: 0; right: 0; bottom: 0;
-    width: 32px;
-    background: linear-gradient(to right, transparent, #f2ebe3 75%);
-    pointer-events: none;
-  }
-  .public-nav-chevron {
-    display: block;
-    position: absolute;
-    top: 50%; right: 2px;
-    transform: translateY(-50%);
-    pointer-events: none;
-    animation: nav-chevron-nudge 1.8s ease-in-out infinite;
-  }
+  .public-nav-desktop { display: none !important; }
+  .public-nav-mobile { display: block; }
 }
 
 @keyframes nav-chevron-nudge {
