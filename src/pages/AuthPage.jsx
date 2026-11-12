@@ -1,24 +1,20 @@
 import React, { useState } from 'react'
 import { supabase } from '../supabase'
 
-export default function AuthPage() {
+// Sign-in only. This dashboard has a single owner, so there is no sign-up
+// form — new accounts should also be disabled in Supabase (Authentication →
+// Sign In / Providers → "Allow new users to sign up").
+export default function AuthPage({ notice }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [mode, setMode] = useState('login')
   const [loading, setLoading] = useState(false)
-  const [msg, setMsg] = useState('')
+  const [msg, setMsg] = useState(notice || '')
 
   async function handle() {
     setLoading(true)
     setMsg('')
-    if (mode === 'login') {
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
-      if (error) setMsg(error.message)
-    } else {
-      const { error } = await supabase.auth.signUp({ email, password })
-      if (error) setMsg(error.message)
-      else setMsg('Check your email to confirm your account.')
-    }
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) setMsg(error.message)
     setLoading(false)
   }
 
@@ -26,7 +22,7 @@ export default function AuthPage() {
     <div className="auth-wrap" style={{ width: "100%" }}>
       <div className="auth-card">
         <h1>Paige Camryn Music</h1>
-        <p>{mode === 'login' ? 'Sign in to your account' : 'Create a new account'}</p>
+        <p>Sign in to your account</p>
         <div className="field" style={{ marginBottom: 14 }}>
           <label>Email</label>
           <input type="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" />
@@ -34,20 +30,13 @@ export default function AuthPage() {
         <div className="field" style={{ marginBottom: 20 }}>
           <label>Password</label>
           <input type="password" value={password} onChange={e => setPassword(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handle()} />
+            autoComplete="current-password" onKeyDown={e => e.key === 'Enter' && handle()} />
         </div>
-        {msg && <p style={{ color: msg.startsWith('Check') ? 'green' : 'red', fontSize: 13, marginBottom: 14 }}>{msg}</p>}
-        <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginBottom: 12 }}
+        {msg && <p style={{ color: 'red', fontSize: 13, marginBottom: 14 }}>{msg}</p>}
+        <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }}
           onClick={handle} disabled={loading}>
-          {loading ? 'Please wait…' : mode === 'login' ? 'Sign In' : 'Create Account'}
+          {loading ? 'Please wait…' : 'Sign In'}
         </button>
-        <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--ink3)' }}>
-          {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
-          <button style={{ background: 'none', border: 'none', color: 'var(--gold)', fontWeight: 600, cursor: 'pointer', fontSize: 13 }}
-            onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setMsg('') }}>
-            {mode === 'login' ? 'Sign up' : 'Sign in'}
-          </button>
-        </p>
       </div>
     </div>
   )

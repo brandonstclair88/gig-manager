@@ -14,6 +14,7 @@ import SignPage from './pages/SignPage'
 import RepertoirePage from './pages/RepertoirePage'
 import InquiriesPage from './pages/InquiriesPage'
 import PublicSite from './pages/PublicSite'
+import { OWNER_USER_ID } from './owner'
 
 const NAV = [
   { id: 'dashboard',  label: 'Dashboard',  short: 'Home',    icon: LayoutDashboard },
@@ -77,13 +78,26 @@ export default function App() {
     tag.setAttribute('content', 'noindex, nofollow')
   }, [])
 
+  // Only the owner gets in. Anyone else who somehow has an account is
+  // signed straight back out.
+  const [authNotice, setAuthNotice] = useState('')
+  const acceptUser = useCallback(u => {
+    if (u && OWNER_USER_ID && u.id !== OWNER_USER_ID) {
+      supabase.auth.signOut()
+      setAuthNotice('This account does not have access.')
+      setUser(null)
+      return
+    }
+    setUser(u || null)
+  }, [])
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      setUser(data.session?.user || null)
+      acceptUser(data.session?.user)
       setAuthLoading(false)
     })
     const { data } = supabase.auth.onAuthStateChange((_e, session) => {
-      setUser(session?.user || null)
+      acceptUser(session?.user)
     })
     return () => data.subscription.unsubscribe()
   }, [])
@@ -141,7 +155,7 @@ export default function App() {
     </div>
   )
 
-  if (!user) return <AuthPage />
+  if (!user) return <AuthPage notice={authNotice} />
 
   return (
     <>
